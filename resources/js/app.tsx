@@ -29,7 +29,6 @@ void createInertiaApp({
                 return AppLayout;
         }
     },
-    strictMode: true,
     withApp(app) {
         return (
             <TooltipProvider delayDuration={0}>

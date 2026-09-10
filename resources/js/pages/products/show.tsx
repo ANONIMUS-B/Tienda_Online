@@ -42,6 +42,8 @@ export default function ProductShow({ product }: { product: Product }) {
                                     <img
                                         src={product.images[0].path}
                                         alt={product.name}
+                                        loading="lazy"
+                                        decoding="async"
                                         className="size-full object-cover"
                                     />
                                 )}
@@ -52,6 +54,8 @@ export default function ProductShow({ product }: { product: Product }) {
                                         key={image.id}
                                         src={image.path}
                                         alt=""
+                                        loading="lazy"
+                                        decoding="async"
                                         className="aspect-square rounded-xl border border-white/10 object-cover"
                                     />
                                 ))}
