@@ -19,7 +19,6 @@ import {
     ShieldCheck,
     ShoppingCart,
     Smartphone,
-    Sparkles,
     Star,
     Store,
     Wrench,
@@ -27,16 +26,27 @@ import {
     Zap,
 } from 'lucide-react';
 import { useState } from 'react';
+import type { HeroContent } from '@/types/homepage';
 
-import { dashboard, login, register } from '@/routes';
+import {
+    about,
+    categories as categoriesPage,
+    dashboard,
+    home,
+    login,
+    products as productsPage,
+    register,
+    services as servicesPage,
+    software as softwarePage,
+} from '@/routes';
 
 const navigation = [
-    ['Inicio', '#inicio'],
-    ['Productos', '#productos'],
-    ['Categorías', '#categorias'],
-    ['Servicios', '#servicios'],
-    ['Software', '#software'],
-    ['Nosotros', '#nosotros'],
+    { label: 'Inicio', route: home },
+    { label: 'Productos', route: productsPage },
+    { label: 'Categorías', route: categoriesPage },
+    { label: 'Servicios', route: servicesPage },
+    { label: 'Software', route: softwarePage },
+    { label: 'Nosotros', route: about },
 ];
 
 const categories = [
@@ -135,7 +145,7 @@ const benefits = [
     },
 ];
 
-export default function Welcome() {
+export default function Welcome({ hero }: { hero: HeroContent }) {
     const { auth, currentTeam } = usePage().props;
     const [menuOpen, setMenuOpen] = useState(false);
     const dashboardUrl = currentTeam ? dashboard(currentTeam.slug) : '/';
@@ -177,14 +187,14 @@ export default function Welcome() {
                             className="hidden items-center gap-7 lg:flex"
                             aria-label="Navegación principal"
                         >
-                            {navigation.map(([label, href]) => (
-                                <a
-                                    key={label}
-                                    href={href}
+                            {navigation.map((item) => (
+                                <Link
+                                    key={item.label}
+                                    href={item.route()}
                                     className="text-sm font-medium text-white/65 transition hover:text-lime-400"
                                 >
-                                    {label}
-                                </a>
+                                    {item.label}
+                                </Link>
                             ))}
                         </nav>
                         <div className="hidden items-center gap-2 lg:flex">
@@ -244,15 +254,15 @@ export default function Welcome() {
                     {menuOpen && (
                         <div className="border-t border-white/8 bg-[#08100b] px-5 py-5 lg:hidden">
                             <nav className="flex flex-col gap-1">
-                                {navigation.map(([label, href]) => (
-                                    <a
-                                        key={label}
-                                        href={href}
+                                {navigation.map((item) => (
+                                    <Link
+                                        key={item.label}
+                                        href={item.route()}
                                         onClick={() => setMenuOpen(false)}
                                         className="rounded-xl px-4 py-3 text-sm text-white/75 hover:bg-white/5"
                                     >
-                                        {label}
-                                    </a>
+                                        {item.label}
+                                    </Link>
                                 ))}
                                 <div className="mt-3 flex gap-3 border-t border-white/8 pt-4">
                                     <Link
@@ -280,75 +290,106 @@ export default function Welcome() {
                 <main>
                     <section
                         id="inicio"
-                        className="relative flex min-h-[760px] items-center pt-28"
+                        className="relative min-h-screen overflow-hidden pt-24"
                     >
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_42%,rgba(91,255,0,.13),transparent_28%),radial-gradient(circle_at_20%_85%,rgba(0,120,46,.15),transparent_35%)]" />
-                        <div className="pointer-events-none absolute inset-0 [background-image:linear-gradient(rgba(132,255,75,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(132,255,75,.08)_1px,transparent_1px)] [mask-image:linear-gradient(to_bottom,black,transparent_90%)] [background-size:48px_48px] opacity-25" />
-                        <div className="relative mx-auto grid w-full max-w-7xl items-center gap-14 px-5 py-20 lg:grid-cols-[1.05fr_.95fr] lg:px-8">
-                            <div>
-                                <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-lime-400/25 bg-lime-400/8 px-4 py-2 text-xs font-bold tracking-[.16em] text-lime-300 uppercase">
-                                    <Sparkles className="size-4" /> Soluciones
-                                    que impulsan tu futuro
-                                </div>
-                                <h1 className="max-w-3xl text-5xl leading-[1.02] font-black tracking-[-.04em] sm:text-6xl lg:text-7xl">
-                                    Tecnología que transforma{' '}
-                                    <span className="bg-gradient-to-r from-lime-300 via-[#61ef00] to-emerald-500 bg-clip-text text-transparent">
-                                        tu manera de avanzar.
-                                    </span>
-                                </h1>
-                                <p className="mt-7 max-w-xl text-lg leading-8 text-white/58">
-                                    Productos, soporte, software y soluciones
-                                    empresariales diseñadas para conectar tus
-                                    ideas con resultados reales.
-                                </p>
-                                <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                                    <a
-                                        href="#productos"
-                                        className="group inline-flex items-center justify-center gap-2 rounded-full bg-lime-400 px-7 py-4 text-sm font-extrabold text-black shadow-[0_0_40px_rgba(105,255,0,.22)] hover:bg-lime-300"
-                                    >
-                                        Explorar productos{' '}
-                                        <ArrowRight className="size-4 transition group-hover:translate-x-1" />
-                                    </a>
-                                    <a
-                                        href="#contacto"
-                                        className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-7 py-4 text-sm font-bold"
-                                    >
-                                        <MessageCircle className="size-4 text-lime-400" />{' '}
-                                        Hablar con un asesor
-                                    </a>
-                                </div>
-                                <div className="mt-10 flex flex-wrap gap-x-7 gap-y-3 text-sm text-white/45">
-                                    {[
-                                        'Asesoría personalizada',
-                                        'Compra segura',
-                                        'Soporte especializado',
-                                    ].map((item) => (
-                                        <span
-                                            key={item}
-                                            className="flex items-center gap-2"
-                                        >
-                                            <Check className="size-4 text-lime-400" />
-                                            {item}
-                                        </span>
-                                    ))}
-                                </div>
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_55%_58%,rgba(66,210,0,.18),transparent_28%),radial-gradient(circle_at_88%_18%,rgba(255,255,255,.08),transparent_22%),linear-gradient(155deg,#080b09_20%,#111511_55%,#061008)]" />
+                        <div className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-[#14440c]/80 via-[#0b2808]/35 to-transparent" />
+                        <div className="pointer-events-none absolute inset-0 [background-image:linear-gradient(rgba(132,255,75,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(132,255,75,.08)_1px,transparent_1px)] [mask-image:linear-gradient(to_bottom,transparent,black_48%,transparent)] [background-size:64px_64px] opacity-20" />
+
+                        <div className="relative mx-auto min-h-[820px] max-w-7xl px-5 py-12 lg:px-8">
+                            <p className="text-[clamp(4.2rem,10.5vw,9.2rem)] leading-[.78] font-light tracking-[-.075em] text-white uppercase">
+                                {hero.hero_title}
+                            </p>
+                            <p className="relative z-20 mt-[clamp(16rem,30vw,24rem)] text-right text-[clamp(3.6rem,9.7vw,8.6rem)] leading-[.78] font-light tracking-[-.075em] text-white uppercase lg:mt-44">
+                                {hero.hero_accent}
+                            </p>
+
+                            <div className="absolute top-[18%] left-1/2 z-10 w-[min(82vw,740px)] -translate-x-1/2 lg:top-[15%]">
+                                <div className="absolute inset-[18%] rounded-full bg-lime-400/18 blur-[90px]" />
+                                <img
+                                    src={hero.hero_image_path}
+                                    alt="Centro tecnológico modular 3D"
+                                    className="relative w-full animate-[hero-float_6s_ease-in-out_infinite] object-contain drop-shadow-[0_45px_55px_rgba(0,0,0,.65)]"
+                                />
                             </div>
-                            <div className="relative mx-auto w-full max-w-[560px]">
-                                <div className="absolute inset-12 rounded-full bg-lime-400/20 blur-[90px]" />
-                                <div className="relative aspect-square rounded-[2.5rem] border border-white/10 bg-gradient-to-br from-white/8 to-white/[.02] p-8 shadow-2xl backdrop-blur-sm">
-                                    <div className="absolute inset-5 rounded-[2rem] border border-lime-300/10" />
-                                    <div className="absolute top-8 right-8 flex items-center gap-2 rounded-full border border-white/10 bg-black/40 px-3 py-2 text-xs text-white/55">
-                                        <span className="size-2 animate-pulse rounded-full bg-lime-400" />{' '}
-                                        Tecnología activa
-                                    </div>
-                                    <img
-                                        src="/images/brand/jbtechline-logo.png"
-                                        alt="Logo oficial de JBTECHLINE"
-                                        className="relative z-10 h-full w-full object-contain drop-shadow-[0_25px_45px_rgba(56,220,0,.22)]"
+
+                            <div className="absolute top-[47%] left-5 z-20 hidden w-52 overflow-hidden rounded-2xl border border-white/14 bg-black/20 backdrop-blur-xl sm:block lg:left-8">
+                                <div className="flex h-32 items-center justify-center border-b border-white/10 bg-gradient-to-br from-lime-400/10 to-transparent">
+                                    <Cpu
+                                        className="size-20 text-lime-300/90"
+                                        strokeWidth={1}
                                     />
-                                    <CircuitBoard className="absolute bottom-9 left-9 size-8 text-lime-400/35" />
+                                </div>
+                                <div className="flex items-end justify-between p-4">
+                                    <div>
+                                        <p className="text-[10px] tracking-[.18em] text-white/35 uppercase">
+                                            {hero.hero_overline}
+                                        </p>
+                                        <p className="mt-1 text-sm font-black uppercase">
+                                            Tech solutions
+                                        </p>
+                                    </div>
+                                    <a
+                                        href={hero.hero_primary_url}
+                                        className="flex size-8 items-center justify-center rounded-full bg-lime-400 text-black"
+                                        aria-label="Ver productos"
+                                    >
+                                        <ArrowRight className="size-4" />
+                                    </a>
                                 </div>
                             </div>
+
+                            <div className="absolute top-[31%] right-5 z-20 hidden items-center gap-4 lg:right-8 lg:flex">
+                                <p className="max-w-28 text-right text-[10px] leading-3 font-semibold tracking-wide text-white/55 uppercase">
+                                    Donde la tecnología acelera la innovación
+                                </p>
+                                <div className="flex size-24 items-center justify-center rounded-2xl border border-white/12 bg-white/5 backdrop-blur-xl">
+                                    <CircuitBoard
+                                        className="size-12 text-lime-400"
+                                        strokeWidth={1.2}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="absolute right-5 bottom-12 z-20 max-w-56 lg:right-8">
+                                <p className="text-sm leading-5 text-white/58">
+                                    {hero.hero_description}
+                                </p>
+                                <a
+                                    href={hero.hero_secondary_url}
+                                    className="mt-4 inline-flex items-center gap-2 text-xs font-bold tracking-wider text-lime-400 uppercase"
+                                >
+                                    {hero.hero_secondary_label}{' '}
+                                    <ArrowRight className="size-4" />
+                                </a>
+                            </div>
+                            <div className="absolute bottom-10 left-5 z-20 lg:left-8">
+                                <div className="flex gap-1 text-lime-400">
+                                    {Array.from({ length: 5 }).map(
+                                        (_, index) => (
+                                            <Star
+                                                key={index}
+                                                className="size-3.5 fill-current"
+                                            />
+                                        ),
+                                    )}
+                                </div>
+                                <div className="mt-2 flex items-end gap-3">
+                                    <span className="text-3xl font-light italic">
+                                        360°
+                                    </span>
+                                    <span className="max-w-24 text-[10px] leading-3 font-bold text-white/45 uppercase">
+                                        Asesoría tecnológica integral
+                                    </span>
+                                </div>
+                            </div>
+
+                            <a
+                                href={hero.hero_primary_url}
+                                className="absolute bottom-8 left-1/2 z-20 hidden size-24 -translate-x-1/2 items-center justify-center rounded-full border border-lime-400/25 bg-lime-400/10 text-center text-[10px] font-bold tracking-wider text-lime-300 uppercase backdrop-blur md:flex"
+                            >
+                                {hero.hero_primary_label}
+                            </a>
                         </div>
                     </section>
 

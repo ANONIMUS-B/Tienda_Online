@@ -1,5 +1,11 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
+import {
+    BookOpen,
+    FolderGit2,
+    FolderTree,
+    LayoutGrid,
+    PanelsTopLeft,
+} from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -15,6 +21,8 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { edit as editHomepage } from '@/routes/admin/homepage';
+import { index as categoryIndex } from '@/routes/admin/categories';
 import type { NavItem } from '@/types';
 
 export function AppSidebar() {
@@ -29,6 +37,24 @@ export function AppSidebar() {
             href: dashboardUrl,
             icon: LayoutGrid,
         },
+        ...(page.props.currentTeam?.role !== 'member'
+            ? [
+                  {
+                      title: 'Administrar portada',
+                      href: page.props.currentTeam
+                          ? editHomepage(page.props.currentTeam.slug)
+                          : '/',
+                      icon: PanelsTopLeft,
+                  },
+                  {
+                      title: 'Categorías',
+                      href: page.props.currentTeam
+                          ? categoryIndex(page.props.currentTeam.slug)
+                          : '/',
+                      icon: FolderTree,
+                  },
+              ]
+            : []),
     ];
 
     const footerNavItems: NavItem[] = [

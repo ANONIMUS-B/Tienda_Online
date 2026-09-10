@@ -145,3 +145,14 @@
         @apply bg-background text-foreground;
     }
 }
+
+@keyframes hero-float {
+    0%,
+    100% {
+        transform: translateY(0) rotate(-1deg);
+    }
+
+    50% {
+        transform: translateY(-18px) rotate(1deg);
+    }
+}
