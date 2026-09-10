@@ -2,6 +2,7 @@
 
 use App\Enums\TeamRole;
 use App\Models\HomepageSetting;
+use App\Models\Product;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
@@ -19,6 +20,19 @@ test('homepage renders the configured 3d hero content', function () {
             ->component('welcome')
             ->where('hero.hero_title', 'Tecnología configurable')
             ->where('hero.hero_image_path', '/images/brand/jbtechline-hero-3d.png'),
+        );
+});
+
+test('homepage displays available products with the highlighted products first', function () {
+    $featured = Product::factory()->create(['name' => 'Laptop destacada', 'is_featured' => true, 'stock' => 3]);
+    Product::factory()->create(['name' => 'Producto sin stock', 'stock' => 0]);
+
+    $this->get(route('home'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('welcome')
+            ->has('featuredProducts', 1)
+            ->where('featuredProducts.0.id', $featured->id)
+            ->where('heroProduct.id', $featured->id),
         );
 });
 

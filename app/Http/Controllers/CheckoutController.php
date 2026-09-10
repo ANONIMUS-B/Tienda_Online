@@ -3,13 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCheckoutRequest;
-use App\Mail\OrderConfirmation;
 use App\Models\Order;
 use App\Services\ShoppingCart;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -29,6 +26,13 @@ class CheckoutController extends Controller
 
     public function store(StoreCheckoutRequest $request, ShoppingCart $cart): RedirectResponse
     {
+        $whatsappNumber = (string) config('services.whatsapp.number');
+        if ($whatsappNumber === '') {
+            throw ValidationException::withMessages([
+                'cart' => 'La atención por WhatsApp aún no está configurada.',
+            ]);
+        }
+
         $order = DB::transaction(function () use ($request, $cart): Order {
             $items = $cart->items(lock: true);
             if ($items->isEmpty()) {
@@ -45,14 +49,27 @@ class CheckoutController extends Controller
             foreach ($items as $item) {
                 $product = $item['product'];
                 $order->items()->create(['product_id' => $product->id, 'sku' => $product->sku, 'name' => $product->name, 'quantity' => $item['quantity'], 'unit_price' => $item['unit_price'], 'total' => $item['total']]);
-                $product->decrement('stock', $item['quantity']);
             }
 
             return $order;
         });
         $cart->clear();
-        Mail::to($order->customer_email)->send(new OrderConfirmation($order->load('items')));
 
-        return redirect()->to(URL::temporarySignedRoute('orders.show', now()->addDays(7), ['number' => $order->number]));
+        return redirect()->away($this->whatsappUrl($order->load('items'), $whatsappNumber));
+    }
+
+    private function whatsappUrl(Order $order, string $whatsappNumber): string
+    {
+        $items = $order->items
+            ->map(fn ($item): string => "- {$item->name} x{$item->quantity}: S/ {$item->total}")
+            ->implode("\n");
+
+        $message = "Hola, deseo registrar la solicitud {$order->number}.\n\n"
+            ."Cliente: {$order->customer_name}\n"
+            ."Teléfono: {$order->customer_phone}\n\n"
+            ."Productos:\n{$items}\n\n"
+            ."Total estimado: S/ {$order->total}";
+
+        return 'https://wa.me/'.preg_replace('/\D/', '', $whatsappNumber).'?text='.rawurlencode($message);
     }
 }

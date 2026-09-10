@@ -48,6 +48,11 @@ class HandleInertiaRequests extends Middleware
             'currentTeam' => fn () => $user?->currentTeam ? $user->toUserTeam($user->currentTeam) : null,
             'teams' => fn () => $user?->toUserTeams(includeCurrent: true) ?? [],
             'cartCount' => fn () => array_sum(app(ShoppingCart::class)->quantities()),
+            'flash' => [
+                'toast' => fn () => $request->session()->has('success')
+                    ? ['type' => 'success', 'message' => $request->session()->get('success')]
+                    : null,
+            ],
         ];
     }
 }

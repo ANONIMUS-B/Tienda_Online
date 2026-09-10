@@ -36,6 +36,12 @@ class Product extends Model
         return $this->hasMany(ProductImage::class)->orderByDesc('is_primary')->orderBy('sort_order');
     }
 
+    /** @return HasMany<StockMovement, $this> */
+    public function stockMovements(): HasMany
+    {
+        return $this->hasMany(StockMovement::class)->latest();
+    }
+
     /**
      * @param  Builder<Product>  $query
      * @return Builder<Product>

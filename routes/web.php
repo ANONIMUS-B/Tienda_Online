@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CompanySettingController;
 use App\Http\Controllers\Admin\HomepageSettingController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
@@ -33,8 +34,10 @@ Route::get('/carrito', [CartController::class, 'index'])->name('cart.index');
 Route::post('/carrito', [CartController::class, 'store'])->name('cart.store');
 Route::patch('/carrito/{product}', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/carrito/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
-Route::get('/finalizar-compra', [CheckoutController::class, 'create'])->name('checkout.create');
-Route::post('/finalizar-compra', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::middleware('auth')->group(function () {
+    Route::get('/finalizar-compra', [CheckoutController::class, 'create'])->name('checkout.create');
+    Route::post('/finalizar-compra', [CheckoutController::class, 'store'])->name('checkout.store');
+});
 Route::get('/pedido/{number}', [CustomerOrderController::class, 'show'])->middleware('signed')->name('orders.show');
 
 Route::prefix('{current_team}')
@@ -45,6 +48,8 @@ Route::prefix('{current_team}')
         Route::middleware(EnsureTeamMembership::class.':admin')->group(function () {
             Route::get('administracion/inicio', [HomepageSettingController::class, 'edit'])->name('admin.homepage.edit');
             Route::put('administracion/inicio', [HomepageSettingController::class, 'update'])->name('admin.homepage.update');
+            Route::get('administracion/empresa', [CompanySettingController::class, 'edit'])->name('admin.company-settings.edit');
+            Route::put('administracion/empresa', [CompanySettingController::class, 'update'])->name('admin.company-settings.update');
             Route::resource('administracion/categorias', CategoryController::class)
                 ->parameters(['categorias' => 'category'])
                 ->except('show')

@@ -1,9 +1,8 @@
 <?php
 
-use App\Mail\OrderConfirmation;
 use App\Models\Order;
 use App\Models\Product;
-use Illuminate\Support\Facades\Mail;
+use App\Models\User;
 
 test('customers can add update and remove available products from the cart', function () {
     $product = Product::factory()->create(['stock' => 5, 'price' => 100, 'promotional_price' => 80]);
@@ -23,26 +22,44 @@ test('cart rejects quantities greater than current stock', function () {
     expect(session('cart'))->toBeNull();
 });
 
-test('checkout creates the order snapshots prices reduces stock and sends confirmation', function () {
-    Mail::fake();
-    $product = Product::factory()->create(['stock' => 5, 'price' => 100, 'promotional_price' => 75]);
-    $this->withSession(['cart' => [$product->id => 2]]);
+test('authenticated customers create a request and are redirected to WhatsApp', function () {
+    config()->set('services.whatsapp.number', '51999888777');
+    $product = Product::factory()->create(['name' => 'Laptop empresarial', 'stock' => 5, 'price' => 100, 'promotional_price' => 75]);
+    $user = User::factory()->create();
+    $this->actingAs($user)->withSession(['cart' => [$product->id => 2]]);
 
     $response = $this->post(route('checkout.store'), checkoutPayload());
 
     $order = Order::query()->firstOrFail();
-    $response->assertRedirect();
-    $this->assertDatabaseHas('orders', ['id' => $order->id, 'subtotal' => 150, 'shipping_total' => 15, 'total' => 165]);
+    $response->assertRedirectContains('https://wa.me/51999888777?text=');
+    $this->assertDatabaseHas('orders', ['id' => $order->id, 'user_id' => $user->id, 'subtotal' => 150, 'shipping_total' => 15, 'total' => 165]);
     $this->assertDatabaseHas('order_items', ['order_id' => $order->id, 'product_id' => $product->id, 'quantity' => 2, 'unit_price' => 75, 'total' => 150]);
-    expect($product->fresh()->stock)->toBe(3);
+    expect($product->fresh()->stock)->toBe(5);
     expect(session('cart'))->toBeNull();
-    Mail::assertSent(OrderConfirmation::class, fn (OrderConfirmation $mail) => $mail->order->is($order));
+    expect(urldecode((string) parse_url($response->headers->get('Location'), PHP_URL_QUERY)))->toContain($order->number)->toContain('Laptop');
+});
+
+test('checkout requires an authenticated customer', function () {
+    $this->get(route('checkout.create'))->assertRedirect(route('login'));
 });
 
 test('checkout requires customer delivery and payment information', function () {
     $product = Product::factory()->create(['stock' => 1]);
+    $user = User::factory()->create();
 
-    $this->withSession(['cart' => [$product->id => 1]])->post(route('checkout.store'), [])->assertSessionHasErrors(['customer_name', 'customer_email', 'customer_phone', 'address', 'district', 'province', 'department', 'shipping_method', 'payment_method']);
+    $this->actingAs($user)->withSession(['cart' => [$product->id => 1]])->post(route('checkout.store'), [])->assertSessionHasErrors(['customer_name', 'customer_email', 'customer_phone', 'address', 'district', 'province', 'department', 'shipping_method', 'payment_method']);
+
+    $this->assertDatabaseCount('orders', 0);
+});
+
+test('checkout does not create a request when WhatsApp is not configured', function () {
+    config()->set('services.whatsapp.number', '');
+    $product = Product::factory()->create(['stock' => 1]);
+    $user = User::factory()->create();
+
+    $this->actingAs($user)->withSession(['cart' => [$product->id => 1]])
+        ->post(route('checkout.store'), checkoutPayload())
+        ->assertSessionHasErrors('cart');
 
     $this->assertDatabaseCount('orders', 0);
 });

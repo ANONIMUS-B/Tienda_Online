@@ -1,18 +1,17 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Form, Head, Link, usePage } from '@inertiajs/react';
 import {
     ArrowRight,
     Bot,
     Check,
+    ChevronDown,
     ChevronRight,
     CircuitBoard,
     Code2,
     Cpu,
     Headphones,
-    Heart,
     Laptop,
     Menu,
     MessageCircle,
-    MonitorSmartphone,
     PackageCheck,
     Printer,
     Search,
@@ -45,15 +44,14 @@ import {
     software as softwarePage,
 } from '@/routes';
 import { index as cart } from '@/routes/cart';
+import { store as addToCart } from '@/routes/cart';
+import { show as productShow } from '@/routes/products';
+import type { Product } from '@/types/product';
 
 const navigation = [
-    { label: 'Inicio', route: home },
-    { label: 'Productos', route: productsPage },
-    { label: 'Categorías', route: categoriesPage },
     { label: 'Servicios', route: servicesPage },
     { label: 'Software', route: softwarePage },
     { label: 'Apps', route: apps },
-    { label: 'Marcas', route: brands },
     { label: 'Nosotros', route: about },
     { label: 'Blog', route: blog },
     { label: 'Contacto', route: contact },
@@ -79,33 +77,6 @@ const categories = [
         name: 'Smartphones',
         text: 'Tecnología móvil y accesorios esenciales.',
         icon: Smartphone,
-    },
-];
-
-const products = [
-    {
-        name: 'Laptop empresarial Pro',
-        type: 'Laptops',
-        price: 'S/ 2,899',
-        old: 'S/ 3,299',
-        badge: '-12%',
-        icon: Laptop,
-    },
-    {
-        name: 'Monitor UltraView 27”',
-        type: 'Monitores',
-        price: 'S/ 899',
-        old: 'S/ 1,099',
-        badge: 'Oferta',
-        icon: MonitorSmartphone,
-    },
-    {
-        name: 'Kit PC Performance',
-        type: 'Componentes',
-        price: 'S/ 1,449',
-        old: 'S/ 1,649',
-        badge: 'Popular',
-        icon: Cpu,
     },
 ];
 
@@ -155,7 +126,15 @@ const benefits = [
     },
 ];
 
-export default function Welcome({ hero }: { hero: HeroContent }) {
+export default function Welcome({
+    hero,
+    featuredProducts,
+    heroProduct,
+}: {
+    hero: HeroContent;
+    featuredProducts: Product[];
+    heroProduct: Product | null;
+}) {
     const { auth, currentTeam } = usePage().props;
     const [menuOpen, setMenuOpen] = useState(false);
     const dashboardUrl = currentTeam ? dashboard(currentTeam.slug) : '/';
@@ -197,6 +176,40 @@ export default function Welcome({ hero }: { hero: HeroContent }) {
                             className="hidden items-center gap-4 xl:flex"
                             aria-label="Navegación principal"
                         >
+                            <Link
+                                href={home()}
+                                className="text-xs font-medium text-white/65 transition hover:text-lime-400"
+                            >
+                                Inicio
+                            </Link>
+                            <div className="group relative">
+                                <Link
+                                    href={productsPage()}
+                                    className="flex items-center gap-1 py-3 text-xs font-medium text-white/65 transition hover:text-lime-400"
+                                >
+                                    Productos <ChevronDown className="size-3" />
+                                </Link>
+                                <div className="invisible absolute top-full left-0 z-50 w-44 translate-y-1 rounded-xl border border-white/10 bg-[#0b120d] p-2 opacity-0 shadow-xl transition group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+                                    <Link
+                                        href={productsPage()}
+                                        className="block rounded-lg px-3 py-2 text-xs text-white/70 hover:bg-white/8 hover:text-lime-400"
+                                    >
+                                        Ver productos
+                                    </Link>
+                                    <Link
+                                        href={categoriesPage()}
+                                        className="block rounded-lg px-3 py-2 text-xs text-white/70 hover:bg-white/8 hover:text-lime-400"
+                                    >
+                                        Categorías
+                                    </Link>
+                                    <Link
+                                        href={brands()}
+                                        className="block rounded-lg px-3 py-2 text-xs text-white/70 hover:bg-white/8 hover:text-lime-400"
+                                    >
+                                        Marcas
+                                    </Link>
+                                </div>
+                            </div>
                             {navigation.map((item) => (
                                 <Link
                                     key={item.label}
@@ -264,6 +277,36 @@ export default function Welcome({ hero }: { hero: HeroContent }) {
                     {menuOpen && (
                         <div className="border-t border-white/8 bg-[#08100b] px-5 py-5 lg:hidden">
                             <nav className="flex flex-col gap-1">
+                                <Link
+                                    href={home()}
+                                    onClick={() => setMenuOpen(false)}
+                                    className="rounded-xl px-4 py-3 text-sm text-white/75 hover:bg-white/5"
+                                >
+                                    Inicio
+                                </Link>
+                                <Link
+                                    href={productsPage()}
+                                    onClick={() => setMenuOpen(false)}
+                                    className="rounded-xl px-4 py-3 text-sm text-white/75 hover:bg-white/5"
+                                >
+                                    Productos
+                                </Link>
+                                <div className="ml-4 border-l border-white/10 pl-2">
+                                    <Link
+                                        href={categoriesPage()}
+                                        onClick={() => setMenuOpen(false)}
+                                        className="block rounded-xl px-4 py-2 text-sm text-white/60"
+                                    >
+                                        Categorías
+                                    </Link>
+                                    <Link
+                                        href={brands()}
+                                        onClick={() => setMenuOpen(false)}
+                                        className="block rounded-xl px-4 py-2 text-sm text-white/60"
+                                    >
+                                        Marcas
+                                    </Link>
+                                </div>
                                 {navigation.map((item) => (
                                     <Link
                                         key={item.label}
@@ -328,13 +371,57 @@ export default function Welcome({ hero }: { hero: HeroContent }) {
                                 {hero.hero_accent}
                             </p>
 
-                            <div className="absolute top-[18%] left-1/2 z-10 w-[min(82vw,740px)] -translate-x-1/2 lg:top-[15%]">
+                            <div className="absolute top-[20%] left-1/2 z-10 w-[min(62vw,460px)] -translate-x-1/2 lg:top-[17%]">
                                 <div className="absolute inset-[18%] rounded-full bg-lime-400/18 blur-[90px]" />
                                 <img
-                                    src={hero.hero_image_path}
-                                    alt="Centro tecnológico modular 3D"
-                                    className="relative w-full animate-[hero-float_6s_ease-in-out_infinite] object-contain drop-shadow-[0_45px_55px_rgba(0,0,0,.65)]"
+                                    src={
+                                        heroProduct?.images[0]?.path ??
+                                        hero.hero_image_path
+                                    }
+                                    alt={
+                                        heroProduct
+                                            ? heroProduct.name
+                                            : 'Centro tecnológico modular 3D'
+                                    }
+                                    className="relative mx-auto max-h-[360px] w-full animate-[hero-float_6s_ease-in-out_infinite] rounded-[2rem] object-contain drop-shadow-[0_35px_45px_rgba(0,0,0,.65)]"
                                 />
+                                {heroProduct && (
+                                    <div className="absolute top-full left-1/2 mt-3 w-[min(90vw,360px)] -translate-x-1/2 rounded-2xl border border-lime-400/20 bg-[#071008]/90 p-4 shadow-2xl backdrop-blur-xl">
+                                        <p className="text-[10px] font-bold tracking-[.16em] text-lime-400 uppercase">
+                                            {heroProduct.brand?.name ??
+                                                heroProduct.category?.name ??
+                                                'Producto destacado'}
+                                        </p>
+                                        <div className="mt-1 flex items-start justify-between gap-4">
+                                            <h2 className="text-base font-black text-white">
+                                                {heroProduct.name}
+                                            </h2>
+                                            <p className="shrink-0 text-sm font-black text-lime-300">
+                                                S/{' '}
+                                                {heroProduct.promotional_price ??
+                                                    heroProduct.price}
+                                            </p>
+                                        </div>
+                                        {heroProduct.specifications && (
+                                            <div className="mt-3 grid grid-cols-3 gap-2 border-t border-white/10 pt-3">
+                                                {Object.entries(
+                                                    heroProduct.specifications,
+                                                )
+                                                    .slice(0, 3)
+                                                    .map(([key, value]) => (
+                                                        <div key={key}>
+                                                            <p className="truncate text-[9px] font-bold tracking-wide text-white/35 uppercase">
+                                                                {key}
+                                                            </p>
+                                                            <p className="truncate text-xs text-white/80">
+                                                                {value}
+                                                            </p>
+                                                        </div>
+                                                    ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="absolute top-[47%] left-5 z-20 hidden w-52 overflow-hidden rounded-2xl border border-white/14 bg-black/20 backdrop-blur-xl sm:block lg:left-8">
@@ -480,84 +567,104 @@ export default function Welcome({ hero }: { hero: HeroContent }) {
                                 <SectionHeading
                                     eyebrow="Selección destacada"
                                     title="Tecnología recomendada para ti"
-                                    text="Una vista previa de los equipos que pronto encontrarás en nuestro catálogo."
+                                    text="Productos disponibles seleccionados para ti."
                                     align="left"
                                 />
-                                <a
-                                    href="#contacto"
+                                <Link
+                                    href={productsPage()}
                                     className="inline-flex items-center gap-2 text-sm font-bold text-lime-400"
                                 >
                                     Consultar catálogo{' '}
                                     <ArrowRight className="size-4" />
-                                </a>
+                                </Link>
                             </div>
                             <div className="mt-12 grid gap-5 md:grid-cols-3">
-                                {products.map(
-                                    ({
-                                        name,
-                                        type,
-                                        price,
-                                        old,
-                                        badge,
-                                        icon: Icon,
-                                    }) => (
-                                        <article
-                                            key={name}
-                                            className="group overflow-hidden rounded-3xl border border-white/9 bg-[#0c140e]"
+                                {featuredProducts.map((product) => (
+                                    <article
+                                        key={product.id}
+                                        className="group overflow-hidden rounded-3xl border border-white/9 bg-[#0c140e]"
+                                    >
+                                        <Link
+                                            href={productShow(product.slug)}
+                                            className="relative flex aspect-[4/3] items-center justify-center bg-[radial-gradient(circle_at_center,rgba(123,255,61,.12),transparent_62%)]"
                                         >
-                                            <div className="relative flex aspect-[4/3] items-center justify-center bg-[radial-gradient(circle_at_center,rgba(123,255,61,.12),transparent_62%)]">
-                                                <span className="absolute top-5 left-5 rounded-full bg-lime-400 px-3 py-1 text-xs font-black text-black">
-                                                    {badge}
-                                                </span>
-                                                <button
-                                                    type="button"
-                                                    className="absolute top-5 right-5 rounded-full border border-white/10 bg-black/30 p-2.5 text-white/50"
-                                                    aria-label={`Agregar ${name} a favoritos`}
-                                                >
-                                                    <Heart className="size-4" />
-                                                </button>
-                                                <Icon
+                                            <span className="absolute top-5 left-5 z-10 rounded-full bg-lime-400 px-3 py-1 text-xs font-black text-black">
+                                                {product.is_featured
+                                                    ? 'Destacado'
+                                                    : product.is_bestseller
+                                                      ? 'Popular'
+                                                      : 'Disponible'}
+                                            </span>
+                                            {product.images[0] ? (
+                                                <img
+                                                    src={product.images[0].path}
+                                                    alt={product.name}
+                                                    className="size-full object-cover transition group-hover:scale-105"
+                                                />
+                                            ) : (
+                                                <PackageCheck
                                                     className="size-28 text-lime-300/80 transition group-hover:scale-105"
                                                     strokeWidth={1.1}
                                                 />
-                                            </div>
-                                            <div className="border-t border-white/8 p-6">
-                                                <p className="text-xs font-semibold tracking-wider text-lime-400/70 uppercase">
-                                                    {type}
-                                                </p>
-                                                <h3 className="mt-2 text-lg font-bold">
-                                                    {name}
-                                                </h3>
-                                                <div className="mt-3 flex gap-1 text-amber-300">
-                                                    {Array.from({
-                                                        length: 5,
-                                                    }).map((_, index) => (
-                                                        <Star
-                                                            key={index}
-                                                            className="size-3.5 fill-current"
-                                                        />
-                                                    ))}
-                                                </div>
-                                                <div className="mt-5 flex items-end justify-between">
-                                                    <div>
+                                            )}
+                                        </Link>
+                                        <div className="border-t border-white/8 p-6">
+                                            <p className="text-xs font-semibold tracking-wider text-lime-400/70 uppercase">
+                                                {product.brand?.name ??
+                                                    product.category?.name}
+                                            </p>
+                                            <Link
+                                                href={productShow(product.slug)}
+                                                className="mt-2 block text-lg font-bold hover:text-lime-400"
+                                            >
+                                                {product.name}
+                                            </Link>
+                                            <div className="mt-5 flex items-end justify-between">
+                                                <div>
+                                                    {product.promotional_price && (
                                                         <p className="text-xs text-white/30 line-through">
-                                                            {old}
+                                                            S/ {product.price}
                                                         </p>
-                                                        <p className="text-xl font-black">
-                                                            {price}
-                                                        </p>
-                                                    </div>
-                                                    <a
-                                                        href="#contacto"
+                                                    )}
+                                                    <p className="text-xl font-black">
+                                                        S/{' '}
+                                                        {product.promotional_price ??
+                                                            product.price}
+                                                    </p>
+                                                </div>
+                                                <Form
+                                                    {...addToCart.form()}
+                                                    options={{
+                                                        preserveScroll: true,
+                                                    }}
+                                                >
+                                                    <input
+                                                        type="hidden"
+                                                        name="product_id"
+                                                        value={product.id}
+                                                    />
+                                                    <input
+                                                        type="hidden"
+                                                        name="quantity"
+                                                        value="1"
+                                                    />
+                                                    <button
+                                                        type="submit"
                                                         className="flex size-11 items-center justify-center rounded-full bg-lime-400 text-black"
-                                                        aria-label={`Consultar ${name}`}
+                                                        aria-label={`Agregar ${product.name} al carrito`}
                                                     >
                                                         <ShoppingCart className="size-4" />
-                                                    </a>
-                                                </div>
+                                                    </button>
+                                                </Form>
                                             </div>
-                                        </article>
-                                    ),
+                                        </div>
+                                    </article>
+                                ))}
+                                {featuredProducts.length === 0 && (
+                                    <p className="col-span-full rounded-3xl border border-white/10 p-10 text-center text-white/50">
+                                        Pronto tendremos productos disponibles.
+                                        Vuelve a revisar el catálogo.
+                                    </p>
                                 )}
                             </div>
                         </div>

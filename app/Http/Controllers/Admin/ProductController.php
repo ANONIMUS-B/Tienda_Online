@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateProductRequest;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\StockMovement;
 use App\Models\Team;
 use App\Services\ImageUploader;
 use Illuminate\Http\RedirectResponse;
@@ -36,6 +37,16 @@ class ProductController extends Controller
     {
         DB::transaction(function () use ($request): void {
             $product = Product::query()->create($this->attributes($request->safe()->except(['primary_image', 'gallery'])));
+            if ($product->stock > 0) {
+                StockMovement::query()->create([
+                    'product_id' => $product->id,
+                    'user_id' => $request->user()->id,
+                    'type' => 'entry',
+                    'quantity' => $product->stock,
+                    'stock_after' => $product->stock,
+                    'reason' => 'Stock inicial del producto.',
+                ]);
+            }
             $path = $this->images->replace($request->file('primary_image'), 'products');
             $product->images()->create(['path' => $path, 'alt_text' => $product->name, 'is_primary' => true]);
             $this->storeGallery($product, $request->file('gallery', []));
@@ -52,7 +63,19 @@ class ProductController extends Controller
     public function update(UpdateProductRequest $request, Team $currentTeam, Product $product): RedirectResponse
     {
         DB::transaction(function () use ($request, $product): void {
+            $previousStock = $product->stock;
             $product->update($this->attributes($request->safe()->except(['primary_image', 'gallery'])));
+            $stockDifference = $product->stock - $previousStock;
+            if ($stockDifference !== 0) {
+                StockMovement::query()->create([
+                    'product_id' => $product->id,
+                    'user_id' => $request->user()->id,
+                    'type' => $stockDifference > 0 ? 'entry' : 'adjustment',
+                    'quantity' => $stockDifference,
+                    'stock_after' => $product->stock,
+                    'reason' => 'Ajuste desde administración.',
+                ]);
+            }
             if ($request->hasFile('primary_image')) {
                 $old = $product->images()->where('is_primary', true)->first();
                 $path = $this->images->replace($request->file('primary_image'), 'products', $old?->path);

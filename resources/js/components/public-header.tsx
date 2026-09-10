@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Menu, Search, ShoppingCart, X } from 'lucide-react';
+import { ChevronDown, Menu, Search, ShoppingCart, X } from 'lucide-react';
 import { useState } from 'react';
 import { index as cart } from '@/routes/cart';
 import {
@@ -20,13 +20,9 @@ import {
 } from '@/routes';
 
 const navigation = [
-    ['Inicio', home],
-    ['Productos', products],
-    ['Categorías', categories],
     ['Servicios', services],
     ['Software', software],
     ['Apps', apps],
-    ['Marcas', brands],
     ['Nosotros', about],
     ['Blog', blog],
     ['Contacto', contact],
@@ -55,6 +51,40 @@ export default function PublicHeader() {
                     </div>
                 </Link>
                 <nav className="hidden items-center gap-4 xl:flex">
+                    <Link
+                        href={home()}
+                        className="text-xs font-medium text-white/65 transition hover:text-lime-400"
+                    >
+                        Inicio
+                    </Link>
+                    <div className="group relative">
+                        <Link
+                            href={products()}
+                            className="flex items-center gap-1 py-3 text-xs font-medium text-white/65 transition hover:text-lime-400"
+                        >
+                            Productos <ChevronDown className="size-3" />
+                        </Link>
+                        <div className="invisible absolute top-full left-0 z-50 w-44 translate-y-1 rounded-xl border border-white/10 bg-[#0b120d] p-2 opacity-0 shadow-xl transition group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+                            <Link
+                                href={products()}
+                                className="block rounded-lg px-3 py-2 text-xs text-white/70 hover:bg-white/8 hover:text-lime-400"
+                            >
+                                Ver productos
+                            </Link>
+                            <Link
+                                href={categories()}
+                                className="block rounded-lg px-3 py-2 text-xs text-white/70 hover:bg-white/8 hover:text-lime-400"
+                            >
+                                Categorías
+                            </Link>
+                            <Link
+                                href={brands()}
+                                className="block rounded-lg px-3 py-2 text-xs text-white/70 hover:bg-white/8 hover:text-lime-400"
+                            >
+                                Marcas
+                            </Link>
+                        </div>
+                    </div>
                     {navigation.map(([label, route]) => (
                         <Link
                             key={label}
@@ -121,6 +151,36 @@ export default function PublicHeader() {
             </div>
             {open && (
                 <nav className="flex flex-col border-t border-white/8 bg-[#08100b] px-5 py-5 lg:hidden">
+                    <Link
+                        href={home()}
+                        onClick={() => setOpen(false)}
+                        className="rounded-xl px-4 py-3 text-sm text-white/75"
+                    >
+                        Inicio
+                    </Link>
+                    <Link
+                        href={products()}
+                        onClick={() => setOpen(false)}
+                        className="rounded-xl px-4 py-3 text-sm text-white/75"
+                    >
+                        Productos
+                    </Link>
+                    <div className="ml-4 border-l border-white/10 pl-2">
+                        <Link
+                            href={categories()}
+                            onClick={() => setOpen(false)}
+                            className="block rounded-xl px-4 py-2 text-sm text-white/60"
+                        >
+                            Categorías
+                        </Link>
+                        <Link
+                            href={brands()}
+                            onClick={() => setOpen(false)}
+                            className="block rounded-xl px-4 py-2 text-sm text-white/60"
+                        >
+                            Marcas
+                        </Link>
+                    </div>
                     {navigation.map(([label, route]) => (
                         <Link
                             key={label}
