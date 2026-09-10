@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
+    BadgeCheck,
     BookOpen,
     FolderGit2,
     FolderTree,
@@ -21,6 +22,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { index as brandIndex } from '@/routes/admin/brands';
 import { edit as editHomepage } from '@/routes/admin/homepage';
 import { index as categoryIndex } from '@/routes/admin/categories';
 import type { NavItem } from '@/types';
@@ -52,6 +54,13 @@ export function AppSidebar() {
                           ? categoryIndex(page.props.currentTeam.slug)
                           : '/',
                       icon: FolderTree,
+                  },
+                  {
+                      title: 'Marcas',
+                      href: page.props.currentTeam
+                          ? brandIndex(page.props.currentTeam.slug)
+                          : '/',
+                      icon: BadgeCheck,
                   },
               ]
             : []),

@@ -12,10 +12,12 @@ import {
     MonitorSmartphone,
     PackageCheck,
     Printer,
+    Search,
     ShieldCheck,
     Smartphone,
     Sparkles,
     Store,
+    ShoppingCart,
     Wrench,
     X,
     Zap,
@@ -24,17 +26,34 @@ import { useState, type ComponentType } from 'react';
 
 import {
     about,
+    apps,
+    blog,
+    brands,
+    cart,
     categories,
+    contact,
     dashboard,
     home,
     login,
     products,
     register,
+    search,
     services,
     software,
 } from '@/routes';
 
-type Section = 'products' | 'categories' | 'services' | 'software' | 'about';
+type Section =
+    | 'products'
+    | 'categories'
+    | 'services'
+    | 'software'
+    | 'apps'
+    | 'brands'
+    | 'about'
+    | 'blog'
+    | 'contact'
+    | 'search'
+    | 'cart';
 type Icon = ComponentType<{ className?: string; strokeWidth?: number }>;
 type PublicCategory = {
     id: number;
@@ -43,6 +62,14 @@ type PublicCategory = {
     description: string | null;
     image_path: string | null;
     children: Array<{ id: number; name: string; slug: string }>;
+};
+type PublicBrand = {
+    id: number;
+    name: string;
+    slug: string;
+    description: string | null;
+    logo_path: string | null;
+    website_url: string | null;
 };
 
 type SectionContent = {
@@ -55,6 +82,7 @@ type SectionContent = {
         description: string;
         icon: Icon;
         label?: string;
+        imagePath?: string | null;
     }>;
 };
 
@@ -244,6 +272,108 @@ const sectionContent: Record<Section, SectionContent> = {
             },
         ],
     },
+    apps: {
+        eyebrow: 'Aplicaciones inteligentes',
+        title: 'Experiencias digitales',
+        accent: 'en cualquier dispositivo.',
+        description:
+            'Aplicaciones web, Android, iOS y soluciones empresariales creadas para simplificar tu operación.',
+        items: [
+            {
+                title: 'Aplicaciones Android',
+                description:
+                    'Soluciones móviles ágiles para clientes y equipos de trabajo.',
+                icon: Smartphone,
+                label: 'Android',
+            },
+            {
+                title: 'Aplicaciones iOS',
+                description:
+                    'Experiencias cuidadas, seguras y optimizadas para Apple.',
+                icon: MonitorSmartphone,
+                label: 'iOS',
+            },
+            {
+                title: 'Apps empresariales',
+                description:
+                    'Procesos, reportes y operaciones disponibles desde cualquier lugar.',
+                icon: Store,
+                label: 'Business',
+            },
+            {
+                title: 'Aplicaciones web',
+                description:
+                    'Plataformas modernas que funcionan sin instalaciones complejas.',
+                icon: Code2,
+                label: 'Web',
+            },
+            {
+                title: 'Integraciones',
+                description:
+                    'Conecta sistemas, datos y servicios en un mismo flujo.',
+                icon: Boxes,
+                label: 'API',
+            },
+            {
+                title: 'Desarrollo personalizado',
+                description:
+                    'Una solución diseñada desde cero alrededor de tu negocio.',
+                icon: Sparkles,
+                label: 'A medida',
+            },
+        ],
+    },
+    brands: {
+        eyebrow: 'Marcas de confianza',
+        title: 'Tecnología respaldada',
+        accent: 'por grandes fabricantes.',
+        description:
+            'Seleccionamos marcas reconocidas y soluciones confiables para cada necesidad tecnológica.',
+        items: [
+            {
+                title: 'Cómputo profesional',
+                description:
+                    'Fabricantes líderes en laptops, PCs y estaciones de trabajo.',
+                icon: Laptop,
+                label: 'Equipos',
+            },
+            {
+                title: 'Componentes',
+                description:
+                    'Rendimiento y compatibilidad para construir mejores equipos.',
+                icon: Cpu,
+                label: 'Hardware',
+            },
+            {
+                title: 'Impresión',
+                description:
+                    'Equipos, consumibles y soporte para cada volumen de trabajo.',
+                icon: Printer,
+                label: 'Print',
+            },
+            {
+                title: 'Dispositivos móviles',
+                description:
+                    'Tecnología para comunicarte y producir en movimiento.',
+                icon: Smartphone,
+                label: 'Mobile',
+            },
+            {
+                title: 'Seguridad',
+                description:
+                    'Fabricantes especializados en protección y continuidad.',
+                icon: ShieldCheck,
+                label: 'Security',
+            },
+            {
+                title: 'Software original',
+                description:
+                    'Licenciamiento auténtico con asesoría antes y después de la compra.',
+                icon: Code2,
+                label: 'Software',
+            },
+        ],
+    },
     about: {
         eyebrow: 'Conoce JBTECHLINE',
         title: 'Tecnología con propósito,',
@@ -289,6 +419,139 @@ const sectionContent: Record<Section, SectionContent> = {
             },
         ],
     },
+    blog: {
+        eyebrow: 'Blog y noticias',
+        title: 'Decisiones tecnológicas',
+        accent: 'mejor informadas.',
+        description:
+            'Consejos, tutoriales, comparativas y novedades para aprovechar mejor la tecnología.',
+        items: [
+            {
+                title: 'Guías de compra',
+                description:
+                    'Criterios claros para elegir equipos, componentes y accesorios.',
+                icon: Laptop,
+                label: 'Guías',
+            },
+            {
+                title: 'Consejos de soporte',
+                description:
+                    'Buenas prácticas para cuidar el rendimiento y la seguridad.',
+                icon: Wrench,
+                label: 'Soporte',
+            },
+            {
+                title: 'Transformación digital',
+                description:
+                    'Ideas prácticas para modernizar procesos empresariales.',
+                icon: Zap,
+                label: 'Negocios',
+            },
+            {
+                title: 'Comparativas',
+                description:
+                    'Diferencias importantes antes de tomar una decisión de compra.',
+                icon: Boxes,
+                label: 'Análisis',
+            },
+            {
+                title: 'Seguridad tecnológica',
+                description:
+                    'Recomendaciones para proteger información y dispositivos.',
+                icon: ShieldCheck,
+                label: 'Seguridad',
+            },
+            {
+                title: 'Novedades JBTECHLINE',
+                description:
+                    'Lanzamientos, promociones y noticias de nuestra comunidad.',
+                icon: Sparkles,
+                label: 'Noticias',
+            },
+        ],
+    },
+    contact: {
+        eyebrow: 'Contacto',
+        title: 'Conversemos sobre',
+        accent: 'tu próxima solución.',
+        description:
+            'Cuéntanos qué necesitas y recibe acompañamiento tecnológico personalizado.',
+        items: [
+            {
+                title: 'Asesoría comercial',
+                description:
+                    'Te ayudamos a elegir productos, software y licencias.',
+                icon: MessageCircle,
+                label: 'Ventas',
+            },
+            {
+                title: 'Soporte técnico',
+                description:
+                    'Diagnóstico, mantenimiento y solución de incidencias.',
+                icon: Headphones,
+                label: 'Soporte',
+            },
+            {
+                title: 'Proyectos empresariales',
+                description:
+                    'Soluciones escalables alineadas con tus objetivos.',
+                icon: Store,
+                label: 'Empresas',
+            },
+        ],
+    },
+    search: {
+        eyebrow: 'Buscador global',
+        title: 'Encuentra exactamente',
+        accent: 'lo que necesitas.',
+        description:
+            'Busca productos, categorías, servicios, software y aplicaciones desde un solo lugar.',
+        items: [
+            {
+                title: 'Productos y equipos',
+                description:
+                    'Explora tecnología por nombre, categoría o necesidad.',
+                icon: Laptop,
+            },
+            {
+                title: 'Servicios especializados',
+                description:
+                    'Encuentra soporte, mantenimiento e instalaciones.',
+                icon: Wrench,
+            },
+            {
+                title: 'Software y aplicaciones',
+                description: 'Descubre herramientas digitales para crecer.',
+                icon: Code2,
+            },
+        ],
+    },
+    cart: {
+        eyebrow: 'Tu selección',
+        title: 'Prepara tu solicitud',
+        accent: 'con total claridad.',
+        description:
+            'Reúne productos, licencias y servicios antes de solicitar atención o una cotización.',
+        items: [
+            {
+                title: 'Agrega soluciones',
+                description:
+                    'Selecciona los productos y servicios que te interesan.',
+                icon: PackageCheck,
+            },
+            {
+                title: 'Revisa cantidades',
+                description: 'Organiza tu selección y obtén un total estimado.',
+                icon: Boxes,
+            },
+            {
+                title: 'Solicita asesoría',
+                description:
+                    'Envía tu selección para recibir atención personalizada.',
+                icon: MessageCircle,
+            },
+        ],
+    },
 };
 
 const navigation = [
@@ -297,18 +560,24 @@ const navigation = [
     { label: 'Categorías', route: categories },
     { label: 'Servicios', route: services },
     { label: 'Software', route: software },
+    { label: 'Apps', route: apps },
+    { label: 'Marcas', route: brands },
     { label: 'Nosotros', route: about },
+    { label: 'Blog', route: blog },
+    { label: 'Contacto', route: contact },
 ];
 
 export default function PublicSection({
     section,
     categories: categoryRecords = [],
+    brands: brandRecords = [],
 }: {
     section: Section;
     categories?: PublicCategory[];
+    brands?: PublicBrand[];
 }) {
     const defaultContent = sectionContent[section];
-    const content =
+    const content: SectionContent =
         section === 'categories'
             ? {
                   ...defaultContent,
@@ -324,7 +593,20 @@ export default function PublicSection({
                               : 'Categoría',
                   })),
               }
-            : defaultContent;
+            : section === 'brands'
+              ? {
+                    ...defaultContent,
+                    items: brandRecords.map((brand) => ({
+                        title: brand.name,
+                        description:
+                            brand.description ??
+                            'TecnologÃ­a confiable disponible con asesorÃ­a especializada.',
+                        icon: Store,
+                        label: 'Marca oficial',
+                        imagePath: brand.logo_path,
+                    })),
+                }
+              : defaultContent;
     const page = usePage();
     const { auth, currentTeam } = page.props;
     const [menuOpen, setMenuOpen] = useState(false);
@@ -337,7 +619,7 @@ export default function PublicSection({
             </Head>
             <div className="min-h-screen bg-[#050806] text-white selection:bg-lime-400 selection:text-black">
                 <header className="border-b border-white/8 bg-[#050806]/90 backdrop-blur-xl">
-                    <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 lg:px-8">
+                    <div className="mx-auto flex h-20 max-w-[1500px] items-center justify-between px-5 lg:px-8">
                         <Link href={home()} className="flex items-center gap-3">
                             <img
                                 src="/images/brand/jbtechline-logo.png"
@@ -356,18 +638,32 @@ export default function PublicSection({
                                 </p>
                             </div>
                         </Link>
-                        <nav className="hidden items-center gap-7 lg:flex">
+                        <nav className="hidden items-center gap-4 xl:flex">
                             {navigation.map((item) => (
                                 <Link
                                     key={item.label}
                                     href={item.route()}
-                                    className={`text-sm font-medium transition hover:text-lime-400 ${item.route().url === page.url ? 'text-lime-400' : 'text-white/60'}`}
+                                    className={`text-xs font-medium transition hover:text-lime-400 ${item.route().url === page.url ? 'text-lime-400' : 'text-white/60'}`}
                                 >
                                     {item.label}
                                 </Link>
                             ))}
                         </nav>
-                        <div className="hidden items-center gap-2 lg:flex">
+                        <div className="hidden items-center gap-1 lg:flex">
+                            <Link
+                                href={search()}
+                                className="rounded-full p-2.5 text-white/70 hover:bg-white/8 hover:text-lime-400"
+                                aria-label="Buscar"
+                            >
+                                <Search className="size-5" />
+                            </Link>
+                            <Link
+                                href={cart()}
+                                className="rounded-full p-2.5 text-white/70 hover:bg-white/8 hover:text-lime-400"
+                                aria-label="Carrito"
+                            >
+                                <ShoppingCart className="size-5" />
+                            </Link>
                             {auth.user ? (
                                 <Link
                                     href={dashboardUrl}
@@ -416,6 +712,20 @@ export default function PublicSection({
                                     {item.label}
                                 </Link>
                             ))}
+                            <div className="mt-3 grid grid-cols-2 gap-2 border-t border-white/8 pt-4">
+                                <Link
+                                    href={search()}
+                                    className="rounded-xl border border-white/10 px-4 py-3 text-center text-sm"
+                                >
+                                    Buscar
+                                </Link>
+                                <Link
+                                    href={cart()}
+                                    className="rounded-xl border border-white/10 px-4 py-3 text-center text-sm"
+                                >
+                                    Carrito
+                                </Link>
+                            </div>
                         </nav>
                     )}
                 </header>
@@ -447,6 +757,33 @@ export default function PublicSection({
                         </div>
                     </section>
 
+                    {section === 'search' && (
+                        <section className="mx-auto max-w-4xl px-5 pt-16 lg:px-8">
+                            <form
+                                action={search().url}
+                                method="get"
+                                className="flex flex-col gap-3 rounded-3xl border border-lime-400/20 bg-white/[.04] p-4 sm:flex-row"
+                            >
+                                <label htmlFor="q" className="sr-only">
+                                    Buscar en JBTECHLINE
+                                </label>
+                                <input
+                                    id="q"
+                                    name="q"
+                                    type="search"
+                                    placeholder="Ejemplo: laptop, mantenimiento, sistema POS…"
+                                    className="min-h-12 flex-1 rounded-2xl border border-white/10 bg-black/30 px-5 text-white outline-none placeholder:text-white/30 focus:border-lime-400/50"
+                                />
+                                <button
+                                    type="submit"
+                                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-lime-400 px-7 font-bold text-black"
+                                >
+                                    <Search className="size-5" /> Buscar
+                                </button>
+                            </form>
+                        </section>
+                    )}
+
                     <section className="mx-auto max-w-7xl px-5 py-24 lg:px-8">
                         {content.items.length === 0 && (
                             <div className="rounded-3xl border border-white/9 bg-white/[.035] px-6 py-14 text-center text-white/50">
@@ -457,7 +794,13 @@ export default function PublicSection({
                         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                             {content.items.map(
                                 (
-                                    { title, description, icon: Icon, label },
+                                    {
+                                        title,
+                                        description,
+                                        icon: Icon,
+                                        label,
+                                        imagePath,
+                                    },
                                     index,
                                 ) => (
                                     <article
@@ -466,7 +809,15 @@ export default function PublicSection({
                                     >
                                         <div className="flex items-start justify-between">
                                             <div className="flex size-14 items-center justify-center rounded-2xl border border-lime-400/20 bg-lime-400/10 text-lime-400">
-                                                <Icon className="size-7" />
+                                                {imagePath ? (
+                                                    <img
+                                                        src={imagePath}
+                                                        alt=""
+                                                        className="size-full bg-white object-contain p-2"
+                                                    />
+                                                ) : (
+                                                    <Icon className="size-7" />
+                                                )}
                                             </div>
                                             <span className="text-xs font-bold tracking-wider text-white/20">
                                                 {label ?? `0${index + 1}`}

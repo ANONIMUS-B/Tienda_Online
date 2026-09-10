@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\HomepageSettingController;
+use App\Http\Controllers\BrandCatalogController;
 use App\Http\Controllers\CategoryCatalogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomepageController;
@@ -14,7 +16,13 @@ Route::inertia('/productos', 'public-section', ['section' => 'products'])->name(
 Route::get('/categorias', CategoryCatalogController::class)->name('categories');
 Route::inertia('/servicios', 'public-section', ['section' => 'services'])->name('services');
 Route::inertia('/software', 'public-section', ['section' => 'software'])->name('software');
+Route::inertia('/apps', 'public-section', ['section' => 'apps'])->name('apps');
+Route::get('/marcas', BrandCatalogController::class)->name('brands');
 Route::inertia('/nosotros', 'public-section', ['section' => 'about'])->name('about');
+Route::inertia('/blog', 'public-section', ['section' => 'blog'])->name('blog');
+Route::inertia('/contacto', 'public-section', ['section' => 'contact'])->name('contact');
+Route::inertia('/buscar', 'public-section', ['section' => 'search'])->name('search');
+Route::inertia('/carrito', 'public-section', ['section' => 'cart'])->name('cart');
 
 Route::prefix('{current_team}')
     ->middleware(['auth', 'verified', EnsureTeamMembership::class])
@@ -28,6 +36,10 @@ Route::prefix('{current_team}')
                 ->parameters(['categorias' => 'category'])
                 ->except('show')
                 ->names('admin.categories');
+            Route::resource('administracion/marcas', BrandController::class)
+                ->parameters(['marcas' => 'brand'])
+                ->except('show')
+                ->names('admin.brands');
         });
     });
 

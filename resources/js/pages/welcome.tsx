@@ -30,12 +30,18 @@ import type { HeroContent } from '@/types/homepage';
 
 import {
     about,
+    apps,
+    blog,
+    brands,
+    cart,
     categories as categoriesPage,
+    contact,
     dashboard,
     home,
     login,
     products as productsPage,
     register,
+    search as searchPage,
     services as servicesPage,
     software as softwarePage,
 } from '@/routes';
@@ -46,7 +52,11 @@ const navigation = [
     { label: 'Categorías', route: categoriesPage },
     { label: 'Servicios', route: servicesPage },
     { label: 'Software', route: softwarePage },
+    { label: 'Apps', route: apps },
+    { label: 'Marcas', route: brands },
     { label: 'Nosotros', route: about },
+    { label: 'Blog', route: blog },
+    { label: 'Contacto', route: contact },
 ];
 
 const categories = [
@@ -160,7 +170,7 @@ export default function Welcome({ hero }: { hero: HeroContent }) {
             </Head>
             <div className="min-h-screen overflow-hidden bg-[#050806] text-white selection:bg-lime-400 selection:text-black">
                 <header className="fixed inset-x-0 top-0 z-50 border-b border-white/8 bg-[#050806]/85 backdrop-blur-xl">
-                    <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 lg:px-8">
+                    <div className="mx-auto flex h-20 max-w-[1500px] items-center justify-between px-5 lg:px-8">
                         <a
                             href="#inicio"
                             className="flex items-center gap-3"
@@ -184,35 +194,35 @@ export default function Welcome({ hero }: { hero: HeroContent }) {
                             </div>
                         </a>
                         <nav
-                            className="hidden items-center gap-7 lg:flex"
+                            className="hidden items-center gap-4 xl:flex"
                             aria-label="Navegación principal"
                         >
                             {navigation.map((item) => (
                                 <Link
                                     key={item.label}
                                     href={item.route()}
-                                    className="text-sm font-medium text-white/65 transition hover:text-lime-400"
+                                    className="text-xs font-medium text-white/65 transition hover:text-lime-400"
                                 >
                                     {item.label}
                                 </Link>
                             ))}
                         </nav>
                         <div className="hidden items-center gap-2 lg:flex">
-                            <a
-                                href="#productos"
+                            <Link
+                                href={searchPage()}
                                 className="rounded-full p-2.5 text-white/70 hover:bg-white/8 hover:text-lime-400"
                                 aria-label="Buscar"
                             >
                                 <Search className="size-5" />
-                            </a>
-                            <a
-                                href="#productos"
+                            </Link>
+                            <Link
+                                href={cart()}
                                 className="relative rounded-full p-2.5 text-white/70 hover:bg-white/8 hover:text-lime-400"
                                 aria-label="Carrito"
                             >
                                 <ShoppingCart className="size-5" />
                                 <span className="absolute top-1 right-1 size-2 rounded-full bg-lime-400" />
-                            </a>
+                            </Link>
                             {auth.user ? (
                                 <Link
                                     href={dashboardUrl}
@@ -264,6 +274,20 @@ export default function Welcome({ hero }: { hero: HeroContent }) {
                                         {item.label}
                                     </Link>
                                 ))}
+                                <div className="mt-3 grid grid-cols-2 gap-2 border-t border-white/8 pt-4">
+                                    <Link
+                                        href={searchPage()}
+                                        className="rounded-xl border border-white/10 px-4 py-3 text-center text-sm"
+                                    >
+                                        Buscar
+                                    </Link>
+                                    <Link
+                                        href={cart()}
+                                        className="rounded-xl border border-white/10 px-4 py-3 text-center text-sm"
+                                    >
+                                        Carrito
+                                    </Link>
+                                </div>
                                 <div className="mt-3 flex gap-3 border-t border-white/8 pt-4">
                                     <Link
                                         href={
