@@ -53,13 +53,16 @@ export default function BrandForm({
                         <InputError message={errors.description} />
                     </div>
                     <div className="grid gap-5 sm:grid-cols-2">
-                        <Field
-                            label="Ruta del logo"
-                            name="logo_path"
-                            value={brand?.logo_path ?? ''}
-                            error={errors.logo_path}
-                            placeholder="/images/marcas/logo.webp"
-                        />
+                        <div className="grid gap-2">
+                            <Label htmlFor="logo">Logo</Label>
+                            <Input
+                                id="logo"
+                                name="logo"
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp"
+                            />
+                            <InputError message={errors.logo} />
+                        </div>
                         <Field
                             label="Sitio web"
                             name="website_url"

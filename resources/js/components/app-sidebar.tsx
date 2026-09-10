@@ -6,6 +6,7 @@ import {
     FolderTree,
     LayoutGrid,
     PanelsTopLeft,
+    Package,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
@@ -23,6 +24,7 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as brandIndex } from '@/routes/admin/brands';
+import { index as productIndex } from '@/routes/admin/products';
 import { edit as editHomepage } from '@/routes/admin/homepage';
 import { index as categoryIndex } from '@/routes/admin/categories';
 import type { NavItem } from '@/types';
@@ -61,6 +63,13 @@ export function AppSidebar() {
                           ? brandIndex(page.props.currentTeam.slug)
                           : '/',
                       icon: BadgeCheck,
+                  },
+                  {
+                      title: 'Productos',
+                      href: page.props.currentTeam
+                          ? productIndex(page.props.currentTeam.slug)
+                          : '/',
+                      icon: Package,
                   },
               ]
             : []),

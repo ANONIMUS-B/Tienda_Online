@@ -31,7 +31,7 @@ class UpdateHomepageSettingRequest extends FormRequest
             'hero_primary_url' => ['required', 'string', 'max:255', 'starts_with:/,#,https://'],
             'hero_secondary_label' => ['required', 'string', 'max:50'],
             'hero_secondary_url' => ['required', 'string', 'max:255', 'starts_with:/,#,https://'],
-            'hero_image_path' => ['required', 'string', 'max:255', 'starts_with:/,https://'],
+            'hero_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:6144'],
         ];
     }
 }

@@ -103,12 +103,22 @@ export default function EditHomepage({
                                         error={errors.hero_secondary_url}
                                     />
                                 </div>
-                                <Field
-                                    label="Ruta de la imagen 3D"
-                                    name="hero_image_path"
-                                    value={hero.hero_image_path}
-                                    error={errors.hero_image_path}
-                                />
+                                <div className="grid gap-2">
+                                    <Label htmlFor="hero_image">
+                                        Imagen principal 3D
+                                    </Label>
+                                    <Input
+                                        id="hero_image"
+                                        name="hero_image"
+                                        type="file"
+                                        accept="image/jpeg,image/png,image/webp"
+                                    />
+                                    <InputError message={errors.hero_image} />
+                                    <p className="text-muted-foreground text-xs">
+                                        Déjalo vacío para conservar la imagen
+                                        actual.
+                                    </p>
+                                </div>
                                 <div className="flex items-center gap-4">
                                     <Button type="submit" disabled={processing}>
                                         <Save />{' '}

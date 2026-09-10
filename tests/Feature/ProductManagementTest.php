@@ -1,0 +1,61 @@
+<?php
+
+use App\Enums\TeamRole;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\Team;
+use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Inertia\Testing\AssertableInertia as Assert;
+
+test('administrators can create products with uploaded images', function () {
+    Storage::fake('public');
+    $user = User::factory()->create();
+    $category = Category::factory()->create();
+    $brand = Brand::factory()->create();
+
+    $this->actingAs($user)->post(route('admin.products.store', $user->currentTeam), productPayload($category, $brand))->assertRedirect();
+    $product = Product::query()->firstOrFail();
+    expect($product->images)->toHaveCount(2)->and($product->images->first()->is_primary)->toBeTrue();
+    Storage::disk('public')->assertExists(str($product->images->first()->path)->after('/storage/')->toString());
+});
+
+test('product image uploads reject unsafe formats', function () {
+    $user = User::factory()->create();
+    $category = Category::factory()->create();
+    $payload = productPayload($category);
+    $payload['primary_image'] = UploadedFile::fake()->create('product.svg', 20, 'image/svg+xml');
+    $this->actingAs($user)->post(route('admin.products.store', $user->currentTeam), $payload)->assertSessionHasErrors('primary_image');
+});
+
+test('regular members cannot manage products', function () {
+    $owner = User::factory()->create();
+    $member = User::factory()->create();
+    $team = Team::factory()->create();
+    $team->members()->attach($owner, ['role' => TeamRole::Owner->value]);
+    $team->members()->attach($member, ['role' => TeamRole::Member->value]);
+    $this->actingAs($member)->get(route('admin.products.index', $team))->assertForbidden();
+});
+
+test('public catalog filters products and renders product details', function () {
+    $category = Category::factory()->create(['name' => 'Laptops', 'slug' => 'laptops']);
+    $brand = Brand::factory()->create(['name' => 'Lenovo', 'slug' => 'lenovo']);
+    $product = Product::factory()->create(['category_id' => $category->id, 'brand_id' => $brand->id, 'name' => 'ThinkPad Pro', 'slug' => 'thinkpad-pro']);
+    Product::factory()->create(['category_id' => $category->id, 'name' => 'Otro equipo']);
+
+    $this->get(route('products', ['q' => 'ThinkPad']))->assertInertia(fn (Assert $page) => $page->component('products/index')->has('products.data', 1)->where('products.data.0.name', 'ThinkPad Pro'));
+    $this->get(route('products.show', $product))->assertInertia(fn (Assert $page) => $page->component('products/show')->where('product.name', 'ThinkPad Pro'));
+});
+
+test('inactive products are hidden from their public detail page', function () {
+    $product = Product::factory()->create(['is_active' => false]);
+    $this->get(route('products.show', $product))->assertNotFound();
+});
+
+/** @return array<string, mixed> */
+function productPayload(Category $category, ?Brand $brand = null): array
+{
+    return ['category_id' => $category->id, 'brand_id' => $brand?->id, 'type' => 'physical', 'sku' => 'JB-001', 'name' => 'Laptop profesional', 'slug' => 'laptop-profesional', 'short_description' => 'Equipo de alto rendimiento.', 'description' => 'Descripción completa.', 'specifications_text' => "RAM: 16 GB\nDisco: 512 GB", 'price' => 3000, 'promotional_price' => 2799, 'stock' => 10, 'minimum_stock' => 3, 'is_featured' => true, 'is_bestseller' => false, 'is_new' => true, 'is_active' => true, 'primary_image' => UploadedFile::fake()->image('principal.webp'), 'gallery' => [UploadedFile::fake()->image('detalle.webp')]];
+}

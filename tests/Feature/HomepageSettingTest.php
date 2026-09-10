@@ -4,6 +4,8 @@ use App\Enums\TeamRole;
 use App\Models\HomepageSetting;
 use App\Models\Team;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('homepage renders the configured 3d hero content', function () {
@@ -21,11 +23,13 @@ test('homepage renders the configured 3d hero content', function () {
 });
 
 test('team administrators can update the homepage hero', function () {
+    Storage::fake('public');
     $user = User::factory()->create();
     $team = $user->currentTeam;
 
     $payload = HomepageSetting::defaults();
     $payload['hero_title'] = 'Innovación administrable';
+    $payload['hero_image'] = UploadedFile::fake()->image('hero.jpg', 1600, 900);
 
     $this->actingAs($user)
         ->put(route('admin.homepage.update', $team), $payload)
@@ -34,6 +38,9 @@ test('team administrators can update the homepage hero', function () {
     $this->assertDatabaseHas('homepage_settings', [
         'hero_title' => 'Innovación administrable',
     ]);
+    $setting = HomepageSetting::query()->firstOrFail();
+    expect($setting->hero_image_path)->toStartWith('/storage/homepage/');
+    Storage::disk('public')->assertExists(substr($setting->hero_image_path, strlen('/storage/')));
 });
 
 test('regular team members cannot administer the homepage', function () {

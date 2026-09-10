@@ -4,13 +4,17 @@ use App\Enums\TeamRole;
 use App\Models\Brand;
 use App\Models\Team;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('administrators can create brands', function () {
+    Storage::fake('public');
     $user = User::factory()->create();
+    $logo = UploadedFile::fake()->image('lenovo.png');
 
     $this->actingAs($user)
-        ->post(route('admin.brands.store', $user->currentTeam), brandPayload())
+        ->post(route('admin.brands.store', $user->currentTeam), brandPayload(['logo' => $logo]))
         ->assertRedirect(route('admin.brands.index', $user->currentTeam));
 
     $this->assertDatabaseHas('brands', [
@@ -18,6 +22,9 @@ test('administrators can create brands', function () {
         'slug' => 'lenovo',
         'is_active' => true,
     ]);
+    $brand = Brand::query()->where('slug', 'lenovo')->firstOrFail();
+    expect($brand->logo_path)->toStartWith('/storage/brands/');
+    Storage::disk('public')->assertExists(substr($brand->logo_path, strlen('/storage/')));
 });
 
 test('brand data and external links are validated', function () {
@@ -26,10 +33,10 @@ test('brand data and external links are validated', function () {
     $this->actingAs($user)
         ->post(route('admin.brands.store', $user->currentTeam), brandPayload([
             'name' => '',
-            'logo_path' => 'javascript:alert(1)',
+            'logo' => UploadedFile::fake()->create('invalid.svg', 10, 'image/svg+xml'),
             'website_url' => 'javascript:alert(1)',
         ]))
-        ->assertSessionHasErrors(['name', 'logo_path', 'website_url']);
+        ->assertSessionHasErrors(['name', 'logo', 'website_url']);
 
     $this->assertDatabaseCount('brands', 0);
 });
@@ -88,7 +95,6 @@ function brandPayload(array $overrides = []): array
         'name' => 'Lenovo',
         'slug' => 'lenovo',
         'description' => 'Tecnología para personas y empresas.',
-        'logo_path' => '/images/marcas/lenovo.webp',
         'website_url' => 'https://www.lenovo.com',
         'is_active' => true,
         'sort_order' => 1,

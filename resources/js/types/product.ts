@@ -1,0 +1,29 @@
+export type ProductImage = {
+    id: number;
+    path: string;
+    alt_text: string | null;
+    is_primary: boolean;
+};
+export type Product = {
+    id: number;
+    category_id: number;
+    brand_id: number | null;
+    type: string;
+    sku: string;
+    name: string;
+    slug: string;
+    short_description: string | null;
+    description: string | null;
+    specifications: Record<string, string> | null;
+    price: string;
+    promotional_price: string | null;
+    stock: number;
+    minimum_stock: number;
+    is_featured: boolean;
+    is_bestseller: boolean;
+    is_new: boolean;
+    is_active: boolean;
+    category?: { id?: number; name: string; slug?: string } | null;
+    brand?: { id?: number; name: string; slug?: string } | null;
+    images: ProductImage[];
+};

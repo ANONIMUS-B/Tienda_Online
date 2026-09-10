@@ -7,6 +7,7 @@ use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Models\Category;
 use App\Models\Team;
+use App\Services\ImageUploader;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
@@ -15,6 +16,8 @@ use Inertia\Response;
 
 class CategoryController extends Controller
 {
+    public function __construct(private ImageUploader $images) {}
+
     /**
      * Display a listing of the resource.
      */
@@ -45,7 +48,9 @@ class CategoryController extends Controller
      */
     public function store(StoreCategoryRequest $request): RedirectResponse
     {
-        Category::query()->create($this->normalized($request->validated()));
+        $attributes = $this->normalized($request->safe()->except('image'));
+        $attributes['image_path'] = $this->images->replace($request->file('image'), 'categories');
+        Category::query()->create($attributes);
 
         return redirect()->route('admin.categories.index', $request->route('current_team'));
     }
@@ -66,7 +71,9 @@ class CategoryController extends Controller
      */
     public function update(UpdateCategoryRequest $request, Team $currentTeam, Category $category): RedirectResponse
     {
-        $category->update($this->normalized($request->validated()));
+        $attributes = $this->normalized($request->safe()->except('image'));
+        $attributes['image_path'] = $this->images->replace($request->file('image'), 'categories', $category->image_path);
+        $category->update($attributes);
 
         return redirect()->route('admin.categories.index', $request->route('current_team'));
     }
@@ -76,6 +83,7 @@ class CategoryController extends Controller
      */
     public function destroy(Team $currentTeam, Category $category): RedirectResponse
     {
+        $this->images->delete($category->image_path);
         $category->delete();
 
         return back();

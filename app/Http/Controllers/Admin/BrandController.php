@@ -7,6 +7,7 @@ use App\Http\Requests\StoreBrandRequest;
 use App\Http\Requests\UpdateBrandRequest;
 use App\Models\Brand;
 use App\Models\Team;
+use App\Services\ImageUploader;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -14,6 +15,8 @@ use Inertia\Response;
 
 class BrandController extends Controller
 {
+    public function __construct(private ImageUploader $images) {}
+
     /**
      * Display a listing of the resource.
      */
@@ -37,7 +40,9 @@ class BrandController extends Controller
      */
     public function store(StoreBrandRequest $request): RedirectResponse
     {
-        Brand::query()->create($this->normalized($request->validated()));
+        $attributes = $this->normalized($request->safe()->except('logo'));
+        $attributes['logo_path'] = $this->images->replace($request->file('logo'), 'brands');
+        Brand::query()->create($attributes);
 
         return redirect()->route('admin.brands.index', $request->route('current_team'));
     }
@@ -55,7 +60,9 @@ class BrandController extends Controller
      */
     public function update(UpdateBrandRequest $request, Team $currentTeam, Brand $brand): RedirectResponse
     {
-        $brand->update($this->normalized($request->validated()));
+        $attributes = $this->normalized($request->safe()->except('logo'));
+        $attributes['logo_path'] = $this->images->replace($request->file('logo'), 'brands', $brand->logo_path);
+        $brand->update($attributes);
 
         return redirect()->route('admin.brands.index', $request->route('current_team'));
     }
@@ -65,6 +72,7 @@ class BrandController extends Controller
      */
     public function destroy(Team $currentTeam, Brand $brand): RedirectResponse
     {
+        $this->images->delete($brand->logo_path);
         $brand->delete();
 
         return back();

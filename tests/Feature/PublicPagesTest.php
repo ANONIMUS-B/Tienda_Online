@@ -10,7 +10,6 @@ test('public sections render on their own pages', function (string $routeName, s
         ->where('section', $section)
     );
 })->with([
-    'products' => ['products', 'products'],
     'categories' => ['categories', 'categories'],
     'services' => ['services', 'services'],
     'software' => ['software', 'software'],

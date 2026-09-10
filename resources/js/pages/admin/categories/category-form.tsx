@@ -74,13 +74,23 @@ export default function CategoryForm({
                         />
                         <InputError message={errors.description} />
                     </div>
-                    <Field
-                        label="Ruta de imagen"
-                        name="image_path"
-                        value={category?.image_path ?? ''}
-                        error={errors.image_path}
-                        placeholder="/images/categorias/laptops.webp"
-                    />
+                    <div className="grid gap-2">
+                        <Label htmlFor="image">Imagen</Label>
+                        <Input
+                            id="image"
+                            name="image"
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                        />
+                        <InputError message={errors.image} />
+                        {category?.image_path && (
+                            <img
+                                src={category.image_path}
+                                alt="Imagen actual"
+                                className="h-28 w-44 rounded-xl object-cover"
+                            />
+                        )}
+                    </div>
                     <div className="grid gap-5 sm:grid-cols-2">
                         <Field
                             label="Orden"

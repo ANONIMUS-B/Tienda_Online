@@ -4,13 +4,17 @@ use App\Enums\TeamRole;
 use App\Models\Category;
 use App\Models\Team;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('administrators can create principal categories', function () {
+    Storage::fake('public');
     $user = User::factory()->create();
+    $image = UploadedFile::fake()->image('laptops.webp');
 
     $this->actingAs($user)
-        ->post(route('admin.categories.store', $user->currentTeam), categoryPayload())
+        ->post(route('admin.categories.store', $user->currentTeam), categoryPayload(['image' => $image]))
         ->assertRedirect(route('admin.categories.index', $user->currentTeam));
 
     $this->assertDatabaseHas('categories', [
@@ -18,6 +22,9 @@ test('administrators can create principal categories', function () {
         'slug' => 'laptops-y-computadoras',
         'is_active' => true,
     ]);
+    $category = Category::query()->where('slug', 'laptops-y-computadoras')->firstOrFail();
+    expect($category->image_path)->toStartWith('/storage/categories/');
+    Storage::disk('public')->assertExists(substr($category->image_path, strlen('/storage/')));
 });
 
 test('administrators can create subcategories below principal categories', function () {
@@ -41,9 +48,9 @@ test('category data is validated', function () {
     $this->actingAs($user)
         ->post(route('admin.categories.store', $user->currentTeam), categoryPayload([
             'name' => '',
-            'image_path' => 'javascript:alert(1)',
+            'image' => UploadedFile::fake()->create('invalid.svg', 10, 'image/svg+xml'),
         ]))
-        ->assertSessionHasErrors(['name', 'image_path']);
+        ->assertSessionHasErrors(['name', 'image']);
 
     $this->assertDatabaseCount('categories', 0);
 });
@@ -105,7 +112,6 @@ function categoryPayload(array $overrides = []): array
         'name' => 'Laptops y computadoras',
         'slug' => 'laptops-y-computadoras',
         'description' => 'Equipos para trabajo y estudio.',
-        'image_path' => '/images/categorias/laptops.webp',
         'is_active' => true,
         'sort_order' => 1,
     ], $overrides);

@@ -3,16 +3,19 @@
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\HomepageSettingController;
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\BrandCatalogController;
 use App\Http\Controllers\CategoryCatalogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomepageController;
+use App\Http\Controllers\ProductCatalogController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use App\Http\Middleware\EnsureTeamMembership;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomepageController::class)->name('home');
-Route::inertia('/productos', 'public-section', ['section' => 'products'])->name('products');
+Route::get('/productos', [ProductCatalogController::class, 'index'])->name('products');
+Route::get('/productos/{product}', [ProductCatalogController::class, 'show'])->name('products.show');
 Route::get('/categorias', CategoryCatalogController::class)->name('categories');
 Route::inertia('/servicios', 'public-section', ['section' => 'services'])->name('services');
 Route::inertia('/software', 'public-section', ['section' => 'software'])->name('software');
@@ -40,6 +43,10 @@ Route::prefix('{current_team}')
                 ->parameters(['marcas' => 'brand'])
                 ->except('show')
                 ->names('admin.brands');
+            Route::resource('administracion/productos', ProductController::class)
+                ->parameters(['productos' => 'product'])
+                ->except('show')
+                ->names('admin.products');
         });
     });
 
