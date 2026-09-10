@@ -8,6 +8,7 @@ import {
 } from '@/routes';
 import { show } from '@/routes/products';
 import type { Product } from '@/types/product';
+import PublicHeader from '@/components/public-header';
 type Paginator = {
     data: Product[];
     links: { url: string | null; label: string; active: boolean }[];
@@ -28,21 +29,28 @@ export default function ProductCatalog({
         <>
             <Head title="Productos | JBTECHLINE" />
             <div className="min-h-screen bg-[#050806] text-white">
-                <header className="border-b border-white/10">
-                    <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5">
-                        <Link href={home()} className="text-xl font-black">
-                            JB<span className="text-lime-400">TECHLINE</span>
-                        </Link>
-                        <nav className="flex gap-5 text-sm text-white/60">
-                            <Link href={products()} className="text-lime-400">
-                                Productos
+                <div className="hidden">
+                    <header className="border-b border-white/10">
+                        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5">
+                            <Link href={home()} className="text-xl font-black">
+                                JB
+                                <span className="text-lime-400">TECHLINE</span>
                             </Link>
-                            <Link href={categoriesPage()}>Categorías</Link>
-                            <Link href={brandsPage()}>Marcas</Link>
-                        </nav>
-                    </div>
-                </header>
-                <main className="mx-auto max-w-7xl px-5 py-16">
+                            <nav className="flex gap-5 text-sm text-white/60">
+                                <Link
+                                    href={products()}
+                                    className="text-lime-400"
+                                >
+                                    Productos
+                                </Link>
+                                <Link href={categoriesPage()}>Categorías</Link>
+                                <Link href={brandsPage()}>Marcas</Link>
+                            </nav>
+                        </div>
+                    </header>
+                </div>
+                <PublicHeader />
+                <main className="mx-auto max-w-7xl px-5 pt-32 pb-16">
                     <p className="text-xs font-bold tracking-[.2em] text-lime-400 uppercase">
                         Catálogo tecnológico
                     </p>

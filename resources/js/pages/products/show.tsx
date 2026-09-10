@@ -1,27 +1,33 @@
-import { Head, Link } from '@inertiajs/react';
+import { Form, Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Check, MessageCircle, ShoppingCart } from 'lucide-react';
 import { home, products } from '@/routes';
 import type { Product } from '@/types/product';
+import PublicHeader from '@/components/public-header';
+import { store as addToCart } from '@/routes/cart';
 export default function ProductShow({ product }: { product: Product }) {
     const price = product.promotional_price ?? product.price;
     return (
         <>
             <Head title={`${product.name} | JBTECHLINE`} />
             <div className="min-h-screen bg-[#050806] text-white">
-                <header className="border-b border-white/10">
-                    <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5">
-                        <Link href={home()} className="text-xl font-black">
-                            JB<span className="text-lime-400">TECHLINE</span>
-                        </Link>
-                        <Link
-                            href={products()}
-                            className="text-sm text-white/60"
-                        >
-                            Ver catálogo
-                        </Link>
-                    </div>
-                </header>
-                <main className="mx-auto max-w-7xl px-5 py-12">
+                <div className="hidden">
+                    <header className="border-b border-white/10">
+                        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5">
+                            <Link href={home()} className="text-xl font-black">
+                                JB
+                                <span className="text-lime-400">TECHLINE</span>
+                            </Link>
+                            <Link
+                                href={products()}
+                                className="text-sm text-white/60"
+                            >
+                                Ver catálogo
+                            </Link>
+                        </div>
+                    </header>
+                </div>
+                <PublicHeader />
+                <main className="mx-auto max-w-7xl px-5 pt-28 pb-12">
                     <Link
                         href={products()}
                         className="inline-flex items-center gap-2 text-sm text-white/50"
@@ -81,10 +87,28 @@ export default function ProductShow({ product }: { product: Product }) {
                                     : 'Agotado'}
                             </p>
                             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                                <button className="inline-flex items-center justify-center gap-2 rounded-full bg-lime-400 px-7 py-4 font-bold text-black">
-                                    <ShoppingCart className="size-5" />
-                                    Agregar al carrito
-                                </button>
+                                <Form
+                                    {...addToCart.form()}
+                                    className="contents"
+                                >
+                                    <input
+                                        type="hidden"
+                                        name="product_id"
+                                        value={product.id}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="quantity"
+                                        value="1"
+                                    />
+                                    <button
+                                        disabled={product.stock < 1}
+                                        className="inline-flex items-center justify-center gap-2 rounded-full bg-lime-400 px-7 py-4 font-bold text-black disabled:opacity-40"
+                                    >
+                                        <ShoppingCart className="size-5" />
+                                        Agregar al carrito
+                                    </button>
+                                </Form>
                                 <button className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 px-7 py-4 font-bold">
                                     <MessageCircle className="size-5" />
                                     Consultar

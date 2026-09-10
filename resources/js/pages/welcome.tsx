@@ -33,7 +33,6 @@ import {
     apps,
     blog,
     brands,
-    cart,
     categories as categoriesPage,
     contact,
     dashboard,
@@ -45,6 +44,7 @@ import {
     services as servicesPage,
     software as softwarePage,
 } from '@/routes';
+import { index as cart } from '@/routes/cart';
 
 const navigation = [
     { label: 'Inicio', route: home },

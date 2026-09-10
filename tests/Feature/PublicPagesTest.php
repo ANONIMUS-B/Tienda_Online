@@ -19,5 +19,4 @@ test('public sections render on their own pages', function (string $routeName, s
     'blog' => ['blog', 'blog'],
     'contact' => ['contact', 'contact'],
     'search' => ['search', 'search'],
-    'cart' => ['cart', 'cart'],
 ]);

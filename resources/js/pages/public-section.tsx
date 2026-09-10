@@ -29,7 +29,6 @@ import {
     apps,
     blog,
     brands,
-    cart,
     categories,
     contact,
     dashboard,
@@ -41,6 +40,7 @@ import {
     services,
     software,
 } from '@/routes';
+import { index as cart } from '@/routes/cart';
 
 type Section =
     | 'products'

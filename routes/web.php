@@ -3,9 +3,13 @@
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\HomepageSettingController;
+use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\BrandCatalogController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryCatalogController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\CustomerOrderController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\ProductCatalogController;
@@ -25,7 +29,13 @@ Route::inertia('/nosotros', 'public-section', ['section' => 'about'])->name('abo
 Route::inertia('/blog', 'public-section', ['section' => 'blog'])->name('blog');
 Route::inertia('/contacto', 'public-section', ['section' => 'contact'])->name('contact');
 Route::inertia('/buscar', 'public-section', ['section' => 'search'])->name('search');
-Route::inertia('/carrito', 'public-section', ['section' => 'cart'])->name('cart');
+Route::get('/carrito', [CartController::class, 'index'])->name('cart.index');
+Route::post('/carrito', [CartController::class, 'store'])->name('cart.store');
+Route::patch('/carrito/{product}', [CartController::class, 'update'])->name('cart.update');
+Route::delete('/carrito/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
+Route::get('/finalizar-compra', [CheckoutController::class, 'create'])->name('checkout.create');
+Route::post('/finalizar-compra', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::get('/pedido/{number}', [CustomerOrderController::class, 'show'])->middleware('signed')->name('orders.show');
 
 Route::prefix('{current_team}')
     ->middleware(['auth', 'verified', EnsureTeamMembership::class])
@@ -47,6 +57,10 @@ Route::prefix('{current_team}')
                 ->parameters(['productos' => 'product'])
                 ->except('show')
                 ->names('admin.products');
+            Route::resource('administracion/pedidos', OrderController::class)
+                ->parameters(['pedidos' => 'order'])
+                ->only(['index', 'show', 'update'])
+                ->names('admin.orders');
         });
     });
 
