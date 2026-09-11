@@ -10,6 +10,7 @@ import {
     ShoppingBag,
     Settings,
     Code2,
+    Users,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
@@ -33,6 +34,7 @@ import { edit as editHomepage } from '@/routes/admin/homepage';
 import { index as categoryIndex } from '@/routes/admin/categories';
 import { edit as companySettings } from '@/routes/admin/company-settings';
 import { index as softwareIndex } from '@/routes/admin/software';
+import { index as customerIndex } from '@/routes/admin/customers';
 import type { NavItem } from '@/types';
 
 export function AppSidebar() {
@@ -97,6 +99,13 @@ export function AppSidebar() {
                           ? softwareIndex(page.props.currentTeam.slug)
                           : '/',
                       icon: Code2,
+                  },
+                  {
+                      title: 'Clientes',
+                      href: page.props.currentTeam
+                          ? customerIndex(page.props.currentTeam.slug)
+                          : '/',
+                      icon: Users,
                   },
               ]
             : []),

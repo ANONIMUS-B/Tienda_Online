@@ -39,8 +39,11 @@ test('authenticated customers create an order and receive a private confirmation
     expect($response->headers->get('Location'))->toContain($order->number)->toContain('signature=');
 });
 
-test('checkout redirects an empty guest cart to the cart page', function () {
-    $this->get(route('checkout.create'))->assertRedirect(route('cart.index'));
+test('checkout requires customers to log in before creating an order', function () {
+    $product = Product::factory()->create(['stock' => 1]);
+    $this->withSession(['cart' => [$product->id => 1]])->get(route('checkout.create'))->assertRedirect(route('login'));
+    $this->withSession(['cart' => [$product->id => 1]])->post(route('checkout.store'), checkoutPayload())->assertRedirect(route('login'));
+    $this->assertDatabaseCount('orders', 0);
 });
 
 test('checkout requires customer delivery and payment information', function () {
@@ -73,7 +76,7 @@ test('checkout only exposes enabled payment methods and whatsapp contact', funct
     $product = Product::factory()->create(['stock' => 1]);
     CompanySetting::query()->create(['company_name' => 'JBTECHLINE', 'whatsapp_number' => '51999888777', 'payment_yape_enabled' => true, 'payment_transfer_enabled' => false, 'payment_cash_enabled' => false, 'payment_gateway_enabled' => false, 'whatsapp_checkout_enabled' => true]);
 
-    $this->withSession(['cart' => [$product->id => 1]])->get(route('checkout.create'))->assertInertia(fn ($page) => $page->component('checkout/create')->has('paymentMethods', 1)->where('paymentMethods.0.value', 'yape')->where('whatsappUrl', fn ($url) => str_starts_with($url, 'https://wa.me/51999888777')));
+    $this->actingAs(User::factory()->create())->withSession(['cart' => [$product->id => 1]])->get(route('checkout.create'))->assertInertia(fn ($page) => $page->component('checkout/create')->has('paymentMethods', 1)->where('paymentMethods.0.value', 'yape')->where('whatsappUrl', fn ($url) => str_starts_with($url, 'https://wa.me/51999888777')));
 });
 
 /** @return array<string, string> */

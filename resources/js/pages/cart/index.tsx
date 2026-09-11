@@ -1,9 +1,9 @@
-import { Form, Head, Link } from '@inertiajs/react';
+import { Form, Head, Link, usePage } from '@inertiajs/react';
 import { Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
 import PublicHeader from '@/components/public-header';
 import { destroy, update } from '@/routes/cart';
 import { create as checkout } from '@/routes/checkout';
-import { products } from '@/routes';
+import { login, products, register } from '@/routes';
 import type { CartItem } from '@/types/order';
 
 export default function Cart({
@@ -11,6 +11,7 @@ export default function Cart({
 }: {
     cart: { items: CartItem[]; count: number; subtotal: number };
 }) {
+    const { auth } = usePage().props;
     return (
         <div className="min-h-screen bg-[#050806] text-white">
             <Head title="Carrito | JBTECHLINE" />
@@ -156,12 +157,33 @@ export default function Cart({
                             <p className="mt-3 text-xs text-white/35">
                                 El envío se calcula al finalizar.
                             </p>
-                            <Link
-                                href={checkout()}
-                                className="mt-7 flex justify-center rounded-full bg-lime-400 px-6 py-4 font-black text-black"
-                            >
-                                Finalizar compra
-                            </Link>
+                            {auth.user ? (
+                                <Link
+                                    href={checkout()}
+                                    className="mt-7 flex justify-center rounded-full bg-lime-400 px-6 py-4 font-black text-black"
+                                >
+                                    Finalizar compra
+                                </Link>
+                            ) : (
+                                <div className="mt-7 grid gap-3">
+                                    <p className="text-center text-sm text-white/50">
+                                        Debes ingresar o registrarte antes de
+                                        realizar el pedido.
+                                    </p>
+                                    <Link
+                                        href={login()}
+                                        className="flex justify-center rounded-full bg-lime-400 px-6 py-4 font-black text-black"
+                                    >
+                                        Iniciar sesión
+                                    </Link>
+                                    <Link
+                                        href={register()}
+                                        className="flex justify-center rounded-full border border-white/15 px-6 py-4 font-bold"
+                                    >
+                                        Crear cuenta
+                                    </Link>
+                                </div>
+                            )}
                         </aside>
                     </div>
                 )}
