@@ -33,7 +33,7 @@ class StoreCheckoutRequest extends FormRequest
             'province' => ['required', 'string', 'max:100'],
             'department' => ['required', 'string', 'max:100'],
             'shipping_method' => ['required', Rule::in(['delivery', 'store_pickup'])],
-            'payment_method' => ['required', Rule::in(['yape', 'bank_transfer', 'cash_on_delivery'])],
+            'payment_method' => ['required', Rule::in(['yape', 'bank_transfer', 'cash_on_delivery', 'gateway'])],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

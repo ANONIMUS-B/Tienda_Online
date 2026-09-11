@@ -42,6 +42,7 @@ import {
     software,
 } from '@/routes';
 import { index as cart } from '@/routes/cart';
+import { index as programs } from '@/routes/programs';
 
 type Section =
     | 'products'
@@ -558,6 +559,7 @@ const sectionContent: Record<Section, SectionContent> = {
 const navigation = [
     { label: 'Servicios', route: services },
     { label: 'Software', route: software },
+    { label: 'Programas', route: programs },
     { label: 'Apps', route: apps },
     { label: 'Nosotros', route: about },
     { label: 'Blog', route: blog },

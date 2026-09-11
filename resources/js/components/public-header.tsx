@@ -2,6 +2,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { ChevronDown, Menu, Search, ShoppingCart, X } from 'lucide-react';
 import { useState } from 'react';
 import { index as cart } from '@/routes/cart';
+import { index as programs } from '@/routes/programs';
 import {
     about,
     apps,
@@ -22,6 +23,7 @@ import {
 const navigation = [
     ['Servicios', services],
     ['Software', software],
+    ['Programas', programs],
     ['Apps', apps],
     ['Nosotros', about],
     ['Blog', blog],

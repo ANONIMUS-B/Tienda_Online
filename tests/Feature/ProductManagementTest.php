@@ -7,11 +7,9 @@ use App\Models\Product;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('administrators can create products with uploaded images', function () {
-    Storage::fake('public');
     $user = User::factory()->create();
     $category = Category::factory()->create();
     $brand = Brand::factory()->create();
@@ -19,7 +17,8 @@ test('administrators can create products with uploaded images', function () {
     $this->actingAs($user)->post(route('admin.products.store', $user->currentTeam), productPayload($category, $brand))->assertRedirect();
     $product = Product::query()->firstOrFail();
     expect($product->images)->toHaveCount(2)->and($product->images->first()->is_primary)->toBeTrue();
-    Storage::disk('public')->assertExists(str($product->images->first()->path)->after('/storage/')->toString());
+    expect($product->images->first()->path)->toStartWith('/media/');
+    $this->assertDatabaseHas('media_files', ['id' => str($product->images->first()->path)->after('/media/')->toString()]);
 });
 
 test('product image uploads reject unsafe formats', function () {

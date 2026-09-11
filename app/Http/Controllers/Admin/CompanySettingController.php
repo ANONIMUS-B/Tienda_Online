@@ -14,14 +14,24 @@ class CompanySettingController extends Controller
 {
     public function edit(): Response
     {
+        $settings = CompanySetting::query()->firstOrNew(['company_name' => 'JBTECHLINE']);
+
         return Inertia::render('admin/company-settings/edit', [
-            'settings' => CompanySetting::query()->firstOrNew(['company_name' => 'JBTECHLINE']),
+            'settings' => $settings,
+            'hasSecretKey' => filled($settings->gateway_secret_key),
         ]);
     }
 
     public function update(UpdateCompanySettingRequest $request, Team $currentTeam): RedirectResponse
     {
-        CompanySetting::query()->updateOrCreate([], $request->validated());
+        $attributes = $request->validated();
+        if (blank($attributes['gateway_public_key'] ?? null)) {
+            unset($attributes['gateway_public_key']);
+        }
+        if (blank($attributes['gateway_secret_key'] ?? null)) {
+            unset($attributes['gateway_secret_key']);
+        }
+        CompanySetting::query()->updateOrCreate([], $attributes);
 
         return back()->with('success', 'Datos de empresa actualizados.');
     }

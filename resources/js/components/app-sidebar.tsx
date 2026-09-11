@@ -8,6 +8,8 @@ import {
     PanelsTopLeft,
     Package,
     ShoppingBag,
+    Settings,
+    Code2,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
@@ -29,6 +31,8 @@ import { index as productIndex } from '@/routes/admin/products';
 import { index as orderIndex } from '@/routes/admin/orders';
 import { edit as editHomepage } from '@/routes/admin/homepage';
 import { index as categoryIndex } from '@/routes/admin/categories';
+import { edit as companySettings } from '@/routes/admin/company-settings';
+import { index as softwareIndex } from '@/routes/admin/software';
 import type { NavItem } from '@/types';
 
 export function AppSidebar() {
@@ -79,6 +83,20 @@ export function AppSidebar() {
                           ? orderIndex(page.props.currentTeam.slug)
                           : '/',
                       icon: ShoppingBag,
+                  },
+                  {
+                      title: 'Empresa y pagos',
+                      href: page.props.currentTeam
+                          ? companySettings(page.props.currentTeam.slug)
+                          : '/',
+                      icon: Settings,
+                  },
+                  {
+                      title: 'Software y programas',
+                      href: page.props.currentTeam
+                          ? softwareIndex(page.props.currentTeam.slug)
+                          : '/',
+                      icon: Code2,
                   },
               ]
             : []),

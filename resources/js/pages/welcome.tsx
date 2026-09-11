@@ -44,6 +44,7 @@ import {
     software as softwarePage,
 } from '@/routes';
 import { index as cart } from '@/routes/cart';
+import { index as programs } from '@/routes/programs';
 import { store as addToCart } from '@/routes/cart';
 import { show as productShow } from '@/routes/products';
 import type { Product } from '@/types/product';
@@ -51,6 +52,7 @@ import type { Product } from '@/types/product';
 const navigation = [
     { label: 'Servicios', route: servicesPage },
     { label: 'Software', route: softwarePage },
+    { label: 'Programas', route: programs },
     { label: 'Apps', route: apps },
     { label: 'Nosotros', route: about },
     { label: 'Blog', route: blog },

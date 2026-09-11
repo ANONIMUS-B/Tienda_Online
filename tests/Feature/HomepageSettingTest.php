@@ -6,7 +6,6 @@ use App\Models\Product;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('homepage renders the configured 3d hero content', function () {
@@ -37,7 +36,6 @@ test('homepage displays available products with the highlighted products first',
 });
 
 test('team administrators can update the homepage hero', function () {
-    Storage::fake('public');
     $user = User::factory()->create();
     $team = $user->currentTeam;
 
@@ -53,8 +51,8 @@ test('team administrators can update the homepage hero', function () {
         'hero_title' => 'Innovación administrable',
     ]);
     $setting = HomepageSetting::query()->firstOrFail();
-    expect($setting->hero_image_path)->toStartWith('/storage/homepage/');
-    Storage::disk('public')->assertExists(substr($setting->hero_image_path, strlen('/storage/')));
+    expect($setting->hero_image_path)->toStartWith('/media/');
+    $this->assertDatabaseHas('media_files', ['id' => str($setting->hero_image_path)->after('/media/')->toString()]);
 });
 
 test('regular team members cannot administer the homepage', function () {

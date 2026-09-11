@@ -5,11 +5,9 @@ use App\Models\Brand;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('administrators can create brands', function () {
-    Storage::fake('public');
     $user = User::factory()->create();
     $logo = UploadedFile::fake()->image('lenovo.png');
 
@@ -23,8 +21,8 @@ test('administrators can create brands', function () {
         'is_active' => true,
     ]);
     $brand = Brand::query()->where('slug', 'lenovo')->firstOrFail();
-    expect($brand->logo_path)->toStartWith('/storage/brands/');
-    Storage::disk('public')->assertExists(substr($brand->logo_path, strlen('/storage/')));
+    expect($brand->logo_path)->toStartWith('/media/');
+    $this->assertDatabaseHas('media_files', ['id' => str($brand->logo_path)->after('/media/')->toString()]);
 });
 
 test('brand data and external links are validated', function () {

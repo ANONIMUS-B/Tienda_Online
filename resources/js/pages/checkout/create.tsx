@@ -1,17 +1,24 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, Link, usePage } from '@inertiajs/react';
 import PublicHeader from '@/components/public-header';
 import { store } from '@/routes/checkout';
 import type { CartItem } from '@/types/order';
+import { MessageCircle } from 'lucide-react';
+import { register } from '@/routes';
 
 const field =
     'min-h-12 w-full rounded-xl border border-white/10 bg-black/30 px-4 outline-none focus:border-lime-400/50';
 export default function Checkout({
     items,
     subtotal,
+    paymentMethods,
+    whatsappUrl,
 }: {
     items: CartItem[];
     subtotal: number;
+    paymentMethods: { value: string; label: string }[];
+    whatsappUrl: string | null;
 }) {
+    const { auth } = usePage().props;
     return (
         <div className="min-h-screen bg-[#050806] text-white">
             <Head title="Finalizar compra | JBTECHLINE" />
@@ -21,6 +28,26 @@ export default function Checkout({
                     Paso final
                 </p>
                 <h1 className="mt-3 text-4xl font-black">Datos de compra</h1>
+                {!auth.user && (
+                    <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-lime-400/25 bg-lime-400/[.06] p-5 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p className="font-bold">
+                                ¿Quieres guardar tus pedidos y acceder a
+                                descargas?
+                            </p>
+                            <p className="mt-1 text-sm text-white/50">
+                                Crea tu cuenta antes de confirmar. Tu carrito se
+                                conservará.
+                            </p>
+                        </div>
+                        <Link
+                            href={register()}
+                            className="shrink-0 rounded-full bg-lime-400 px-6 py-3 text-center font-bold text-black"
+                        >
+                            Crear cuenta
+                        </Link>
+                    </div>
+                )}
                 <Form
                     {...store.form()}
                     className="mt-10 grid gap-8 lg:grid-cols-[1fr_360px]"
@@ -87,15 +114,16 @@ export default function Checkout({
                                 <select
                                     name="payment_method"
                                     className={`${field} sm:col-span-2`}
-                                    defaultValue="yape"
+                                    defaultValue={paymentMethods[0]?.value}
                                 >
-                                    <option value="yape">Yape / Plin</option>
-                                    <option value="bank_transfer">
-                                        Transferencia bancaria
-                                    </option>
-                                    <option value="cash_on_delivery">
-                                        Pago contra entrega
-                                    </option>
+                                    {paymentMethods.map((method) => (
+                                        <option
+                                            key={method.value}
+                                            value={method.value}
+                                        >
+                                            {method.label}
+                                        </option>
+                                    ))}
                                 </select>
                                 <textarea
                                     name="notes"
@@ -139,6 +167,17 @@ export default function Checkout({
                                         ? 'Registrando…'
                                         : 'Confirmar pedido'}
                                 </button>
+                                {whatsappUrl && (
+                                    <a
+                                        href={whatsappUrl}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-emerald-400/40 px-6 py-4 font-bold text-emerald-300"
+                                    >
+                                        <MessageCircle className="size-5" />
+                                        Comprar por WhatsApp
+                                    </a>
+                                )}
                                 <p className="mt-4 text-xs leading-5 text-white/35">
                                     El pago quedará pendiente hasta su
                                     verificación.

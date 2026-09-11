@@ -5,11 +5,9 @@ use App\Models\Category;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('administrators can create principal categories', function () {
-    Storage::fake('public');
     $user = User::factory()->create();
     $image = UploadedFile::fake()->image('laptops.webp');
 
@@ -23,8 +21,8 @@ test('administrators can create principal categories', function () {
         'is_active' => true,
     ]);
     $category = Category::query()->where('slug', 'laptops-y-computadoras')->firstOrFail();
-    expect($category->image_path)->toStartWith('/storage/categories/');
-    Storage::disk('public')->assertExists(substr($category->image_path, strlen('/storage/')));
+    expect($category->image_path)->toStartWith('/media/');
+    $this->assertDatabaseHas('media_files', ['id' => str($category->image_path)->after('/media/')->toString()]);
 });
 
 test('administrators can create subcategories below principal categories', function () {

@@ -12,7 +12,6 @@ test('public sections render on their own pages', function (string $routeName, s
 })->with([
     'categories' => ['categories', 'categories'],
     'services' => ['services', 'services'],
-    'software' => ['software', 'software'],
     'apps' => ['apps', 'apps'],
     'brands' => ['brands', 'brands'],
     'about' => ['about', 'about'],

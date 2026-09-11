@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCheckoutRequest;
+use App\Mail\OrderConfirmation;
+use App\Models\CompanySetting;
 use App\Models\Order;
 use App\Services\ShoppingCart;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -20,19 +24,30 @@ class CheckoutController extends Controller
         if ($items->isEmpty()) {
             return redirect()->route('cart.index');
         }
+        $settings = CompanySetting::query()->firstOrNew([], ['payment_yape_enabled' => true, 'payment_transfer_enabled' => true, 'payment_cash_enabled' => true, 'payment_gateway_enabled' => false, 'whatsapp_checkout_enabled' => true]);
+        $methods = collect([
+            ['value' => 'yape', 'label' => 'Yape / Plin', 'enabled' => $settings->payment_yape_enabled],
+            ['value' => 'bank_transfer', 'label' => 'Transferencia bancaria', 'enabled' => $settings->payment_transfer_enabled],
+            ['value' => 'cash_on_delivery', 'label' => 'Pago contra entrega', 'enabled' => $settings->payment_cash_enabled],
+            ['value' => 'gateway', 'label' => 'Tarjeta en línea', 'enabled' => $settings->payment_gateway_enabled],
+        ])->where('enabled', true)->values();
+        $whatsappUrl = null;
+        if ($settings->whatsapp_checkout_enabled && filled($settings->whatsapp_number)) {
+            $details = $items->map(fn (array $item): string => "- {$item['product']->name} × {$item['quantity']}: S/ ".number_format($item['total'], 2))->implode("\n");
+            $message = "Hola, deseo comprar los siguientes productos:\n\n{$details}\n\nSubtotal: S/ ".number_format((float) $items->sum('total'), 2);
+            $whatsappUrl = 'https://wa.me/'.preg_replace('/\D/', '', (string) $settings->whatsapp_number).'?text='.rawurlencode($message);
+        }
 
-        return Inertia::render('checkout/create', ['items' => $items, 'subtotal' => round($items->sum('total'), 2)]);
+        return Inertia::render('checkout/create', ['items' => $items, 'subtotal' => round($items->sum('total'), 2), 'paymentMethods' => $methods, 'whatsappUrl' => $whatsappUrl]);
     }
 
     public function store(StoreCheckoutRequest $request, ShoppingCart $cart): RedirectResponse
     {
-        $whatsappNumber = (string) config('services.whatsapp.number');
-        if ($whatsappNumber === '') {
-            throw ValidationException::withMessages([
-                'cart' => 'La atención por WhatsApp aún no está configurada.',
-            ]);
+        $settings = CompanySetting::query()->firstOrNew([], ['payment_yape_enabled' => true, 'payment_transfer_enabled' => true, 'payment_cash_enabled' => true, 'payment_gateway_enabled' => false]);
+        $enabledMethods = array_filter(['yape' => $settings->payment_yape_enabled, 'bank_transfer' => $settings->payment_transfer_enabled, 'cash_on_delivery' => $settings->payment_cash_enabled, 'gateway' => $settings->payment_gateway_enabled]);
+        if (! array_key_exists($request->string('payment_method')->toString(), $enabledMethods)) {
+            throw ValidationException::withMessages(['payment_method' => 'Este método de pago no está habilitado.']);
         }
-
         $order = DB::transaction(function () use ($request, $cart): Order {
             $items = $cart->items(lock: true);
             if ($items->isEmpty()) {
@@ -49,27 +64,14 @@ class CheckoutController extends Controller
             foreach ($items as $item) {
                 $product = $item['product'];
                 $order->items()->create(['product_id' => $product->id, 'sku' => $product->sku, 'name' => $product->name, 'quantity' => $item['quantity'], 'unit_price' => $item['unit_price'], 'total' => $item['total']]);
+                $product->decrement('stock', $item['quantity']);
             }
 
             return $order;
         });
         $cart->clear();
+        Mail::to($order->customer_email)->send(new OrderConfirmation($order->load('items')));
 
-        return redirect()->away($this->whatsappUrl($order->load('items'), $whatsappNumber));
-    }
-
-    private function whatsappUrl(Order $order, string $whatsappNumber): string
-    {
-        $items = $order->items
-            ->map(fn ($item): string => "- {$item->name} x{$item->quantity}: S/ {$item->total}")
-            ->implode("\n");
-
-        $message = "Hola, deseo registrar la solicitud {$order->number}.\n\n"
-            ."Cliente: {$order->customer_name}\n"
-            ."Teléfono: {$order->customer_phone}\n\n"
-            ."Productos:\n{$items}\n\n"
-            ."Total estimado: S/ {$order->total}";
-
-        return 'https://wa.me/'.preg_replace('/\D/', '', $whatsappNumber).'?text='.rawurlencode($message);
+        return redirect()->to(URL::temporarySignedRoute('orders.show', now()->addDays(7), ['number' => $order->number]));
     }
 }
