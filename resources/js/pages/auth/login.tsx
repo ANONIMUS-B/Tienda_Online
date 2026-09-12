@@ -1,8 +1,9 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, Link } from '@inertiajs/react';
+import { Lock, Mail, LogIn } from 'lucide-react';
 import InputError from '@/components/input-error';
+import PasskeyVerify from '@/components/passkey-verify';
 import PasswordInput from '@/components/password-input';
 import TeamInvitationAlert from '@/components/team-invitation-alert';
-import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -11,7 +12,6 @@ import { Spinner } from '@/components/ui/spinner';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
-import PasskeyVerify from '@/components/passkey-verify';
 import type { TeamInvitationContext } from '@/types';
 
 type Props = {
@@ -27,51 +27,76 @@ export default function Login({
 }: Props) {
     return (
         <>
-            <Head title="Log in" />
+            <Head title="Iniciar sesión" />
 
             {teamInvitation && (
                 <TeamInvitationAlert
                     invitation={teamInvitation}
-                    action="Log in"
+                    action="Iniciar sesión"
                 />
             )}
 
-            <PasskeyVerify />
+            {status && (
+                <div className="mb-5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-center text-xs font-semibold text-emerald-300 backdrop-blur-md">
+                    {status}
+                </div>
+            )}
+
+            <PasskeyVerify
+                label="Ingresar con Passkey / Huella"
+                loadingLabel="Autenticando..."
+                separator="O ingresa con tu correo"
+            />
 
             <Form
                 {...store.form()}
                 resetOnSuccess={['password']}
-                className="flex flex-col gap-6"
+                className="flex flex-col gap-5"
             >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-6">
+                        <div className="grid gap-5">
+                            {/* Email Field */}
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    name="email"
-                                    required
-                                    autoFocus
-                                    tabIndex={1}
-                                    autoComplete="email"
-                                    placeholder="email@example.com"
-                                />
-                                <InputError message={errors.email} />
+                                <Label
+                                    htmlFor="email"
+                                    className="flex items-center gap-1.5 text-xs font-bold tracking-wide text-white/80 uppercase"
+                                >
+                                    <Mail className="size-3.5 text-lime-400" /> Correo Electrónico
+                                </Label>
+                                <div className="relative">
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        name="email"
+                                        required
+                                        autoFocus
+                                        tabIndex={1}
+                                        autoComplete="email"
+                                        placeholder="tu@correo.com"
+                                        className="h-11 rounded-xl border-white/14 bg-white/5 px-4 text-sm text-white placeholder:text-white/35 focus:border-lime-400/80 focus:bg-black/40 focus:ring-2 focus:ring-lime-400/30"
+                                    />
+                                </div>
+                                <InputError message={errors.email} className="mt-1 text-xs text-red-400" />
                             </div>
 
+                            {/* Password Field */}
                             <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
+                                <div className="flex items-center justify-between">
+                                    <Label
+                                        htmlFor="password"
+                                        className="flex items-center gap-1.5 text-xs font-bold tracking-wide text-white/80 uppercase"
+                                    >
+                                        <Lock className="size-3.5 text-lime-400" /> Contraseña
+                                    </Label>
                                     {canResetPassword && (
-                                        <TextLink
+                                        <Link
                                             href={request()}
-                                            className="ml-auto text-sm"
+                                            className="text-xs font-semibold text-lime-400/90 transition hover:text-lime-300 hover:underline"
                                             tabIndex={5}
                                         >
-                                            Forgot password?
-                                        </TextLink>
+                                            ¿Olvidaste tu contraseña?
+                                        </Link>
                                     )}
                                 </div>
                                 <PasswordInput
@@ -80,60 +105,70 @@ export default function Login({
                                     required
                                     tabIndex={2}
                                     autoComplete="current-password"
-                                    placeholder="Password"
+                                    placeholder="••••••••••••"
+                                    className="h-11 rounded-xl border-white/14 bg-white/5 px-4 text-sm text-white placeholder:text-white/35 focus:border-lime-400/80 focus:bg-black/40 focus:ring-2 focus:ring-lime-400/30"
                                 />
-                                <InputError message={errors.password} />
+                                <InputError message={errors.password} className="mt-1 text-xs text-red-400" />
                             </div>
 
-                            <div className="flex items-center space-x-3">
+                            {/* Remember Me Checkbox */}
+                            <div className="flex items-center space-x-2.5 pt-1">
                                 <Checkbox
                                     id="remember"
                                     name="remember"
                                     tabIndex={3}
+                                    className="border-white/20 data-[state=checked]:bg-lime-400 data-[state=checked]:text-black"
                                 />
-                                <Label htmlFor="remember">Remember me</Label>
+                                <Label
+                                    htmlFor="remember"
+                                    className="cursor-pointer text-xs font-medium text-white/70 select-none hover:text-white"
+                                >
+                                    Recordar mi sesión en este equipo
+                                </Label>
                             </div>
 
+                            {/* Submit CTA Button */}
                             <Button
                                 type="submit"
-                                className="mt-4 w-full"
+                                className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-lime-400 text-sm font-extrabold text-black shadow-[0_0_25px_rgba(163,230,53,0.3)] transition-all hover:scale-[1.01] hover:bg-lime-300 hover:shadow-[0_0_35px_rgba(163,230,53,0.5)] active:scale-[0.99] disabled:opacity-50"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
                             >
-                                {processing && <Spinner />}
-                                Log in
+                                {processing ? (
+                                    <Spinner className="size-5 text-black" />
+                                ) : (
+                                    <>
+                                        <LogIn className="size-4" /> Iniciar Sesión
+                                    </>
+                                )}
                             </Button>
                         </div>
 
-                        <div className="text-muted-foreground text-center text-sm">
-                            Don't have an account?{' '}
-                            <TextLink
+                        {/* Sign up link */}
+                        <div className="mt-4 text-center text-xs text-white/60">
+                            ¿Aún no tienes una cuenta?{' '}
+                            <Link
                                 href={register({
                                     query: {
                                         invitation: teamInvitation?.code,
                                     },
                                 })}
+                                className="font-bold text-lime-400 transition hover:text-lime-300 hover:underline"
                                 data-test="register-link"
                                 tabIndex={5}
                             >
-                                Sign up
-                            </TextLink>
+                                Crear una cuenta ahora
+                            </Link>
                         </div>
                     </>
                 )}
             </Form>
-
-            {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
         </>
     );
 }
 
 Login.layout = {
-    title: 'Log in to your account',
-    description: 'Enter your email and password below to log in',
+    title: '¡Hola de nuevo!',
+    description: 'Ingresa tus credenciales para acceder a tu panel y servicios',
 };

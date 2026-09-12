@@ -106,17 +106,17 @@ export default function ProductCatalog({
                         {result.data.map((product) => (
                             <article
                                 key={product.id}
-                                className="group overflow-hidden rounded-3xl border border-white/10 bg-white/[.035]"
+                                className="group overflow-hidden rounded-3xl border border-white/10 bg-[#071008]/90 transition duration-300 hover:border-lime-400/50 hover:shadow-[0_15px_35px_rgba(0,0,0,0.6)]"
                             >
                                 <Link href={show(product.slug)}>
-                                    <div className="aspect-square overflow-hidden bg-white/5">
+                                    <div className="relative flex aspect-square items-center justify-center overflow-hidden bg-gradient-to-b from-white/5 via-lime-400/5 to-transparent p-6">
                                         {product.images[0] ? (
                                             <img
                                                 src={product.images[0].path}
                                                 alt={product.name}
                                                 loading="lazy"
                                                 decoding="async"
-                                                className="size-full object-cover transition group-hover:scale-105"
+                                                className="max-h-full max-w-full object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.65)] transition-transform duration-300 group-hover:scale-105"
                                             />
                                         ) : (
                                             <div className="flex size-full items-center justify-center text-white/25">
@@ -125,14 +125,14 @@ export default function ProductCatalog({
                                         )}
                                     </div>
                                     <div className="p-5">
-                                        <p className="text-xs text-lime-400">
+                                        <p className="text-[10px] font-bold tracking-widest text-lime-400 uppercase">
                                             {product.brand?.name ??
                                                 product.category?.name}
                                         </p>
-                                        <h2 className="mt-2 font-bold">
+                                        <h2 className="mt-1.5 font-bold text-white transition-colors group-hover:text-lime-300 line-clamp-1">
                                             {product.name}
                                         </h2>
-                                        <p className="mt-2 line-clamp-2 text-sm text-white/45">
+                                        <p className="mt-2 line-clamp-2 text-xs text-white/45">
                                             {product.short_description}
                                         </p>
                                         <div className="mt-5 flex items-center justify-between">
@@ -142,13 +142,13 @@ export default function ProductCatalog({
                                                         S/ {product.price}
                                                     </p>
                                                 )}
-                                                <p className="text-xl font-black">
+                                                <p className="text-xl font-black text-lime-300">
                                                     S/{' '}
                                                     {product.promotional_price ??
                                                         product.price}
                                                 </p>
                                             </div>
-                                            <span className="flex size-10 items-center justify-center rounded-full bg-lime-400 text-black">
+                                            <span className="flex size-10 items-center justify-center rounded-full bg-lime-400 text-black shadow-[0_0_15px_rgba(163,230,53,0.3)] transition hover:scale-105 hover:bg-lime-300">
                                                 <ShoppingCart className="size-4" />
                                             </span>
                                         </div>

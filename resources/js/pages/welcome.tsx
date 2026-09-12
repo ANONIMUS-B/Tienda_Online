@@ -363,144 +363,141 @@ export default function Welcome({
                         <div className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-[#14440c]/80 via-[#0b2808]/35 to-transparent" />
                         <div className="pointer-events-none absolute inset-0 [background-image:linear-gradient(rgba(132,255,75,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(132,255,75,.08)_1px,transparent_1px)] [mask-image:linear-gradient(to_bottom,transparent,black_48%,transparent)] [background-size:64px_64px] opacity-20" />
 
-                        <div className="relative mx-auto min-h-[820px] max-w-7xl px-5 py-12 lg:px-8">
-                            <p className="text-[clamp(4.2rem,10.5vw,9.2rem)] leading-[.78] font-light tracking-[-.075em] text-white uppercase">
-                                {hero.hero_title}
-                            </p>
-                            <p className="relative z-20 mt-[clamp(16rem,30vw,24rem)] text-right text-[clamp(3.6rem,9.7vw,8.6rem)] leading-[.78] font-light tracking-[-.075em] text-white uppercase lg:mt-44">
-                                {hero.hero_accent}
-                            </p>
+                        <div className="relative mx-auto min-h-[780px] max-w-7xl px-5 py-10 lg:px-8">
+                            {/* Watermark Background Title (Non-overlapping, pointer-events-none) */}
+                            <div className="pointer-events-none select-none absolute inset-x-0 top-12 z-0 text-center opacity-10">
+                                <p className="text-[clamp(3.5rem,8vw,7.5rem)] leading-none font-black tracking-widest text-white uppercase drop-shadow-[0_0_50px_rgba(255,255,255,0.2)]">
+                                    {heroProduct
+                                        ? heroProduct.category?.name ?? 'TECNOLOGÍA 3D'
+                                        : hero.hero_title}
+                                </p>
+                                <p className="mt-2 text-[clamp(2.5rem,6vw,5.5rem)] leading-none font-black tracking-widest text-lime-400 uppercase">
+                                    {heroProduct
+                                        ? heroProduct.brand?.name ?? 'JBTECHLINE'
+                                        : hero.hero_accent}
+                                </p>
+                            </div>
 
-                            <div className="absolute top-[20%] left-1/2 z-10 w-[min(62vw,460px)] -translate-x-1/2 lg:top-[17%]">
-                                <div className="absolute inset-[18%] rounded-full bg-lime-400/18 blur-[90px]" />
-                                <img
-                                    src={
-                                        heroProduct?.images[0]?.path ??
-                                        hero.hero_image_path
-                                    }
-                                    alt={
-                                        heroProduct
-                                            ? heroProduct.name
-                                            : 'Centro tecnológico modular 3D'
-                                    }
-                                    className="relative mx-auto max-h-[360px] w-full animate-[hero-float_6s_ease-in-out_infinite] rounded-[2rem] object-contain drop-shadow-[0_35px_45px_rgba(0,0,0,.65)]"
-                                />
+                            {/* Main 3D Floating Showcase */}
+                            <div className="relative z-10 mx-auto flex flex-col items-center justify-center pt-8">
+                                {/* Neon Radial Glow Pedestal */}
+                                <div className="pointer-events-none absolute top-1/2 left-1/2 size-[360px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-lime-400/20 blur-[100px] sm:size-[460px]" />
+
+                                {/* Floating 3D Image */}
+                                <div className="relative z-20 mx-auto w-full max-w-[480px]">
+                                    <img
+                                        src={
+                                            heroProduct?.images[0]?.path ??
+                                            hero.hero_image_path
+                                        }
+                                        alt={
+                                            heroProduct
+                                                ? heroProduct.name
+                                                : 'Centro tecnológico modular 3D'
+                                        }
+                                        className="relative mx-auto max-h-[380px] w-full animate-[hero-float_6s_ease-in-out_infinite] object-contain drop-shadow-[0_45px_65px_rgba(0,0,0,0.85)] filter brightness-105"
+                                    />
+                                </div>
+
+                                {/* Clean Glassmorphism Featured Product Card */}
                                 {heroProduct && (
-                                    <div className="absolute top-full left-1/2 mt-3 w-[min(90vw,360px)] -translate-x-1/2 rounded-2xl border border-lime-400/20 bg-[#071008]/90 p-4 shadow-2xl backdrop-blur-xl">
-                                        <p className="text-[10px] font-bold tracking-[.16em] text-lime-400 uppercase">
-                                            {heroProduct.brand?.name ??
-                                                heroProduct.category?.name ??
-                                                'Producto destacado'}
-                                        </p>
-                                        <div className="mt-1 flex items-start justify-between gap-4">
-                                            <h2 className="text-base font-black text-white">
+                                    <Link
+                                        href={productShow(heroProduct.slug)}
+                                        className="group relative z-30 mt-6 flex w-[min(90vw,440px)] items-center justify-between gap-4 rounded-2xl border border-lime-400/35 bg-[#071008]/90 p-4 shadow-[0_20px_50px_rgba(0,0,0,0.7)] backdrop-blur-2xl transition duration-300 hover:scale-[1.02] hover:border-lime-400 hover:bg-[#09160a] hover:shadow-[0_0_30px_rgba(163,230,53,0.3)]"
+                                    >
+                                        <div className="min-w-0 flex-1">
+                                            <span className="inline-flex items-center gap-1.5 rounded-full border border-lime-400/30 bg-lime-400/10 px-2.5 py-0.5 text-[9px] font-extrabold tracking-wider text-lime-300 uppercase">
+                                                <Zap className="size-3 text-lime-400" /> Producto Destacado
+                                            </span>
+                                            <h2 className="mt-1.5 truncate text-sm font-extrabold text-white transition-colors group-hover:text-lime-300">
                                                 {heroProduct.name}
                                             </h2>
-                                            <p className="shrink-0 text-sm font-black text-lime-300">
+                                            <p className="truncate text-[11px] text-white/50">
+                                                {heroProduct.brand?.name
+                                                    ? `Marca: ${heroProduct.brand.name}`
+                                                    : heroProduct.category?.name}
+                                            </p>
+                                        </div>
+                                        <div className="flex shrink-0 flex-col items-end gap-1.5">
+                                            <span className="text-base font-black text-lime-300">
                                                 S/{' '}
                                                 {heroProduct.promotional_price ??
                                                     heroProduct.price}
-                                            </p>
+                                            </span>
+                                            <span className="inline-flex items-center gap-1 rounded-full bg-lime-400 px-3 py-1 text-[10px] font-extrabold text-black transition hover:bg-lime-300">
+                                                Ver Producto <ArrowRight className="size-3" />
+                                            </span>
                                         </div>
-                                        {heroProduct.specifications && (
-                                            <div className="mt-3 grid grid-cols-3 gap-2 border-t border-white/10 pt-3">
-                                                {Object.entries(
-                                                    heroProduct.specifications,
-                                                )
-                                                    .slice(0, 3)
-                                                    .map(([key, value]) => (
-                                                        <div key={key}>
-                                                            <p className="truncate text-[9px] font-bold tracking-wide text-white/35 uppercase">
-                                                                {key}
-                                                            </p>
-                                                            <p className="truncate text-xs text-white/80">
-                                                                {value}
-                                                            </p>
-                                                        </div>
-                                                    ))}
-                                            </div>
-                                        )}
-                                    </div>
+                                    </Link>
                                 )}
                             </div>
 
-                            <div className="absolute top-[47%] left-5 z-20 hidden w-52 overflow-hidden rounded-2xl border border-white/14 bg-black/20 backdrop-blur-xl sm:block lg:left-8">
-                                <div className="flex h-32 items-center justify-center border-b border-white/10 bg-gradient-to-br from-lime-400/10 to-transparent">
-                                    <Cpu
-                                        className="size-20 text-lime-300/90"
-                                        strokeWidth={1}
-                                    />
-                                </div>
-                                <div className="flex items-end justify-between p-4">
-                                    <div>
-                                        <p className="text-[10px] tracking-[.18em] text-white/35 uppercase">
-                                            {hero.hero_overline}
-                                        </p>
-                                        <p className="mt-1 text-sm font-black uppercase">
-                                            Tech solutions
-                                        </p>
-                                    </div>
-                                    <a
-                                        href={hero.hero_primary_url}
-                                        className="flex size-8 items-center justify-center rounded-full bg-lime-400 text-black"
-                                        aria-label="Ver productos"
-                                    >
-                                        <ArrowRight className="size-4" />
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div className="absolute top-[31%] right-5 z-20 hidden items-center gap-4 lg:right-8 lg:flex">
-                                <p className="max-w-28 text-right text-[10px] leading-3 font-semibold tracking-wide text-white/55 uppercase">
-                                    Donde la tecnología acelera la innovación
-                                </p>
-                                <div className="flex size-24 items-center justify-center rounded-2xl border border-white/12 bg-white/5 backdrop-blur-xl">
-                                    <CircuitBoard
-                                        className="size-12 text-lime-400"
-                                        strokeWidth={1.2}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="absolute right-5 bottom-12 z-20 max-w-56 lg:right-8">
-                                <p className="text-sm leading-5 text-white/58">
-                                    {hero.hero_description}
-                                </p>
-                                <a
-                                    href={hero.hero_secondary_url}
-                                    className="mt-4 inline-flex items-center gap-2 text-xs font-bold tracking-wider text-lime-400 uppercase"
-                                >
-                                    {hero.hero_secondary_label}{' '}
-                                    <ArrowRight className="size-4" />
-                                </a>
-                            </div>
-                            <div className="absolute bottom-10 left-5 z-20 lg:left-8">
-                                <div className="flex gap-1 text-lime-400">
-                                    {Array.from({ length: 5 }).map(
-                                        (_, index) => (
-                                            <Star
-                                                key={index}
-                                                className="size-3.5 fill-current"
-                                            />
-                                        ),
-                                    )}
-                                </div>
-                                <div className="mt-2 flex items-end gap-3">
-                                    <span className="text-3xl font-light italic">
-                                        360°
-                                    </span>
-                                    <span className="max-w-24 text-[10px] leading-3 font-bold text-white/45 uppercase">
-                                        Asesoría tecnológica integral
-                                    </span>
-                                </div>
-                            </div>
-
-                            <a
+                            {/* Left Side Floating Card: Products Catalog */}
+                            <Link
                                 href={hero.hero_primary_url}
-                                className="absolute bottom-8 left-1/2 z-20 hidden size-24 -translate-x-1/2 items-center justify-center rounded-full border border-lime-400/25 bg-lime-400/10 text-center text-[10px] font-bold tracking-wider text-lime-300 uppercase backdrop-blur md:flex"
+                                className="group absolute top-1/3 left-6 z-20 hidden w-56 items-center gap-3 rounded-2xl border border-white/14 bg-black/40 p-4 shadow-xl backdrop-blur-xl transition hover:border-lime-400/50 hover:bg-black/60 lg:flex"
                             >
-                                {hero.hero_primary_label}
-                            </a>
+                                <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-lime-400/15 text-lime-300 group-hover:scale-105 transition-transform">
+                                    <Laptop className="size-6" />
+                                </div>
+                                <div>
+                                    <p className="text-[9px] font-bold tracking-widest text-white/40 uppercase">
+                                        Catálogo Oficial
+                                    </p>
+                                    <p className="mt-0.5 text-xs font-black text-white uppercase group-hover:text-lime-400 transition-colors">
+                                        Productos Tech
+                                    </p>
+                                </div>
+                            </Link>
+
+                            {/* Right Side Floating Card: Support & Services */}
+                            <Link
+                                href={hero.hero_secondary_url}
+                                className="group absolute top-1/3 right-6 z-20 hidden w-56 items-center gap-3 rounded-2xl border border-white/14 bg-black/40 p-4 shadow-xl backdrop-blur-xl transition hover:border-lime-400/50 hover:bg-black/60 lg:flex"
+                            >
+                                <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-lime-400/15 text-lime-300 group-hover:scale-105 transition-transform">
+                                    <CircuitBoard className="size-6" />
+                                </div>
+                                <div>
+                                    <p className="text-[9px] font-bold tracking-widest text-white/40 uppercase">
+                                        Asesoría 360°
+                                    </p>
+                                    <p className="mt-0.5 text-xs font-black text-white uppercase group-hover:text-lime-400 transition-colors">
+                                        Servicios & Tech
+                                    </p>
+                                </div>
+                            </Link>
+
+                            {/* Bottom Rating & Guarantee Badges */}
+                            <div className="mt-12 flex flex-col items-center justify-between gap-6 border-t border-white/10 pt-8 sm:flex-row">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex gap-1 text-lime-400">
+                                        {Array.from({ length: 5 }).map(
+                                            (_, index) => (
+                                                <Star
+                                                    key={index}
+                                                    className="size-3.5 fill-current"
+                                                />
+                                            ),
+                                        )}
+                                    </div>
+                                    <p className="text-xs font-semibold text-white/60">
+                                        <span className="text-white font-bold">4.9/5</span> Valoración de Clientes
+                                    </p>
+                                </div>
+
+                                <Link
+                                    href={hero.hero_primary_url}
+                                    className="inline-flex items-center gap-2 rounded-full border border-lime-400/30 bg-lime-400/10 px-6 py-2.5 text-xs font-extrabold tracking-wider text-lime-300 uppercase backdrop-blur transition hover:border-lime-400 hover:bg-lime-400 hover:text-black"
+                                >
+                                    Explorar Catálogo de Productos <ArrowRight className="size-4" />
+                                </Link>
+
+                                <div className="flex items-center gap-2 text-xs font-semibold text-white/60">
+                                    <ShieldCheck className="size-4 text-lime-400" />
+                                    <span>Garantía Oficial JBTECHLINE</span>
+                                </div>
+                            </div>
                         </div>
                     </section>
 
@@ -582,13 +579,13 @@ export default function Welcome({
                                 {featuredProducts.map((product) => (
                                     <article
                                         key={product.id}
-                                        className="group overflow-hidden rounded-3xl border border-white/9 bg-[#0c140e]"
+                                        className="group overflow-hidden rounded-3xl border border-white/10 bg-[#071008]/90 transition duration-300 hover:border-lime-400/50 hover:shadow-[0_15px_35px_rgba(0,0,0,0.6)]"
                                     >
                                         <Link
                                             href={productShow(product.slug)}
-                                            className="relative flex aspect-[4/3] items-center justify-center bg-[radial-gradient(circle_at_center,rgba(123,255,61,.12),transparent_62%)]"
+                                            className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden bg-gradient-to-b from-white/5 via-lime-400/5 to-transparent p-6"
                                         >
-                                            <span className="absolute top-5 left-5 z-10 rounded-full bg-lime-400 px-3 py-1 text-xs font-black text-black">
+                                            <span className="absolute top-4 left-4 z-10 inline-flex items-center gap-1 rounded-full border border-lime-400/40 bg-[#071008]/85 px-3 py-1 text-[10px] font-extrabold tracking-wider text-lime-300 uppercase shadow-md backdrop-blur-md">
                                                 {product.is_featured
                                                     ? 'Destacado'
                                                     : product.is_bestseller
@@ -599,34 +596,34 @@ export default function Welcome({
                                                 <img
                                                     src={product.images[0].path}
                                                     alt={product.name}
-                                                    className="size-full object-cover transition group-hover:scale-105"
+                                                    className="max-h-full max-w-full object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.65)] transition-transform duration-300 group-hover:scale-105"
                                                 />
                                             ) : (
                                                 <PackageCheck
-                                                    className="size-28 text-lime-300/80 transition group-hover:scale-105"
+                                                    className="size-24 text-lime-300/60 transition group-hover:scale-105"
                                                     strokeWidth={1.1}
                                                 />
                                             )}
                                         </Link>
-                                        <div className="border-t border-white/8 p-6">
-                                            <p className="text-xs font-semibold tracking-wider text-lime-400/70 uppercase">
+                                        <div className="border-t border-white/8 p-5">
+                                            <p className="text-[10px] font-bold tracking-widest text-lime-400 uppercase">
                                                 {product.brand?.name ??
                                                     product.category?.name}
                                             </p>
                                             <Link
                                                 href={productShow(product.slug)}
-                                                className="mt-2 block text-lg font-bold hover:text-lime-400"
+                                                className="mt-1.5 block text-base font-extrabold text-white transition-colors hover:text-lime-300 line-clamp-1"
                                             >
                                                 {product.name}
                                             </Link>
-                                            <div className="mt-5 flex items-end justify-between">
+                                            <div className="mt-4 flex items-end justify-between">
                                                 <div>
                                                     {product.promotional_price && (
-                                                        <p className="text-xs text-white/30 line-through">
+                                                        <p className="text-xs text-white/40 line-through">
                                                             S/ {product.price}
                                                         </p>
                                                     )}
-                                                    <p className="text-xl font-black">
+                                                    <p className="text-xl font-black text-lime-300">
                                                         S/{' '}
                                                         {product.promotional_price ??
                                                             product.price}
@@ -650,7 +647,7 @@ export default function Welcome({
                                                     />
                                                     <button
                                                         type="submit"
-                                                        className="flex size-11 items-center justify-center rounded-full bg-lime-400 text-black"
+                                                        className="flex size-11 items-center justify-center rounded-full bg-lime-400 text-black shadow-[0_0_15px_rgba(163,230,53,0.3)] transition hover:scale-105 hover:bg-lime-300 hover:shadow-[0_0_25px_rgba(163,230,53,0.5)] active:scale-95"
                                                         aria-label={`Agregar ${product.name} al carrito`}
                                                     >
                                                         <ShoppingCart className="size-4" />

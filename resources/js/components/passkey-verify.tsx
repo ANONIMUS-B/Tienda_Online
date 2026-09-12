@@ -42,31 +42,28 @@ export default function PasskeyVerify({
     return (
         <>
             <div className="grid gap-2">
-                <Button
+                <button
                     type="button"
-                    variant="outline"
-                    className="w-full"
                     onClick={verify}
                     disabled={isLoading}
+                    className="flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-lime-400/35 bg-lime-400/10 px-4 text-xs font-extrabold tracking-wide text-lime-300 transition-all hover:border-lime-400 hover:bg-lime-400/20 hover:text-white hover:shadow-[0_0_20px_rgba(163,230,53,0.25)] active:scale-[0.99] disabled:opacity-50"
                 >
-                    {isLoading ? <Spinner /> : <KeyRound className="h-4 w-4" />}
+                    {isLoading ? <Spinner className="size-4 text-lime-300" /> : <KeyRound className="size-4 text-lime-400" />}
                     {isLoading
-                        ? (loadingLabel ?? 'Authenticating...')
-                        : (label ?? 'Sign in with a passkey')}
-                </Button>
+                        ? (loadingLabel ?? 'Autenticando...')
+                        : (label ?? 'Ingresar con Passkey / Huella')}
+                </button>
                 {error && (
-                    <InputError message={error} className="text-center" />
+                    <InputError message={error} className="text-center text-xs text-red-400" />
                 )}
             </div>
 
-            <div className="relative my-6">
+            <div className="relative my-5 flex items-center justify-center">
                 <div className="absolute inset-0 flex items-center">
-                    <Separator className="w-full" />
+                    <div className="w-full border-t border-white/12" />
                 </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background text-muted-foreground px-2">
-                        {separator ?? 'Or continue with email'}
-                    </span>
+                <div className="relative z-10 rounded-full border border-white/12 bg-[#09140c] px-3 py-0.5 text-[10px] font-bold tracking-widest text-white/50 uppercase shadow-md">
+                    {separator ?? 'O ingresa con tu correo'}
                 </div>
             </div>
         </>

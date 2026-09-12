@@ -1,8 +1,8 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, Link } from '@inertiajs/react';
+import { Lock, Mail, ShieldCheck, User, UserPlus } from 'lucide-react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import TeamInvitationAlert from '@/components/team-invitation-alert';
-import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,7 +24,7 @@ export default function Register({ passwordRules, teamInvitation }: Props) {
                 {...store.form()}
                 resetOnSuccess={['password', 'password_confirmation']}
                 disableWhileProcessing
-                className="flex flex-col gap-6"
+                className="flex flex-col gap-5"
             >
                 {({ processing, errors }) => (
                     <>
@@ -35,9 +35,15 @@ export default function Register({ passwordRules, teamInvitation }: Props) {
                             />
                         )}
 
-                        <div className="grid gap-6">
+                        <div className="grid gap-5">
+                            {/* Full Name */}
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Nombre completo</Label>
+                                <Label
+                                    htmlFor="name"
+                                    className="flex items-center gap-1.5 text-xs font-bold tracking-wide text-white/80 uppercase"
+                                >
+                                    <User className="size-3.5 text-lime-400" /> Nombre Completo
+                                </Label>
                                 <Input
                                     id="name"
                                     type="text"
@@ -46,17 +52,22 @@ export default function Register({ passwordRules, teamInvitation }: Props) {
                                     tabIndex={1}
                                     autoComplete="name"
                                     name="name"
-                                    placeholder="Nombres y apellidos"
+                                    placeholder="Nombres y Apellidos"
+                                    className="h-11 rounded-xl border-white/14 bg-white/5 px-4 text-sm text-white placeholder:text-white/35 focus:border-lime-400/80 focus:bg-black/40 focus:ring-2 focus:ring-lime-400/30"
                                 />
                                 <InputError
                                     message={errors.name}
-                                    className="mt-2"
+                                    className="mt-1 text-xs text-red-400"
                                 />
                             </div>
 
+                            {/* Email Address */}
                             <div className="grid gap-2">
-                                <Label htmlFor="email">
-                                    Correo electrónico
+                                <Label
+                                    htmlFor="email"
+                                    className="flex items-center gap-1.5 text-xs font-bold tracking-wide text-white/80 uppercase"
+                                >
+                                    <Mail className="size-3.5 text-lime-400" /> Correo Electrónico
                                 </Label>
                                 <Input
                                     id="email"
@@ -65,28 +76,40 @@ export default function Register({ passwordRules, teamInvitation }: Props) {
                                     tabIndex={2}
                                     autoComplete="email"
                                     name="email"
-                                    placeholder="email@example.com"
+                                    placeholder="tu@correo.com"
+                                    className="h-11 rounded-xl border-white/14 bg-white/5 px-4 text-sm text-white placeholder:text-white/35 focus:border-lime-400/80 focus:bg-black/40 focus:ring-2 focus:ring-lime-400/30"
                                 />
-                                <InputError message={errors.email} />
+                                <InputError message={errors.email} className="mt-1 text-xs text-red-400" />
                             </div>
 
+                            {/* Password */}
                             <div className="grid gap-2">
-                                <Label htmlFor="password">Contraseña</Label>
+                                <Label
+                                    htmlFor="password"
+                                    className="flex items-center gap-1.5 text-xs font-bold tracking-wide text-white/80 uppercase"
+                                >
+                                    <Lock className="size-3.5 text-lime-400" /> Contraseña
+                                </Label>
                                 <PasswordInput
                                     id="password"
                                     required
                                     tabIndex={3}
                                     autoComplete="new-password"
                                     name="password"
-                                    placeholder="Contraseña segura"
+                                    placeholder="Crea una contraseña segura"
                                     passwordrules={passwordRules}
+                                    className="h-11 rounded-xl border-white/14 bg-white/5 px-4 text-sm text-white placeholder:text-white/35 focus:border-lime-400/80 focus:bg-black/40 focus:ring-2 focus:ring-lime-400/30"
                                 />
-                                <InputError message={errors.password} />
+                                <InputError message={errors.password} className="mt-1 text-xs text-red-400" />
                             </div>
 
+                            {/* Confirm Password */}
                             <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">
-                                    Confirmar contraseña
+                                <Label
+                                    htmlFor="password_confirmation"
+                                    className="flex items-center gap-1.5 text-xs font-bold tracking-wide text-white/80 uppercase"
+                                >
+                                    <ShieldCheck className="size-3.5 text-lime-400" /> Confirmar Contraseña
                                 </Label>
                                 <PasswordInput
                                     id="password_confirmation"
@@ -94,28 +117,37 @@ export default function Register({ passwordRules, teamInvitation }: Props) {
                                     tabIndex={4}
                                     autoComplete="new-password"
                                     name="password_confirmation"
-                                    placeholder="Repite la contraseña"
+                                    placeholder="Repite tu contraseña"
                                     passwordrules={passwordRules}
+                                    className="h-11 rounded-xl border-white/14 bg-white/5 px-4 text-sm text-white placeholder:text-white/35 focus:border-lime-400/80 focus:bg-black/40 focus:ring-2 focus:ring-lime-400/30"
                                 />
                                 <InputError
                                     message={errors.password_confirmation}
+                                    className="mt-1 text-xs text-red-400"
                                 />
                             </div>
 
+                            {/* Submit Button */}
                             <Button
                                 type="submit"
-                                className="mt-2 w-full"
+                                className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-lime-400 text-sm font-extrabold text-black shadow-[0_0_25px_rgba(163,230,53,0.3)] transition-all hover:scale-[1.01] hover:bg-lime-300 hover:shadow-[0_0_35px_rgba(163,230,53,0.5)] active:scale-[0.99] disabled:opacity-50"
                                 tabIndex={5}
                                 data-test="register-user-button"
                             >
-                                {processing && <Spinner />}
-                                Crear cuenta
+                                {processing ? (
+                                    <Spinner className="size-5 text-black" />
+                                ) : (
+                                    <>
+                                        <UserPlus className="size-4" /> Registrar mi cuenta
+                                    </>
+                                )}
                             </Button>
                         </div>
 
-                        <div className="text-muted-foreground text-center text-sm">
-                            ¿Ya tienes una cuenta?{' '}
-                            <TextLink
+                        {/* Sign in link */}
+                        <div className="mt-4 text-center text-xs text-white/60">
+                            ¿Ya tienes una cuenta registrada?{' '}
+                            <Link
                                 href={
                                     teamInvitation
                                         ? login.url({
@@ -126,11 +158,12 @@ export default function Register({ passwordRules, teamInvitation }: Props) {
                                           })
                                         : login()
                                 }
+                                className="font-bold text-lime-400 transition hover:text-lime-300 hover:underline"
                                 data-test="team-invitation-login-link"
                                 tabIndex={6}
                             >
-                                Ingresar
-                            </TextLink>
+                                Iniciar sesión
+                            </Link>
                         </div>
                     </>
                 )}
@@ -141,5 +174,5 @@ export default function Register({ passwordRules, teamInvitation }: Props) {
 
 Register.layout = {
     title: 'Crea tu cuenta de cliente',
-    description: 'Regístrate para gestionar pedidos y descargar programas',
+    description: 'Únete para hacer pedidos, descargar software y gestionar tu soporte',
 };
