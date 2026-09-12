@@ -8,7 +8,6 @@ import {
 } from '@/routes';
 import { show } from '@/routes/products';
 import type { Product } from '@/types/product';
-import PublicHeader from '@/components/public-header';
 type Paginator = {
     data: Product[];
     links: { url: string | null; label: string; active: boolean }[];
@@ -16,19 +15,22 @@ type Paginator = {
 type Option = { name: string; slug: string };
 export default function ProductCatalog({
     products: result,
-    categories,
-    brands,
-    filters,
+    categories = [],
+    brands = [],
+    filters = {},
 }: {
     products: Paginator;
     categories: Option[];
     brands: Option[];
     filters: Record<string, string>;
 }) {
+    const categoryOptions = Array.isArray(categories) ? categories : [];
+    const brandOptions = Array.isArray(brands) ? brands : [];
+
     return (
         <>
             <Head title="Productos | JBTECHLINE" />
-            <div className="min-h-screen bg-[#050806] text-white">
+            <div className="min-h-screen bg-[#101a17] text-white">
                 <div className="hidden">
                     <header className="border-b border-white/10">
                         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5">
@@ -49,7 +51,6 @@ export default function ProductCatalog({
                         </div>
                     </header>
                 </div>
-                <PublicHeader />
                 <main className="mx-auto max-w-7xl px-5 pt-32 pb-16">
                     <p className="text-xs font-bold tracking-[.2em] text-lime-400 uppercase">
                         Catálogo tecnológico
@@ -75,10 +76,10 @@ export default function ProductCatalog({
                         <select
                             name="category"
                             defaultValue={filters.category}
-                            className="rounded-xl border border-white/10 bg-[#0b120d] px-4"
+                            className="rounded-xl border border-white/10 bg-[#182722] px-4"
                         >
                             <option value="">Todas las categorías</option>
-                            {categories.map((x) => (
+                            {categoryOptions.map((x) => (
                                 <option key={x.slug} value={x.slug}>
                                     {x.name}
                                 </option>
@@ -87,10 +88,10 @@ export default function ProductCatalog({
                         <select
                             name="brand"
                             defaultValue={filters.brand}
-                            className="rounded-xl border border-white/10 bg-[#0b120d] px-4"
+                            className="rounded-xl border border-white/10 bg-[#182722] px-4"
                         >
                             <option value="">Todas las marcas</option>
-                            {brands.map((x) => (
+                            {brandOptions.map((x) => (
                                 <option key={x.slug} value={x.slug}>
                                     {x.name}
                                 </option>

@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateHomepageSettingRequest;
 use App\Models\HomepageSetting;
 use App\Services\ImageUploader;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -31,6 +32,8 @@ class HomepageSettingController extends Controller
             $setting->hero_image_path,
         );
         HomepageSetting::query()->updateOrCreate([], $attributes);
+        Cache::forget('public.homepage-content');
+        Cache::forget('public.home.featured-products');
 
         return back()->with('success', 'La portada se actualizó correctamente.');
     }

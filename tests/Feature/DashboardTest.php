@@ -6,6 +6,10 @@ use App\Models\TeamInvitation;
 use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
+test('inertia server rendering is disabled unless an SSR service is configured', function () {
+    expect(config('inertia.ssr.enabled'))->toBeFalse();
+});
+
 test('guests are redirected to the login page', function () {
     $user = User::factory()->create();
     $team = $user->currentTeam;
@@ -23,6 +27,8 @@ test('authenticated users can visit the dashboard', function () {
         ->get(route('dashboard'));
 
     $response->assertOk();
+    $response->assertSee('name="google" content="notranslate"', false);
+    $response->assertSee('translate="no"', false);
 });
 
 test('dashboard includes pending invitations for the authenticated user', function () {

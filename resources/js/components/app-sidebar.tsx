@@ -1,8 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
     BadgeCheck,
-    BookOpen,
-    FolderGit2,
+    Globe2,
     FolderTree,
     LayoutGrid,
     PanelsTopLeft,
@@ -35,6 +34,7 @@ import { index as categoryIndex } from '@/routes/admin/categories';
 import { edit as companySettings } from '@/routes/admin/company-settings';
 import { index as softwareIndex } from '@/routes/admin/software';
 import { index as customerIndex } from '@/routes/admin/customers';
+import { index as userIndex } from '@/routes/admin/users';
 import type { NavItem } from '@/types';
 
 export function AppSidebar() {
@@ -45,7 +45,7 @@ export function AppSidebar() {
 
     const mainNavItems: NavItem[] = [
         {
-            title: 'Dashboard',
+            title: 'Panel principal',
             href: dashboardUrl,
             icon: LayoutGrid,
         },
@@ -107,26 +107,22 @@ export function AppSidebar() {
                           : '/',
                       icon: Users,
                   },
+                  {
+                      title: 'Usuarios y roles',
+                      href: page.props.currentTeam
+                          ? userIndex(page.props.currentTeam.slug)
+                          : '/',
+                      icon: Users,
+                  },
               ]
             : []),
     ];
 
-    const footerNavItems: NavItem[] = [
-        {
-            title: 'Repository',
-            href: 'https://github.com/laravel/react-starter-kit',
-            icon: FolderGit2,
-        },
-        {
-            title: 'Documentation',
-            href: 'https://laravel.com/docs/starter-kits#react',
-            icon: BookOpen,
-        },
-    ];
+    const footerNavItems: NavItem[] = [{ title: 'Ver tienda pública', href: '/', icon: Globe2 }];
 
     return (
-        <Sidebar collapsible="icon" variant="inset">
-            <SidebarHeader>
+        <Sidebar collapsible="icon" variant="inset" className="border-r border-emerald-500/10">
+            <SidebarHeader className="border-b border-sidebar-border/60 p-3">
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
@@ -147,7 +143,7 @@ export function AppSidebar() {
                 <NavMain items={mainNavItems} />
             </SidebarContent>
 
-            <SidebarFooter>
+            <SidebarFooter className="border-t border-sidebar-border/60 p-3">
                 <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>

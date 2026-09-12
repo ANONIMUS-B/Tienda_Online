@@ -1,6 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
 import { Download, LockKeyhole } from 'lucide-react';
-import PublicHeader from '@/components/public-header';
 import { contact, login, register, software } from '@/routes';
 import {
     download as programDownload,
@@ -16,9 +15,8 @@ export default function SoftwareShow({
 }) {
     const isPrograms = catalogType === 'programs';
     return (
-        <div className="min-h-screen bg-[#050806] text-white">
+        <div className="min-h-screen bg-[#101a17] text-white">
             <Head title={`${program.name} | Software JBTECHLINE`} />
-            <PublicHeader />
             <main className="mx-auto max-w-6xl px-5 pt-32 pb-20">
                 <Link
                     href={isPrograms ? programsIndex() : software()}

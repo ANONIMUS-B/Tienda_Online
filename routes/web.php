@@ -8,17 +8,20 @@ use App\Http\Controllers\Admin\HomepageSettingController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SoftwareProgramController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\BrandCatalogController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryCatalogController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CustomerOrderController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GlobalSearchController;
 use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\MediaFileController;
 use App\Http\Controllers\ProductCatalogController;
 use App\Http\Controllers\ProgramCatalogController;
 use App\Http\Controllers\ProgramDownloadController;
+use App\Http\Controllers\ServiceCatalogController;
 use App\Http\Controllers\SoftwareCatalogController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use App\Http\Middleware\EnsureTeamMembership;
@@ -29,7 +32,7 @@ Route::get('/media/{mediaFile}', MediaFileController::class)->name('media.show')
 Route::get('/productos', [ProductCatalogController::class, 'index'])->name('products');
 Route::get('/productos/{product}', [ProductCatalogController::class, 'show'])->name('products.show');
 Route::get('/categorias', CategoryCatalogController::class)->name('categories');
-Route::inertia('/servicios', 'public-section', ['section' => 'services'])->name('services');
+Route::get('/servicios', ServiceCatalogController::class)->name('services');
 Route::get('/software', [SoftwareCatalogController::class, 'index'])->name('software');
 Route::get('/software/{softwareProgram}', [SoftwareCatalogController::class, 'show'])->name('software.show');
 Route::get('/programas', [ProgramCatalogController::class, 'index'])->name('programs.index');
@@ -40,8 +43,9 @@ Route::get('/marcas', BrandCatalogController::class)->name('brands');
 Route::inertia('/nosotros', 'public-section', ['section' => 'about'])->name('about');
 Route::inertia('/blog', 'public-section', ['section' => 'blog'])->name('blog');
 Route::inertia('/contacto', 'public-section', ['section' => 'contact'])->name('contact');
-Route::inertia('/buscar', 'public-section', ['section' => 'search'])->name('search');
+Route::get('/buscar', GlobalSearchController::class)->name('search');
 Route::get('/carrito', [CartController::class, 'index'])->name('cart.index');
+Route::get('/carrito/whatsapp', [CartController::class, 'whatsapp'])->middleware('auth')->name('cart.whatsapp');
 Route::post('/carrito', [CartController::class, 'store'])->name('cart.store');
 Route::patch('/carrito/{product}', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/carrito/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
@@ -54,9 +58,9 @@ Route::get('/pedido/{number}', [CustomerOrderController::class, 'show'])->middle
 Route::prefix('{current_team}')
     ->middleware(['auth', 'verified', EnsureTeamMembership::class])
     ->group(function () {
-        Route::get('dashboard', DashboardController::class)->name('dashboard');
+        Route::get('dashboard', DashboardController::class)->middleware('system.role:admin,subadmin')->name('dashboard');
 
-        Route::middleware(EnsureTeamMembership::class.':admin')->group(function () {
+        Route::middleware(['system.role:admin,subadmin', EnsureTeamMembership::class.':admin'])->group(function () {
             Route::get('administracion/inicio', [HomepageSettingController::class, 'edit'])->name('admin.homepage.edit');
             Route::put('administracion/inicio', [HomepageSettingController::class, 'update'])->name('admin.homepage.update');
             Route::get('administracion/empresa', [CompanySettingController::class, 'edit'])->name('admin.company-settings.edit');
@@ -83,6 +87,15 @@ Route::prefix('{current_team}')
                 ->names('admin.software');
             Route::get('administracion/clientes', [CustomerController::class, 'index'])->name('admin.customers.index');
             Route::get('administracion/clientes/{customer}', [CustomerController::class, 'show'])->name('admin.customers.show');
+            Route::get('administracion/usuarios', [UserController::class, 'index'])->name('admin.users.index');
+
+            Route::middleware('system.role:admin')->group(function () {
+                Route::get('administracion/usuarios/crear', [UserController::class, 'create'])->name('admin.users.create');
+                Route::post('administracion/usuarios', [UserController::class, 'store'])->name('admin.users.store');
+                Route::get('administracion/usuarios/{user}/editar', [UserController::class, 'edit'])->name('admin.users.edit');
+                Route::put('administracion/usuarios/{user}', [UserController::class, 'update'])->name('admin.users.update');
+                Route::delete('administracion/usuarios/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
+            });
         });
     });
 

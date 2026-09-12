@@ -7,13 +7,19 @@ enum TeamRole: string
     case Owner = 'owner';
     case Admin = 'admin';
     case Member = 'member';
+    case Customer = 'customer';
 
     /**
      * Get the display label for the role.
      */
     public function label(): string
     {
-        return ucfirst($this->value);
+        return match ($this) {
+            self::Owner => 'Propietario',
+            self::Admin => 'Administrador',
+            self::Member => 'Miembro',
+            self::Customer => 'Cliente',
+        };
     }
 
     /**
@@ -30,7 +36,7 @@ enum TeamRole: string
                 TeamPermission::CreateInvitation,
                 TeamPermission::CancelInvitation,
             ],
-            self::Member => [],
+            self::Member, self::Customer => [],
         };
     }
 
@@ -52,6 +58,7 @@ enum TeamRole: string
             self::Owner => 3,
             self::Admin => 2,
             self::Member => 1,
+            self::Customer => 0,
         };
     }
 
@@ -71,7 +78,7 @@ enum TeamRole: string
     public static function assignable(): array
     {
         return collect(self::cases())
-            ->filter(fn (self $role) => $role !== self::Owner)
+            ->filter(fn (self $role) => in_array($role, [self::Admin, self::Member], true))
             ->map(fn (self $role) => ['value' => $role->value, 'label' => $role->label()])
             ->values()
             ->toArray();

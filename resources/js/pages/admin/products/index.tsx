@@ -3,11 +3,17 @@ import { Package, Pencil, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { create, destroy, edit, index } from '@/routes/admin/products';
 import type { Product } from '@/types/product';
+
+type ProductPaginator = {
+    data: Product[];
+    links: { url: string | null; label: string; active: boolean }[];
+};
+
 export default function ProductsIndex({
     products,
     currentTeam,
 }: {
-    products: Product[];
+    products: ProductPaginator;
     currentTeam: { slug: string };
 }) {
     return (
@@ -40,7 +46,7 @@ export default function ProductsIndex({
                             </tr>
                         </thead>
                         <tbody>
-                            {products.length === 0 && (
+                            {products.data.length === 0 && (
                                 <tr>
                                     <td
                                         colSpan={6}
@@ -51,7 +57,7 @@ export default function ProductsIndex({
                                     </td>
                                 </tr>
                             )}
-                            {products.map((product) => (
+                            {products.data.map((product) => (
                                 <tr key={product.id} className="border-b">
                                     <td className="p-4">
                                         <div className="flex items-center gap-3">
@@ -133,6 +139,19 @@ export default function ProductsIndex({
                             ))}
                         </tbody>
                     </table>
+                </div>
+                <div className="flex flex-wrap justify-center gap-2">
+                    {products.links.map((link, index) =>
+                        link.url ? (
+                            <Link
+                                key={index}
+                                href={link.url}
+                                preserveScroll
+                                className={`rounded-lg border px-3 py-2 text-sm ${link.active ? 'bg-primary text-primary-foreground' : 'bg-card'}`}
+                                dangerouslySetInnerHTML={{ __html: link.label }}
+                            />
+                        ) : null,
+                    )}
                 </div>
             </div>
         </>

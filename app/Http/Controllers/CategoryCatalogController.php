@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -12,13 +13,14 @@ class CategoryCatalogController extends Controller
     {
         return Inertia::render('public-section', [
             'section' => 'categories',
-            'categories' => Category::query()
+            'categories' => Cache::remember('public.categories', now()->addMinute(), fn () => Category::query()
                 ->active()
                 ->whereNull('parent_id')
                 ->with(['children' => fn ($query) => $query->active()])
                 ->orderBy('sort_order')
                 ->orderBy('name')
-                ->get(['id', 'parent_id', 'name', 'slug', 'description', 'image_path']),
+                ->get(['id', 'parent_id', 'name', 'slug', 'description', 'image_path'])
+                ->toArray()),
         ]);
     }
 }

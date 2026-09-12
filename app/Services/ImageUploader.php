@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\MediaFile;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -32,7 +33,9 @@ class ImageUploader
             Storage::disk('public')->delete(Str::after($path, '/storage/'));
         }
         if ($path && Str::startsWith($path, '/media/')) {
-            MediaFile::query()->whereKey(Str::after($path, '/media/'))->delete();
+            $id = Str::after($path, '/media/');
+            MediaFile::query()->whereKey($id)->delete();
+            Cache::forget('media.'.$id);
         }
     }
 }

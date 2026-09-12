@@ -1,13 +1,11 @@
 import { Head, Link } from '@inertiajs/react';
 import { CheckCircle2 } from 'lucide-react';
-import PublicHeader from '@/components/public-header';
 import { products } from '@/routes';
 import type { Order } from '@/types/order';
 export default function OrderShow({ order }: { order: Order }) {
     return (
-        <div className="min-h-screen bg-[#050806] text-white">
+        <div className="min-h-screen bg-[#101a17] text-white">
             <Head title={`Pedido ${order.number}`} />
-            <PublicHeader />
             <main className="mx-auto max-w-3xl px-5 pt-36 pb-20">
                 <div className="rounded-[2rem] border border-lime-400/25 bg-white/[.04] p-8 sm:p-12">
                     <CheckCircle2 className="size-14 text-lime-400" />

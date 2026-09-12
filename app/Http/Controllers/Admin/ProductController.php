@@ -14,6 +14,7 @@ use App\Services\ImageUploader;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -25,7 +26,17 @@ class ProductController extends Controller
 
     public function index(): Response
     {
-        return Inertia::render('admin/products/index', ['products' => Product::query()->with(['category:id,name', 'brand:id,name', 'images'])->latest()->get()]);
+        return Inertia::render('admin/products/index', [
+            'products' => Product::query()
+                ->select(['id', 'category_id', 'brand_id', 'name', 'slug', 'sku', 'price', 'promotional_price', 'stock', 'is_active'])
+                ->with([
+                    'category:id,name',
+                    'brand:id,name',
+                    'images' => fn ($query) => $query->where('is_primary', true)->orderBy('sort_order'),
+                ])
+                ->latest()
+                ->paginate(25),
+        ]);
     }
 
     public function create(): Response
@@ -51,6 +62,7 @@ class ProductController extends Controller
             $product->images()->create(['path' => $path, 'alt_text' => $product->name, 'is_primary' => true]);
             $this->storeGallery($product, $request->file('gallery', []));
         });
+        Cache::flush();
 
         return redirect()->route('admin.products.index', $request->route('current_team'));
     }
@@ -84,6 +96,7 @@ class ProductController extends Controller
             }
             $this->storeGallery($product, $request->file('gallery', []));
         });
+        Cache::flush();
 
         return redirect()->route('admin.products.index', $request->route('current_team'));
     }
@@ -92,6 +105,7 @@ class ProductController extends Controller
     {
         $product->load('images')->images->each(fn ($image) => $this->images->delete($image->path));
         $product->delete();
+        Cache::flush();
 
         return back();
     }

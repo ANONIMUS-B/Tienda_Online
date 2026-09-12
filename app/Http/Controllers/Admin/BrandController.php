@@ -9,6 +9,7 @@ use App\Models\Brand;
 use App\Models\Team;
 use App\Services\ImageUploader;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -43,6 +44,7 @@ class BrandController extends Controller
         $attributes = $this->normalized($request->safe()->except('logo'));
         $attributes['logo_path'] = $this->images->replace($request->file('logo'), 'brands');
         Brand::query()->create($attributes);
+        Cache::flush();
 
         return redirect()->route('admin.brands.index', $request->route('current_team'));
     }
@@ -63,6 +65,7 @@ class BrandController extends Controller
         $attributes = $this->normalized($request->safe()->except('logo'));
         $attributes['logo_path'] = $this->images->replace($request->file('logo'), 'brands', $brand->logo_path);
         $brand->update($attributes);
+        Cache::flush();
 
         return redirect()->route('admin.brands.index', $request->route('current_team'));
     }
@@ -74,6 +77,7 @@ class BrandController extends Controller
     {
         $this->images->delete($brand->logo_path);
         $brand->delete();
+        Cache::flush();
 
         return back();
     }

@@ -24,6 +24,7 @@ import {
     Zap,
 } from 'lucide-react';
 import { useState, type ComponentType } from 'react';
+import SearchPopover from '@/components/search-popover';
 
 import {
     about,
@@ -35,6 +36,7 @@ import {
     dashboard,
     home,
     login,
+    logout,
     products,
     register,
     search,
@@ -561,8 +563,6 @@ const navigation = [
     { label: 'Software', route: software },
     { label: 'Programas', route: programs },
     { label: 'Apps', route: apps },
-    { label: 'Nosotros', route: about },
-    { label: 'Blog', route: blog },
     { label: 'Contacto', route: contact },
 ];
 
@@ -570,10 +570,12 @@ export default function PublicSection({
     section,
     categories: categoryRecords = [],
     brands: brandRecords = [],
+    whatsappUrl,
 }: {
     section: Section;
     categories?: PublicCategory[];
     brands?: PublicBrand[];
+    whatsappUrl?: string | null;
 }) {
     const defaultContent = sectionContent[section];
     const content: SectionContent =
@@ -610,14 +612,16 @@ export default function PublicSection({
     const { auth, currentTeam } = page.props;
     const [menuOpen, setMenuOpen] = useState(false);
     const dashboardUrl = currentTeam ? dashboard(currentTeam.slug) : home();
+    const isCustomer = auth.user?.role === 'user';
+    const accountUrl = isCustomer ? cart() : dashboardUrl;
 
     return (
         <>
             <Head title={`${content.eyebrow} | JBTECHLINE`}>
                 <meta name="description" content={content.description} />
             </Head>
-            <div className="min-h-screen bg-[#050806] text-white selection:bg-lime-400 selection:text-black">
-                <header className="border-b border-white/8 bg-[#050806]/90 backdrop-blur-xl">
+            <div className="min-h-screen bg-[#101a17] text-white selection:bg-lime-400 selection:text-black">
+                <header className="hidden">
                     <div className="mx-auto flex h-20 max-w-[1500px] items-center justify-between px-5 lg:px-8">
                         <Link href={home()} className="flex items-center gap-3">
                             <img
@@ -683,13 +687,7 @@ export default function PublicSection({
                             ))}
                         </nav>
                         <div className="hidden items-center gap-1 lg:flex">
-                            <Link
-                                href={search()}
-                                className="rounded-full p-2.5 text-white/70 hover:bg-white/8 hover:text-lime-400"
-                                aria-label="Buscar"
-                            >
-                                <Search className="size-5" />
-                            </Link>
+                                <SearchPopover showLabel />
                             <Link
                                 href={cart()}
                                 className="rounded-full p-2.5 text-white/70 hover:bg-white/8 hover:text-lime-400"
@@ -698,12 +696,17 @@ export default function PublicSection({
                                 <ShoppingCart className="size-5" />
                             </Link>
                             {auth.user ? (
-                                <Link
-                                    href={dashboardUrl}
-                                    className="rounded-full bg-lime-400 px-5 py-2.5 text-sm font-bold text-black"
-                                >
-                                    Mi panel
-                                </Link>
+                                <>
+                                    <Link
+                                        href={accountUrl}
+                                        className="rounded-full bg-lime-400 px-5 py-2.5 text-sm font-bold text-black"
+                                    >
+                                        {isCustomer ? 'Mi carrito' : 'Mi panel'}
+                                    </Link>
+                                    <Link href={logout()} method="post" as="button" className="rounded-full border border-white/15 px-4 py-2.5 text-sm font-semibold text-white/70 hover:text-red-300">
+                                        Cerrar sesión
+                                    </Link>
+                                </>
                             ) : (
                                 <>
                                     <Link
@@ -776,12 +779,7 @@ export default function PublicSection({
                                 </Link>
                             ))}
                             <div className="mt-3 grid grid-cols-2 gap-2 border-t border-white/8 pt-4">
-                                <Link
-                                    href={search()}
-                                    className="rounded-xl border border-white/10 px-4 py-3 text-center text-sm"
-                                >
-                                    Buscar
-                                </Link>
+                                <SearchPopover showLabel />
                                 <Link
                                     href={cart()}
                                     className="rounded-xl border border-white/10 px-4 py-3 text-center text-sm"
@@ -789,6 +787,12 @@ export default function PublicSection({
                                     Carrito
                                 </Link>
                             </div>
+                            {auth.user && (
+                                <div className="mt-3 grid gap-2">
+                                    {!isCustomer && <Link href={dashboardUrl} className="rounded-xl border border-lime-400/40 px-4 py-3 text-center font-bold text-lime-400">Mi panel</Link>}
+                                    <Link href={logout()} method="post" as="button" className="rounded-xl border border-red-300/30 px-4 py-3 text-center font-semibold text-red-300">Cerrar sesión</Link>
+                                </div>
+                            )}
                         </nav>
                     )}
                 </header>
@@ -902,6 +906,30 @@ export default function PublicSection({
                         </div>
                     </section>
 
+                    {section === 'services' && (
+                        <section className="mx-auto grid max-w-7xl gap-6 px-5 pb-24 lg:grid-cols-2 lg:px-8">
+                            <article className="rounded-[2rem] border border-white/10 bg-white/[.035] p-8">
+                                <p className="text-xs font-bold tracking-[.2em] text-lime-400 uppercase">Problemas frecuentes</p>
+                                <h2 className="mt-3 text-2xl font-black">Cuéntanos qué ocurre con tu equipo</h2>
+                                <div className="mt-6 grid gap-3 text-sm text-white/60 sm:grid-cols-2">
+                                    {['Está lento o se congela', 'Se calienta o hace ruido', 'No enciende o no carga', 'Pantalla azul o reinicios', 'Virus y ventanas extrañas', 'Necesita más memoria o SSD'].map((problem) => (
+                                        <div key={problem} className="rounded-xl border border-white/8 bg-black/20 p-4">{problem}</div>
+                                    ))}
+                                </div>
+                            </article>
+                            <article className="rounded-[2rem] border border-lime-400/20 bg-lime-400/[.05] p-8">
+                                <p className="text-xs font-bold tracking-[.2em] text-lime-400 uppercase">Proceso transparente</p>
+                                <h2 className="mt-3 text-2xl font-black">Así atendemos tu servicio</h2>
+                                <ol className="mt-6 space-y-4 text-sm text-white/60">
+                                    {['Nos describes el equipo y la falla.', 'Realizamos el diagnóstico y preparamos la cotización.', 'Trabajamos únicamente después de tu aprobación.', 'Probamos el equipo y explicamos el trabajo realizado.'].map((step, index) => (
+                                        <li key={step} className="flex gap-4"><span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-lime-400 font-black text-black">{index + 1}</span><span className="pt-1">{step}</span></li>
+                                    ))}
+                                </ol>
+                                <p className="mt-6 border-t border-white/10 pt-5 text-xs leading-5 text-white/40">Antes de intervenir, recomendamos respaldar tu información. Los repuestos y el tiempo final se confirman después del diagnóstico.</p>
+                            </article>
+                        </section>
+                    )}
+
                     <section className="px-5 pb-24 lg:px-8">
                         <div className="mx-auto flex max-w-7xl flex-col gap-8 overflow-hidden rounded-[2.5rem] border border-lime-400/20 bg-gradient-to-r from-[#173a0d] to-[#071008] px-7 py-12 sm:px-12 lg:flex-row lg:items-center lg:justify-between">
                             <div>
@@ -917,7 +945,7 @@ export default function PublicSection({
                                 </p>
                             </div>
                             <a
-                                href="https://wa.me/"
+                                href={whatsappUrl ?? contact().url}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="inline-flex shrink-0 items-center justify-center gap-3 rounded-full bg-lime-400 px-7 py-4 font-extrabold text-black"

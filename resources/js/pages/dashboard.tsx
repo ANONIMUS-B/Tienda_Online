@@ -1,42 +1,56 @@
 import { Head } from '@inertiajs/react';
+import { Boxes, Package, ShoppingBag, Users } from 'lucide-react';
 import { useState } from 'react';
 import PendingInvitationsModal from '@/components/pending-invitations-modal';
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { dashboard } from '@/routes';
 import type { DashboardInvitation } from '@/types';
 
 type Props = {
     pendingInvitations?: DashboardInvitation[];
+    summary: { products: number; pendingOrders: number; customers: number; programs: number };
+    recentOrders: Array<{ id: number; number: string; customer_name: string; status: string; total: string; created_at: string }>;
 };
 
-export default function Dashboard({ pendingInvitations = [] }: Props) {
+const statusLabels: Record<string, string> = { pending: 'Pendiente', confirmed: 'Confirmado', processing: 'En proceso', shipped: 'Enviado', delivered: 'Entregado', cancelled: 'Cancelado' };
+
+export default function Dashboard({ pendingInvitations = [], summary, recentOrders }: Props) {
     const [showInvitations, setShowInvitations] = useState(
         pendingInvitations.length > 0,
     );
+    const statistics = [
+        { label: 'Productos', value: summary.products, icon: Package },
+        { label: 'Pedidos pendientes', value: summary.pendingOrders, icon: ShoppingBag },
+        { label: 'Clientes', value: summary.customers, icon: Users },
+        { label: 'Software y programas', value: summary.programs, icon: Boxes },
+    ];
 
     return (
         <>
-            <Head title="Dashboard" />
+            <Head title="Panel principal" />
             <PendingInvitationsModal
                 invitations={pendingInvitations}
                 open={pendingInvitations.length > 0 && showInvitations}
                 onOpenChange={setShowInvitations}
             />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                    </div>
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                    </div>
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                    </div>
+            <div className="flex flex-1 flex-col gap-6 p-4 md:p-6">
+                <div><p className="text-sm text-muted-foreground">Resumen administrativo</p><h1 className="text-3xl font-bold tracking-tight">Bienvenido a JBTECHLINE</h1></div>
+                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                    {statistics.map(({ label, value, icon: Icon }) => (
+                        <article key={label} className="rounded-2xl border bg-card p-5 shadow-sm">
+                            <div className="flex items-center justify-between"><p className="text-sm text-muted-foreground">{label}</p><Icon className="size-5 text-lime-600" /></div>
+                            <p className="mt-4 text-3xl font-black">{value}</p>
+                        </article>
+                    ))}
                 </div>
-                <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border md:min-h-min">
-                    <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                </div>
+                <section className="overflow-hidden rounded-2xl border bg-card shadow-sm">
+                    <div className="border-b p-5"><h2 className="text-lg font-bold">Pedidos recientes</h2><p className="text-sm text-muted-foreground">Últimas solicitudes recibidas desde la tienda.</p></div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm"><thead className="bg-muted/50 text-left text-muted-foreground"><tr><th className="p-4">Pedido</th><th className="p-4">Cliente</th><th className="p-4">Estado</th><th className="p-4 text-right">Total</th></tr></thead>
+                            <tbody>{recentOrders.map((order) => <tr key={order.id} className="border-t"><td className="p-4 font-semibold">{order.number}</td><td className="p-4">{order.customer_name}</td><td className="p-4">{statusLabels[order.status] ?? order.status}</td><td className="p-4 text-right font-semibold">S/ {Number(order.total).toFixed(2)}</td></tr>)}</tbody>
+                        </table>
+                        {recentOrders.length === 0 && <p className="p-10 text-center text-muted-foreground">Todavía no hay pedidos registrados.</p>}
+                    </div>
+                </section>
             </div>
         </>
     );
@@ -45,7 +59,7 @@ export default function Dashboard({ pendingInvitations = [] }: Props) {
 Dashboard.layout = (props: { currentTeam?: { slug: string } | null }) => ({
     breadcrumbs: [
         {
-            title: 'Dashboard',
+            title: 'Panel principal',
             href: props.currentTeam ? dashboard(props.currentTeam.slug) : '/',
         },
     ],

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\SystemRole;
 use App\Enums\TeamRole;
 use App\Models\Order;
 use App\Models\Team;
@@ -7,7 +8,7 @@ use App\Models\User;
 
 test('administrators can search customers and inspect their order history', function () {
     $admin = User::factory()->create();
-    $customer = User::factory()->create(['name' => 'Cliente Tecnológico', 'email' => 'cliente@example.com']);
+    $customer = User::factory()->create(['name' => 'Cliente Tecnológico', 'email' => 'cliente@example.com', 'role' => SystemRole::User]);
     Order::factory()->for($customer)->create(['total' => 450]);
 
     $this->actingAs($admin)->get(route('admin.customers.index', [$admin->currentTeam, 'q' => 'cliente@example.com']))->assertInertia(fn ($page) => $page->component('admin/customers/index')->has('customers.data', 1)->where('customers.data.0.email', 'cliente@example.com')->where('customers.data.0.orders_count', 1));

@@ -10,11 +10,11 @@ import {
     Cpu,
     Headphones,
     Laptop,
+    LogOut,
     Menu,
     MessageCircle,
     PackageCheck,
     Printer,
-    Search,
     ShieldCheck,
     ShoppingCart,
     Smartphone,
@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import type { HeroContent } from '@/types/homepage';
+import SearchPopover from '@/components/search-popover';
 
 import {
     about,
@@ -37,9 +38,9 @@ import {
     dashboard,
     home,
     login,
+    logout,
     products as productsPage,
     register,
-    search as searchPage,
     services as servicesPage,
     software as softwarePage,
 } from '@/routes';
@@ -54,8 +55,6 @@ const navigation = [
     { label: 'Software', route: softwarePage },
     { label: 'Programas', route: programs },
     { label: 'Apps', route: apps },
-    { label: 'Nosotros', route: about },
-    { label: 'Blog', route: blog },
     { label: 'Contacto', route: contact },
 ];
 
@@ -140,6 +139,8 @@ export default function Welcome({
     const { auth, currentTeam } = usePage().props;
     const [menuOpen, setMenuOpen] = useState(false);
     const dashboardUrl = currentTeam ? dashboard(currentTeam.slug) : '/';
+    const isCustomer = auth.user?.role === 'user';
+    const accountUrl = isCustomer ? cart() : dashboardUrl;
 
     return (
         <>
@@ -149,8 +150,8 @@ export default function Welcome({
                     content="JBTECHLINE: productos tecnológicos, software, soporte técnico y soluciones empresariales."
                 />
             </Head>
-            <div className="min-h-screen overflow-hidden bg-[#050806] text-white selection:bg-lime-400 selection:text-black">
-                <header className="fixed inset-x-0 top-0 z-50 border-b border-white/8 bg-[#050806]/85 backdrop-blur-xl">
+            <div className="min-h-screen overflow-hidden bg-[#101a17] text-white selection:bg-lime-400 selection:text-black">
+                <header className="hidden">
                     <div className="mx-auto flex h-20 max-w-[1500px] items-center justify-between px-5 lg:px-8">
                         <a
                             href="#inicio"
@@ -223,13 +224,7 @@ export default function Welcome({
                             ))}
                         </nav>
                         <div className="hidden items-center gap-2 lg:flex">
-                            <Link
-                                href={searchPage()}
-                                className="rounded-full p-2.5 text-white/70 hover:bg-white/8 hover:text-lime-400"
-                                aria-label="Buscar"
-                            >
-                                <Search className="size-5" />
-                            </Link>
+                            <SearchPopover showLabel />
                             <Link
                                 href={cart()}
                                 className="relative rounded-full p-2.5 text-white/70 hover:bg-white/8 hover:text-lime-400"
@@ -239,12 +234,17 @@ export default function Welcome({
                                 <span className="absolute top-1 right-1 size-2 rounded-full bg-lime-400" />
                             </Link>
                             {auth.user ? (
-                                <Link
-                                    href={dashboardUrl}
-                                    className="ml-2 rounded-full bg-lime-400 px-5 py-2.5 text-sm font-bold text-black"
-                                >
-                                    Mi panel
-                                </Link>
+                                <>
+                                    <Link
+                                        href={accountUrl}
+                                        className="ml-2 rounded-full bg-lime-400 px-5 py-2.5 text-sm font-bold text-black"
+                                    >
+                                        {isCustomer ? 'Mi carrito' : 'Mi panel'}
+                                    </Link>
+                                    <Link href={logout()} method="post" as="button" className="flex items-center gap-2 rounded-full border border-white/15 px-4 py-2.5 text-sm font-semibold text-white/75 hover:text-red-300">
+                                        <LogOut className="size-4" /> Cerrar sesión
+                                    </Link>
+                                </>
                             ) : (
                                 <>
                                     <Link
@@ -320,12 +320,7 @@ export default function Welcome({
                                     </Link>
                                 ))}
                                 <div className="mt-3 grid grid-cols-2 gap-2 border-t border-white/8 pt-4">
-                                    <Link
-                                        href={searchPage()}
-                                        className="rounded-xl border border-white/10 px-4 py-3 text-center text-sm"
-                                    >
-                                        Buscar
-                                    </Link>
+                                    <SearchPopover showLabel />
                                     <Link
                                         href={cart()}
                                         className="rounded-xl border border-white/10 px-4 py-3 text-center text-sm"
@@ -335,12 +330,10 @@ export default function Welcome({
                                 </div>
                                 <div className="mt-3 flex gap-3 border-t border-white/8 pt-4">
                                     <Link
-                                        href={
-                                            auth.user ? dashboardUrl : login()
-                                        }
+                                        href={auth.user ? accountUrl : login()}
                                         className="flex-1 rounded-xl border border-white/15 px-4 py-3 text-center text-sm font-semibold"
                                     >
-                                        {auth.user ? 'Mi panel' : 'Ingresar'}
+                                        {auth.user ? (isCustomer ? 'Mi carrito' : 'Mi panel') : 'Ingresar'}
                                     </Link>
                                     {!auth.user && (
                                         <Link
@@ -348,6 +341,11 @@ export default function Welcome({
                                             className="flex-1 rounded-xl bg-lime-400 px-4 py-3 text-center text-sm font-bold text-black"
                                         >
                                             Crear cuenta
+                                        </Link>
+                                    )}
+                                    {auth.user && (
+                                        <Link href={logout()} method="post" as="button" className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-red-300/30 px-4 py-3 text-sm font-semibold text-red-300">
+                                            <LogOut className="size-4" /> Cerrar sesión
                                         </Link>
                                     )}
                                 </div>
@@ -562,7 +560,7 @@ export default function Welcome({
 
                     <section
                         id="productos"
-                        className="border-y border-white/8 bg-[#08100b] py-24"
+                        className="border-y border-white/8 bg-[#14211d] py-24"
                     >
                         <div className="mx-auto max-w-7xl px-5 lg:px-8">
                             <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
@@ -710,7 +708,7 @@ export default function Welcome({
 
                     <section
                         id="software"
-                        className="border-y border-white/8 bg-gradient-to-br from-[#0c1b10] to-[#050806] py-24"
+                        className="border-y border-white/8 bg-gradient-to-br from-[#183024] to-[#101a17] py-24"
                     >
                         <div className="mx-auto grid max-w-7xl items-center gap-14 px-5 lg:grid-cols-2 lg:px-8">
                             <div className="relative min-h-[420px] overflow-hidden rounded-[2.5rem] border border-white/10 bg-black/30 p-7">

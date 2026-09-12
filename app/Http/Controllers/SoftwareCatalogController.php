@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SoftwareProgram;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -23,11 +24,15 @@ class SoftwareCatalogController extends Controller
 
     private function catalog(Request $request): Response
     {
-        $base = SoftwareProgram::query()->where('is_active', true)->where('is_own', true);
-        $programs = (clone $base)->with('image:id')->when($request->filled('q'), fn ($q) => $q->where(fn ($x) => $x->where('name', 'like', '%'.$request->string('q').'%')->orWhere('short_description', 'like', '%'.$request->string('q').'%')))->when($request->filled('category'), fn ($q) => $q->where('category', $request->string('category')))->when($request->filled('platform'), fn ($q) => $q->where('platform', $request->string('platform')))->latest()->paginate(12)->withQueryString();
-        $programs->through(fn (SoftwareProgram $p) => $this->item($p));
+        $catalog = Cache::remember('public.software.safe.'.sha1($request->getQueryString() ?? 'index'), now()->addMinutes(5), function () use ($request): array {
+            $base = SoftwareProgram::query()->where('is_active', true)->where('is_own', true);
+            $programs = (clone $base)->with('image:id')->when($request->filled('q'), fn ($q) => $q->where(fn ($x) => $x->where('name', 'like', '%'.$request->string('q').'%')->orWhere('short_description', 'like', '%'.$request->string('q').'%')))->when($request->filled('category'), fn ($q) => $q->where('category', $request->string('category')))->when($request->filled('platform'), fn ($q) => $q->where('platform', $request->string('platform')))->latest()->paginate(12)->withQueryString();
+            $programs->through(fn (SoftwareProgram $p) => $this->item($p));
 
-        return Inertia::render('software/index', ['catalogType' => 'software', 'programs' => $programs, 'categories' => (clone $base)->distinct()->orderBy('category')->pluck('category'), 'platforms' => (clone $base)->whereNotNull('platform')->distinct()->orderBy('platform')->pluck('platform'), 'filters' => $request->only(['q', 'category', 'platform'])]);
+            return ['programs' => $programs->toArray(), 'categories' => (clone $base)->distinct()->orderBy('category')->pluck('category')->all(), 'platforms' => (clone $base)->whereNotNull('platform')->distinct()->orderBy('platform')->pluck('platform')->all()];
+        });
+
+        return Inertia::render('software/index', ['catalogType' => 'software', ...$catalog, 'filters' => $request->only(['q', 'category', 'platform'])]);
     }
 
     /** @return array<string,mixed> */

@@ -10,6 +10,7 @@ use App\Models\SoftwareProgram;
 use App\Models\Team;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -21,7 +22,12 @@ class SoftwareProgramController extends Controller
      */
     public function index(): Response
     {
-        return Inertia::render('admin/software/index', ['programs' => SoftwareProgram::query()->latest()->get()]);
+        return Inertia::render('admin/software/index', [
+            'programs' => SoftwareProgram::query()
+                ->select(['id', 'name', 'slug', 'category', 'platform', 'is_active', 'created_at'])
+                ->latest()
+                ->paginate(25),
+        ]);
     }
 
     /**
@@ -41,6 +47,7 @@ class SoftwareProgramController extends Controller
         $data['image_id'] = $this->storeMedia($request->file('image'));
         $data['file_id'] = $this->storeMedia($request->file('program_file'));
         SoftwareProgram::query()->create($data);
+        Cache::flush();
 
         return redirect()->route('admin.software.index', $request->route('current_team'));
     }
@@ -66,6 +73,7 @@ class SoftwareProgramController extends Controller
             $data['file_id'] = $this->storeMedia($request->file('program_file'));
         }
         $softwareProgram->update($data);
+        Cache::flush();
 
         return redirect()->route('admin.software.index', $request->route('current_team'));
     }
@@ -76,6 +84,7 @@ class SoftwareProgramController extends Controller
     public function destroy(Team $currentTeam, SoftwareProgram $softwareProgram): RedirectResponse
     {
         $softwareProgram->delete();
+        Cache::flush();
 
         return back();
     }

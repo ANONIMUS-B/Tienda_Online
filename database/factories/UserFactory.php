@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\SystemRole;
 use App\Enums\TeamRole;
 use App\Models\Team;
 use App\Models\User;
@@ -31,6 +32,8 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'role' => SystemRole::Admin,
+            'is_active' => true,
             'remember_token' => Str::random(10),
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,

@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCartItemRequest;
 use App\Http\Requests\UpdateCartItemRequest;
+use App\Models\CompanySetting;
 use App\Models\Product;
 use App\Services\ShoppingCart;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -45,5 +47,21 @@ class CartController extends Controller
         $cart->remove($product);
 
         return back();
+    }
+
+    public function whatsapp(Request $request, ShoppingCart $cart): RedirectResponse
+    {
+        $items = $cart->items();
+        abort_if($items->isEmpty(), 422, 'El carrito está vacío.');
+
+        $settings = CompanySetting::query()->first();
+        $number = preg_replace('/\D/', '', (string) ($settings?->whatsapp_number ?: config('services.whatsapp.number')));
+        abort_if(blank($number), 422, 'El número de WhatsApp no está configurado.');
+
+        $details = $items->map(fn (array $item): string => "Producto: {$item['product']->name}\nCantidad: {$item['quantity']}\nPrecio: S/ ".number_format($item['unit_price'], 2))->implode("\n\n");
+        $user = $request->user();
+        $message = "Hola, estoy interesado en realizar el siguiente pedido:\n\n{$details}\n\nDatos del cliente:\nNombre: {$user->name}\nCorreo: {$user->email}\n\nQuisiera recibir información para continuar con el pedido.";
+
+        return redirect()->away('https://wa.me/'.$number.'?text='.rawurlencode($message));
     }
 }

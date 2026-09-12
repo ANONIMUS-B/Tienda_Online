@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\SystemRole;
 use App\Enums\TeamRole;
 use App\Models\Team;
 use App\Models\TeamInvitation;
@@ -44,5 +45,20 @@ test('new users can register', function () {
     $this->assertAuthenticated();
 
     $user = User::where('email', 'test@example.com')->first();
-    $response->assertRedirect(route('dashboard'));
+    expect($user->role)->toBe(SystemRole::User);
+    expect($user->teamRole($user->currentTeam))->toBe(TeamRole::Customer);
+    $response->assertRedirect(route('cart.index'));
+});
+
+test('customers registered from the storefront cannot access administration', function () {
+    $this->post(route('register.store'), [
+        'name' => 'Store Customer',
+        'email' => 'customer@example.com',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+    ]);
+
+    $customer = User::where('email', 'customer@example.com')->firstOrFail();
+
+    $this->get(route('admin.customers.index', $customer->currentTeam))->assertForbidden();
 });

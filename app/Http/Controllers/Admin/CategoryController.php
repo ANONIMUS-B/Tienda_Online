@@ -10,6 +10,7 @@ use App\Models\Team;
 use App\Services\ImageUploader;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -51,6 +52,7 @@ class CategoryController extends Controller
         $attributes = $this->normalized($request->safe()->except('image'));
         $attributes['image_path'] = $this->images->replace($request->file('image'), 'categories');
         Category::query()->create($attributes);
+        Cache::flush();
 
         return redirect()->route('admin.categories.index', $request->route('current_team'));
     }
@@ -74,6 +76,7 @@ class CategoryController extends Controller
         $attributes = $this->normalized($request->safe()->except('image'));
         $attributes['image_path'] = $this->images->replace($request->file('image'), 'categories', $category->image_path);
         $category->update($attributes);
+        Cache::flush();
 
         return redirect()->route('admin.categories.index', $request->route('current_team'));
     }
@@ -85,6 +88,7 @@ class CategoryController extends Controller
     {
         $this->images->delete($category->image_path);
         $category->delete();
+        Cache::flush();
 
         return back();
     }

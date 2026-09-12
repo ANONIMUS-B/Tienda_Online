@@ -1,7 +1,7 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
 import { Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
-import PublicHeader from '@/components/public-header';
 import { destroy, update } from '@/routes/cart';
+import { whatsapp } from '@/routes/cart';
 import { create as checkout } from '@/routes/checkout';
 import { login, products, register } from '@/routes';
 import type { CartItem } from '@/types/order';
@@ -13,9 +13,8 @@ export default function Cart({
 }) {
     const { auth } = usePage().props;
     return (
-        <div className="min-h-screen bg-[#050806] text-white">
+        <div className="min-h-screen bg-[#101a17] text-white">
             <Head title="Carrito | JBTECHLINE" />
-            <PublicHeader />
             <main className="mx-auto max-w-6xl px-5 pt-32 pb-20">
                 <p className="text-xs font-bold tracking-[.2em] text-lime-400 uppercase">
                     Tu compra
@@ -158,12 +157,22 @@ export default function Cart({
                                 El envío se calcula al finalizar.
                             </p>
                             {auth.user ? (
-                                <Link
-                                    href={checkout()}
-                                    className="mt-7 flex justify-center rounded-full bg-lime-400 px-6 py-4 font-black text-black"
-                                >
-                                    Finalizar compra
-                                </Link>
+                                <div className="mt-7 grid gap-3">
+                                    {auth.user.role === 'user' && (
+                                        <a
+                                            href={whatsapp().url}
+                                            className="flex justify-center rounded-full bg-[#25D366] px-6 py-4 font-black text-black"
+                                        >
+                                            Solicitar por WhatsApp
+                                        </a>
+                                    )}
+                                    <Link
+                                        href={checkout()}
+                                        className="flex justify-center rounded-full border border-lime-400 px-6 py-4 font-black text-lime-400"
+                                    >
+                                        Finalizar compra
+                                    </Link>
+                                </div>
                             ) : (
                                 <div className="mt-7 grid gap-3">
                                     <p className="text-center text-sm text-white/50">

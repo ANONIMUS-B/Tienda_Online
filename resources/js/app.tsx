@@ -5,11 +5,18 @@ import { initializeTheme } from '@/hooks/use-appearance';
 import { useFlashToast } from '@/hooks/use-flash-toast';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
+import PublicLayout from '@/layouts/public-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || 'JBTECHLINE';
 
 void createInertiaApp({
+    defaults: {
+        prefetch: {
+            cacheFor: '2m',
+            hoverDelay: 50,
+        },
+    },
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
         switch (true) {
@@ -20,7 +27,8 @@ void createInertiaApp({
             case name.startsWith('checkout/'):
             case name.startsWith('orders/'):
             case name.startsWith('software/'):
-                return null;
+            case name.startsWith('search/'):
+                return PublicLayout;
             case name.startsWith('auth/'):
                 return AuthLayout;
             case name.startsWith('settings/'):
@@ -39,9 +47,7 @@ void createInertiaApp({
             </TooltipProvider>
         );
     },
-    progress: {
-        color: '#4B5563',
-    },
+    progress: false,
 });
 
 function FlashToasts() {

@@ -3,11 +3,17 @@ import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { create, edit, index } from '@/routes/admin/software';
 import type { SoftwareProgram } from '@/types/software';
+
+type ProgramPaginator = {
+    data: SoftwareProgram[];
+    links: { url: string | null; label: string; active: boolean }[];
+};
+
 export default function Index({
     programs,
     currentTeam,
 }: {
-    programs: SoftwareProgram[];
+    programs: ProgramPaginator;
     currentTeam: { slug: string };
 }) {
     return (
@@ -32,7 +38,7 @@ export default function Index({
                     </Button>
                 </div>
                 <div className="bg-card rounded-xl border">
-                    {programs.map((p) => (
+                    {programs.data.map((p) => (
                         <Link
                             key={p.id}
                             href={edit({
@@ -50,6 +56,19 @@ export default function Index({
                             <span>{p.is_active ? 'Publicado' : 'Oculto'}</span>
                         </Link>
                     ))}
+                </div>
+                <div className="flex flex-wrap justify-center gap-2">
+                    {programs.links.map((link, linkIndex) =>
+                        link.url ? (
+                            <Link
+                                key={linkIndex}
+                                href={link.url}
+                                preserveScroll
+                                className={`rounded-lg border px-3 py-2 text-sm ${link.active ? 'bg-primary text-primary-foreground' : 'bg-card'}`}
+                                dangerouslySetInnerHTML={{ __html: link.label }}
+                            />
+                        ) : null,
+                    )}
                 </div>
             </div>
         </>

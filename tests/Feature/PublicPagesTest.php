@@ -17,5 +17,10 @@ test('public sections render on their own pages', function (string $routeName, s
     'about' => ['about', 'about'],
     'blog' => ['blog', 'blog'],
     'contact' => ['contact', 'contact'],
-    'search' => ['search', 'search'],
 ]);
+
+test('global search renders its optimized results page', function () {
+    $this->get(route('search'))->assertInertia(fn (Assert $page) => $page
+        ->component('search/index')
+    );
+});

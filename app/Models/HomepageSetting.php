@@ -6,6 +6,7 @@ use Database\Factories\HomepageSettingFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 #[Fillable([
     'hero_overline',
@@ -42,8 +43,10 @@ class HomepageSetting extends Model
     /** @return array<string, string> */
     public static function content(): array
     {
-        $setting = static::query()->first();
+        return Cache::remember('public.homepage-content', now()->addMinute(), function (): array {
+            $setting = static::query()->first();
 
-        return array_merge(static::defaults(), $setting?->only(array_keys(static::defaults())) ?? []);
+            return array_merge(static::defaults(), $setting?->only(array_keys(static::defaults())) ?? []);
+        });
     }
 }

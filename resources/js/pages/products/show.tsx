@@ -2,14 +2,13 @@ import { Form, Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Check, MessageCircle, ShoppingCart } from 'lucide-react';
 import { home, products } from '@/routes';
 import type { Product } from '@/types/product';
-import PublicHeader from '@/components/public-header';
 import { store as addToCart } from '@/routes/cart';
 export default function ProductShow({ product }: { product: Product }) {
     const price = product.promotional_price ?? product.price;
     return (
         <>
             <Head title={`${product.name} | JBTECHLINE`} />
-            <div className="min-h-screen bg-[#050806] text-white">
+            <div className="min-h-screen bg-[#101a17] text-white">
                 <div className="hidden">
                     <header className="border-b border-white/10">
                         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5">
@@ -26,7 +25,6 @@ export default function ProductShow({ product }: { product: Product }) {
                         </div>
                     </header>
                 </div>
-                <PublicHeader />
                 <main className="mx-auto max-w-7xl px-5 pt-28 pb-12">
                     <Link
                         href={products()}

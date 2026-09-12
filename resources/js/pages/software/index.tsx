@@ -1,6 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
 import { Code2, Download, Search, Sparkles } from 'lucide-react';
-import PublicHeader from '@/components/public-header';
 import { contact, software } from '@/routes';
 import { show } from '@/routes/software';
 import { index as programsIndex, show as programShow } from '@/routes/programs';
@@ -20,11 +19,10 @@ export default function SoftwareIndex({
 }) {
     const isPrograms = catalogType === 'programs';
     return (
-        <div className="min-h-screen bg-[#050806] text-white">
+        <div className="min-h-screen bg-[#101a17] text-white">
             <Head
                 title={`${isPrograms ? 'Programas' : 'Software'} | JBTECHLINE`}
             />
-            <PublicHeader />
             <main className="mx-auto max-w-7xl px-5 pt-32 pb-20">
                 <p className="text-xs font-bold tracking-[.2em] text-lime-400 uppercase">
                     {isPrograms ? 'Programas disponibles' : 'Desarrollo propio'}
@@ -36,9 +34,9 @@ export default function SoftwareIndex({
                     <span className="text-lime-400">mejor.</span>
                 </h1>
                 <p className="mt-5 max-w-3xl text-white/50">
-                    Descubre sistemas de facturación y ventas, utilidades y
-                    aplicaciones desarrolladas por JBTECHLINE. Puedes explorar
-                    sin cuenta; para descargar deberás registrarte.
+                    {isPrograms
+                        ? 'Aquí encontrarás únicamente los programas publicados por el administrador. Inicia sesión o crea una cuenta para descargarlos.'
+                        : 'Conoce los sistemas de facturación, ventas y aplicaciones desarrolladas por JBTECHLINE. Solicita una demostración o cotiza una solución adaptada a tu negocio.'}
                 </p>
                 <form
                     action={(isPrograms ? programsIndex() : software()).url}
@@ -57,7 +55,7 @@ export default function SoftwareIndex({
                     <select
                         name="category"
                         defaultValue={filters.category}
-                        className="rounded-xl border border-white/10 bg-[#0b120d] px-4"
+                        className="rounded-xl border border-white/10 bg-[#182722] px-4"
                     >
                         <option value="">Todas las categorías</option>
                         {categories.map((x) => (
@@ -67,7 +65,7 @@ export default function SoftwareIndex({
                     <select
                         name="platform"
                         defaultValue={filters.platform}
-                        className="rounded-xl border border-white/10 bg-[#0b120d] px-4"
+                        className="rounded-xl border border-white/10 bg-[#182722] px-4"
                     >
                         <option value="">Todas las plataformas</option>
                         {platforms.map((x) => (
@@ -126,7 +124,9 @@ export default function SoftwareIndex({
                                             ? 'Gratis'
                                             : program.price
                                               ? `S/ ${program.price}`
-                                              : 'Cotizar'}
+                                              : isPrograms
+                                                ? 'Licencia requerida'
+                                                : 'Cotizar'}
                                     </b>
                                     <Download className="size-5 text-lime-400" />
                                 </div>
@@ -134,7 +134,7 @@ export default function SoftwareIndex({
                         </Link>
                     ))}
                 </div>
-                <section className="mt-16 flex flex-col justify-between gap-6 rounded-[2rem] border border-lime-400/20 bg-lime-400/[.06] p-8 md:flex-row md:items-center">
+                {!isPrograms ? <section className="mt-16 flex flex-col justify-between gap-6 rounded-[2rem] border border-lime-400/20 bg-lime-400/[.06] p-8 md:flex-row md:items-center">
                     <div>
                         <h2 className="text-2xl font-black">
                             ¿Necesitas un software a medida?
@@ -150,7 +150,7 @@ export default function SoftwareIndex({
                     >
                         Cotizar desarrollo
                     </Link>
-                </section>
+                </section> : null}
             </main>
         </div>
     );

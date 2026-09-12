@@ -1,5 +1,4 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
-import PublicHeader from '@/components/public-header';
 import { store } from '@/routes/checkout';
 import type { CartItem } from '@/types/order';
 import { MessageCircle } from 'lucide-react';
@@ -20,9 +19,8 @@ export default function Checkout({
 }) {
     const { auth } = usePage().props;
     return (
-        <div className="min-h-screen bg-[#050806] text-white">
+        <div className="min-h-screen bg-[#101a17] text-white">
             <Head title="Finalizar compra | JBTECHLINE" />
-            <PublicHeader />
             <main className="mx-auto max-w-6xl px-5 pt-32 pb-20">
                 <p className="text-xs font-bold tracking-[.2em] text-lime-400 uppercase">
                     Paso final
