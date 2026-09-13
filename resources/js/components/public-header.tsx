@@ -1,6 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronDown, LogOut, Menu, ShoppingCart, X } from 'lucide-react';
 import { useState } from 'react';
+import { openCartDrawer } from '@/components/cart-drawer';
 import SearchPopover from '@/components/search-popover';
 import { index as cart } from '@/routes/cart';
 import { index as programs } from '@/routes/programs';
@@ -105,17 +106,18 @@ export default function PublicHeader() {
                 </nav>
                 <div className="hidden items-center gap-2 lg:flex">
                     <SearchPopover showLabel />
-                    <Link
-                        href={cart()}
-                        className="relative rounded-full p-2.5 text-white/70"
+                    <button
+                        type="button"
+                        onClick={openCartDrawer}
+                        className="relative rounded-full p-2.5 text-white/70 hover:text-lime-400 transition"
                     >
                         <ShoppingCart className="size-5" />
                         {cartCount > 0 && (
-                            <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-lime-400 text-[10px] font-black text-black">
+                            <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-lime-400 text-[10px] font-black text-black shadow-md shadow-lime-400/50">
                                 {cartCount}
                             </span>
                         )}
-                    </Link>
+                    </button>
                     {auth.user ? (
                         <>
                             <Link
@@ -204,12 +206,16 @@ export default function PublicHeader() {
                             {label}
                         </Link>
                     ))}
-                    <Link
-                        href={cart()}
-                        className="mt-3 rounded-xl bg-lime-400 px-4 py-3 text-center font-bold text-black"
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setOpen(false);
+                            openCartDrawer();
+                        }}
+                        className="mt-3 flex items-center justify-center gap-2 rounded-xl bg-lime-400 px-4 py-3 font-bold text-black shadow-lg shadow-lime-400/20"
                     >
-                        Carrito ({cartCount})
-                    </Link>
+                        <ShoppingCart className="size-5" /> Carrito ({cartCount})
+                    </button>
                     {auth.user && (
                         <>
                             {!isCustomer && (

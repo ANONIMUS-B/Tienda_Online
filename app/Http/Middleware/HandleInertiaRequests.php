@@ -50,6 +50,37 @@ class HandleInertiaRequests extends Middleware
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'cartCount' => fn () => array_sum(app(ShoppingCart::class)->quantities()),
+            'cart' => function () {
+                $items = app(ShoppingCart::class)->items();
+
+                return [
+                    'items' => $items->map(function ($item) {
+                        $product = $item['product'];
+                        $primaryImage = $product->images->firstWhere('is_primary', true) ?? $product->images->first();
+                        $imagePath = $primaryImage?->path;
+                        $imageUrl = '/images/brand/jbtechline-logo.png';
+                        if ($imagePath) {
+                            $imageUrl = (str_starts_with($imagePath, 'http') || str_starts_with($imagePath, '/'))
+                                ? $imagePath
+                                : asset('storage/'.$imagePath);
+                        }
+
+                        return [
+                            'id' => $product->id,
+                            'name' => $product->name,
+                            'slug' => $product->slug,
+                            'price' => (float) $item['unit_price'],
+                            'quantity' => (int) $item['quantity'],
+                            'total' => (float) $item['total'],
+                            'image' => $imageUrl,
+                            'brand' => $product->brand?->name,
+                            'category' => $product->category?->name,
+                        ];
+                    })->values()->all(),
+                    'count' => (int) $items->sum('quantity'),
+                    'subtotal' => round((float) $items->sum('total'), 2),
+                ];
+            },
             'flash' => [
                 'toast' => fn () => $request->session()->has('success')
                     ? ['type' => 'success', 'message' => $request->session()->get('success')]
