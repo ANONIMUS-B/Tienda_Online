@@ -84,6 +84,19 @@ export default function ProgramForm({
                         placeholder="Requisitos del sistema"
                         className={`${input} min-h-24 md:col-span-2`}
                     />
+                    <textarea
+                        name="installation_instructions"
+                        defaultValue={program?.installation_instructions ?? ''}
+                        placeholder="Pasos de instalación, uno por línea"
+                        className={`${input} min-h-24 md:col-span-2`}
+                    />
+                    <input
+                        name="tutorial_url"
+                        type="url"
+                        defaultValue={program?.tutorial_url ?? ''}
+                        placeholder="Enlace del video tutorial"
+                        className={`${input} md:col-span-2`}
+                    />
                     <label>
                         Imagen
                         <input
@@ -102,6 +115,11 @@ export default function ProgramForm({
                         />
                     </label>
                     {[
+                        [
+                            'download_enabled',
+                            'Permitir descarga gratuita',
+                            program?.download_enabled,
+                        ],
                         [
                             'is_own',
                             'Desarrollado por nosotros',

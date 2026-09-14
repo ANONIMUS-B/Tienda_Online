@@ -1,6 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
     ArrowRight,
+    Bell,
     ChevronDown,
     ChevronRight,
     LogOut,
@@ -50,10 +51,12 @@ export default function PublicHeader() {
         currentTeam,
         cartCount = 0,
         catalogCategories = [],
+        serviceNotifications = { unread: 0, latest: [] },
     } = page.props as any;
     const [open, setOpen] = useState(false);
     const [categoriesOpen, setCategoriesOpen] = useState(false);
     const [authModal, setAuthModal] = useState<AuthModalMode | null>(null);
+    const [notificationsOpen, setNotificationsOpen] = useState(false);
     const currentPath = page.url.split('?')[0];
     const dashboardUrl = currentTeam ? dashboard(currentTeam.slug) : '/';
     const isCustomer = auth.user?.role === 'user';
@@ -116,18 +119,93 @@ export default function PublicHeader() {
                     </nav>
                     <div className="hidden items-center gap-2 xl:flex">
                         <SearchPopover showLabel />
-                        <button
-                            type="button"
-                            onClick={openCartDrawer}
-                            className="relative rounded-full p-2.5 text-white/70 transition hover:text-lime-400"
-                        >
-                            <ShoppingCart className="size-5" />
-                            {cartCount > 0 && (
-                                <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-lime-400 text-[10px] font-black text-black shadow-md shadow-lime-400/50">
-                                    {cartCount}
-                                </span>
-                            )}
-                        </button>
+                        {isCustomer && (
+                            <div className="relative">
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setNotificationsOpen(!notificationsOpen)
+                                    }
+                                    aria-label={`Respuestas de servicio: ${serviceNotifications.unread} sin leer`}
+                                    className="relative rounded-full p-2.5 text-white/70 transition hover:text-lime-400"
+                                >
+                                    <Bell className="size-5" />
+                                    {serviceNotifications.unread > 0 && (
+                                        <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-lime-400 text-[10px] font-black text-black">
+                                            {serviceNotifications.unread}
+                                        </span>
+                                    )}
+                                </button>
+                                {notificationsOpen && (
+                                    <div className="absolute top-12 right-0 z-50 w-80 overflow-hidden rounded-2xl border border-cyan-200 bg-white text-slate-700 shadow-2xl">
+                                        <div className="border-b border-cyan-100 px-4 py-3">
+                                            <p className="font-bold">
+                                                Respuestas de soporte
+                                            </p>
+                                            <p className="text-xs text-slate-500">
+                                                Seguimiento de tus solicitudes
+                                            </p>
+                                        </div>
+                                        {serviceNotifications.latest.length ===
+                                        0 ? (
+                                            <p className="px-4 py-6 text-center text-sm text-slate-500">
+                                                Aún no tienes respuestas.
+                                            </p>
+                                        ) : (
+                                            serviceNotifications.latest.map(
+                                                (notification: any) => (
+                                                    <Link
+                                                        key={notification.id}
+                                                        href="/mis-solicitudes"
+                                                        onClick={() =>
+                                                            setNotificationsOpen(
+                                                                false,
+                                                            )
+                                                        }
+                                                        className="block border-b border-cyan-50 px-4 py-3 transition hover:bg-cyan-50"
+                                                    >
+                                                        <p className="text-xs font-bold text-cyan-600">
+                                                            {
+                                                                notification.number
+                                                            }
+                                                        </p>
+                                                        <p className="mt-1 line-clamp-2 text-sm">
+                                                            {
+                                                                notification.admin_response
+                                                            }
+                                                        </p>
+                                                    </Link>
+                                                ),
+                                            )
+                                        )}
+                                        <Link
+                                            href="/mis-solicitudes"
+                                            onClick={() =>
+                                                setNotificationsOpen(false)
+                                            }
+                                            className="block px-4 py-3 text-center text-sm font-bold text-cyan-600"
+                                        >
+                                            Ver todas mis solicitudes
+                                        </Link>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        {currentPath !== '/carrito' && (
+                            <button
+                                type="button"
+                                onClick={openCartDrawer}
+                                aria-label={`Abrir carrito con ${cartCount} ${cartCount === 1 ? 'producto' : 'productos'}`}
+                                className="relative rounded-full p-2.5 text-white/70 transition hover:text-lime-400"
+                            >
+                                <ShoppingCart className="size-5" />
+                                {cartCount > 0 && (
+                                    <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-lime-400 text-[10px] font-black text-black shadow-md shadow-lime-400/50">
+                                        {cartCount}
+                                    </span>
+                                )}
+                            </button>
+                        )}
                         {auth.user ? (
                             <>
                                 <Link
@@ -221,17 +299,33 @@ export default function PublicHeader() {
                         <div className="mt-3 border-t border-white/8 pt-3">
                             <SearchPopover showLabel />
                         </div>
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setOpen(false);
-                                openCartDrawer();
-                            }}
-                            className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-lime-400 px-4 py-3 font-bold text-black shadow-lg shadow-lime-400/20"
-                        >
-                            <ShoppingCart className="size-5" /> Carrito (
-                            {cartCount})
-                        </button>
+                        {isCustomer && (
+                            <Link
+                                href="/mis-solicitudes"
+                                onClick={() => setOpen(false)}
+                                className="mt-2 flex items-center justify-center gap-2 rounded-xl border border-cyan-200 px-4 py-3 font-bold text-cyan-700"
+                            >
+                                <Bell className="size-5" /> Mis solicitudes
+                                {serviceNotifications.unread > 0 && (
+                                    <span className="rounded-full bg-cyan-400 px-2 py-0.5 text-xs text-slate-900">
+                                        {serviceNotifications.unread}
+                                    </span>
+                                )}
+                            </Link>
+                        )}
+                        {currentPath !== '/carrito' && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setOpen(false);
+                                    openCartDrawer();
+                                }}
+                                className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-lime-400 px-4 py-3 font-bold text-black shadow-lg shadow-lime-400/20"
+                            >
+                                <ShoppingCart className="size-5" /> Carrito (
+                                {cartCount})
+                            </button>
+                        )}
                         {!auth.user && (
                             <div className="grid grid-cols-2 gap-2 pt-2">
                                 <button

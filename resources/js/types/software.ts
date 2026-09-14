@@ -10,6 +10,10 @@ export type SoftwareProgram = {
     short_description: string;
     description: string | null;
     requirements: string | null;
+    installation_instructions: string | null;
+    tutorial_url: string | null;
+    download_enabled: boolean;
+    can_download?: boolean;
     is_own: boolean;
     is_featured: boolean;
     is_active: boolean;

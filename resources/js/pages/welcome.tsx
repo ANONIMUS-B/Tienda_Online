@@ -16,7 +16,7 @@ import {
     X,
     Zap,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { HeroContent } from '@/types/homepage';
 import SearchPopover from '@/components/search-popover';
 
@@ -73,7 +73,7 @@ const benefits = [
 export default function Welcome({
     hero,
     featuredProducts,
-    heroProduct,
+    heroProduct: initialHeroProduct,
     programs: availablePrograms,
 }: {
     hero: HeroContent;
@@ -83,9 +83,26 @@ export default function Welcome({
 }) {
     const { auth, currentTeam } = usePage().props;
     const [menuOpen, setMenuOpen] = useState(false);
+    const [featuredIndex, setFeaturedIndex] = useState(0);
+    const activeHeroProduct =
+        featuredProducts[featuredIndex] ?? initialHeroProduct;
     const dashboardUrl = currentTeam ? dashboard(currentTeam.slug) : '/';
     const isCustomer = auth.user?.role === 'user';
     const accountUrl = isCustomer ? cart() : dashboardUrl;
+
+    useEffect(() => {
+        if (featuredProducts.length < 2) {
+            return;
+        }
+
+        const rotationTimer = window.setInterval(() => {
+            setFeaturedIndex(
+                (currentIndex) => (currentIndex + 1) % featuredProducts.length,
+            );
+        }, 5000);
+
+        return () => window.clearInterval(rotationTimer);
+    }, [featuredProducts.length]);
 
     return (
         <>
@@ -286,18 +303,18 @@ export default function Welcome({
                         <div className="via-brand-interactive/8 absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-white to-transparent" />
                         <div className="pointer-events-none absolute inset-0 [background-image:linear-gradient(rgb(0_229_255/.1)_1px,transparent_1px),linear-gradient(90deg,rgb(0_229_255/.1)_1px,transparent_1px)] [mask-image:linear-gradient(to_bottom,transparent,black_48%,transparent)] [background-size:64px_64px] opacity-20" />
 
-                        <div className="relative mx-auto min-h-[520px] max-w-7xl px-4 py-5 sm:min-h-[600px] sm:px-5 sm:py-6 lg:min-h-[680px] lg:px-8">
+                        <div className="relative mx-auto min-h-[460px] max-w-7xl px-4 py-4 sm:min-h-[500px] sm:px-5 sm:py-5 lg:min-h-[530px] lg:px-8">
                             {/* Watermark Background Title (Non-overlapping, pointer-events-none) */}
                             <div className="pointer-events-none absolute inset-x-0 top-12 z-0 text-center opacity-10 select-none">
                                 <p className="text-[clamp(3.5rem,8vw,7.5rem)] leading-none font-black tracking-widest text-white uppercase drop-shadow-[0_0_50px_rgba(255,255,255,0.2)]">
-                                    {heroProduct
-                                        ? (heroProduct.category?.name ??
+                                    {activeHeroProduct
+                                        ? (activeHeroProduct.category?.name ??
                                           'TECNOLOGÍA 3D')
                                         : hero.hero_title}
                                 </p>
                                 <p className="mt-2 text-[clamp(2.5rem,6vw,5.5rem)] leading-none font-black tracking-widest text-lime-400 uppercase">
-                                    {heroProduct
-                                        ? (heroProduct.brand?.name ??
+                                    {activeHeroProduct
+                                        ? (activeHeroProduct.brand?.name ??
                                           'JBTECHLINE')
                                         : hero.hero_accent}
                                 </p>
@@ -312,12 +329,12 @@ export default function Welcome({
                                 <div className="relative z-20 mx-auto w-full max-w-[300px] sm:max-w-[400px] lg:max-w-[480px]">
                                     <img
                                         src={
-                                            heroProduct?.images[0]?.path ??
-                                            hero.hero_image_path
+                                            activeHeroProduct?.images[0]
+                                                ?.path ?? hero.hero_image_path
                                         }
                                         alt={
-                                            heroProduct
-                                                ? heroProduct.name
+                                            activeHeroProduct
+                                                ? activeHeroProduct.name
                                                 : 'Centro tecnológico modular 3D'
                                         }
                                         className="relative mx-auto max-h-[260px] w-full animate-[hero-float_6s_ease-in-out_infinite] object-contain brightness-105 drop-shadow-[0_30px_45px_rgba(0,0,0,0.3)] filter sm:max-h-[320px] lg:max-h-[380px]"
@@ -325,38 +342,99 @@ export default function Welcome({
                                 </div>
 
                                 {/* Clean Glassmorphism Featured Product Card */}
-                                {heroProduct && (
+                                {activeHeroProduct && (
                                     <Link
-                                        href={productShow(heroProduct.slug)}
-                                        className="group border-brand-primary/45 bg-brand-background/90 hover:border-brand-primary hover:bg-brand-background relative z-30 mt-4 flex w-full max-w-[440px] flex-col items-stretch justify-between gap-3 rounded-2xl border p-4 shadow-[0_20px_50px_rgba(0,0,0,0.15)] backdrop-blur-2xl transition duration-300 hover:scale-[1.01] hover:shadow-[0_0_30px_rgb(0_247_255/.3)] sm:mt-6 sm:flex-row sm:items-center"
+                                        key={activeHeroProduct.id}
+                                        href={productShow(
+                                            activeHeroProduct.slug,
+                                        )}
+                                        className="group border-brand-primary/45 bg-brand-background/90 hover:border-brand-primary hover:bg-brand-background relative z-30 mt-4 flex w-full max-w-[440px] flex-col items-stretch justify-between gap-3 rounded-2xl border p-4 shadow-[0_20px_50px_rgba(0,0,0,0.15)] backdrop-blur-2xl transition duration-300 hover:scale-[1.01] hover:shadow-[0_0_30px_rgb(0_247_255/.3)] sm:mt-6 lg:absolute lg:top-[28%] lg:right-6 lg:mt-0 lg:w-80"
                                     >
                                         <div className="min-w-0 flex-1">
                                             <span className="inline-flex items-center gap-1.5 rounded-full border border-lime-400/30 bg-lime-400/10 px-2.5 py-0.5 text-[9px] font-extrabold tracking-wider text-lime-300 uppercase">
                                                 <Zap className="size-3 text-lime-400" />{' '}
                                                 Producto Destacado
                                             </span>
-                                            <h2 className="mt-1.5 truncate text-sm font-extrabold text-white transition-colors group-hover:text-lime-300">
-                                                {heroProduct.name}
+                                            <h2 className="mt-2 text-lg font-extrabold text-white transition-colors group-hover:text-lime-300">
+                                                {activeHeroProduct.name}
                                             </h2>
-                                            <p className="truncate text-[11px] text-white/50">
-                                                {heroProduct.brand?.name
-                                                    ? `Marca: ${heroProduct.brand.name}`
-                                                    : heroProduct.category
-                                                          ?.name}
+                                            <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-white/50">
+                                                {activeHeroProduct.brand
+                                                    ?.name && (
+                                                    <span>
+                                                        Marca:{' '}
+                                                        {
+                                                            activeHeroProduct
+                                                                .brand.name
+                                                        }
+                                                    </span>
+                                                )}
+                                                {activeHeroProduct.category
+                                                    ?.name && (
+                                                    <span>
+                                                        {
+                                                            activeHeroProduct
+                                                                .category.name
+                                                        }
+                                                    </span>
+                                                )}
+                                                <span>
+                                                    SKU: {activeHeroProduct.sku}
+                                                </span>
+                                            </div>
+                                            {activeHeroProduct.short_description && (
+                                                <p className="mt-3 line-clamp-2 border-t border-white/10 pt-3 text-xs leading-5 text-white/55">
+                                                    {
+                                                        activeHeroProduct.short_description
+                                                    }
+                                                </p>
+                                            )}
+                                            <p className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-400">
+                                                <span className="size-2 rounded-full bg-emerald-400" />
+                                                Disponible ·{' '}
+                                                {activeHeroProduct.stock} en
+                                                stock
                                             </p>
                                         </div>
-                                        <div className="flex shrink-0 flex-col items-end gap-1.5">
-                                            <span className="text-base font-black text-lime-300">
-                                                S/{' '}
-                                                {heroProduct.promotional_price ??
-                                                    heroProduct.price}
-                                            </span>
+                                        <div className="flex shrink-0 items-end justify-between gap-3 border-t border-white/10 pt-3">
+                                            <div>
+                                                {activeHeroProduct.promotional_price && (
+                                                    <span className="block text-[10px] text-white/35 line-through">
+                                                        S/{' '}
+                                                        {
+                                                            activeHeroProduct.price
+                                                        }
+                                                    </span>
+                                                )}
+                                                <span className="text-lg font-black text-lime-300">
+                                                    S/{' '}
+                                                    {activeHeroProduct.promotional_price ??
+                                                        activeHeroProduct.price}
+                                                </span>
+                                            </div>
                                             <span className="inline-flex items-center gap-1 rounded-full bg-lime-400 px-3 py-1 text-[10px] font-extrabold text-black transition hover:bg-lime-300">
                                                 Ver Producto{' '}
                                                 <ArrowRight className="size-3" />
                                             </span>
                                         </div>
                                     </Link>
+                                )}
+                                {featuredProducts.length > 1 && (
+                                    <div className="relative z-30 mt-4 flex items-center gap-2">
+                                        {featuredProducts.map(
+                                            (featuredProduct, index) => (
+                                                <button
+                                                    key={featuredProduct.id}
+                                                    type="button"
+                                                    onClick={() =>
+                                                        setFeaturedIndex(index)
+                                                    }
+                                                    aria-label={`Mostrar ${featuredProduct.name}`}
+                                                    className={`h-2.5 rounded-full transition-all ${index === featuredIndex ? 'w-8 bg-cyan-400' : 'w-2.5 bg-cyan-200 hover:bg-cyan-300'}`}
+                                                />
+                                            ),
+                                        )}
+                                    </div>
                                 )}
                             </div>
 
@@ -378,10 +456,10 @@ export default function Welcome({
                                 </div>
                             </Link>
 
-                            {/* Right Side Floating Card: Support & Services */}
+                            {/* Support card below the catalog card */}
                             <Link
                                 href={hero.hero_secondary_url}
-                                className="group absolute top-1/3 right-6 z-20 hidden w-56 items-center gap-3 rounded-2xl border border-white/14 bg-black/40 p-4 shadow-xl backdrop-blur-xl transition hover:border-lime-400/50 hover:bg-black/60 lg:flex"
+                                className="group absolute top-[calc(33.333%+100px)] left-6 z-20 hidden w-56 items-center gap-3 rounded-2xl border border-white/14 bg-black/40 p-4 shadow-xl backdrop-blur-xl transition hover:border-lime-400/50 hover:bg-black/60 lg:flex"
                             >
                                 <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-lime-400/15 text-lime-300 transition-transform group-hover:scale-105">
                                     <CircuitBoard className="size-6" />

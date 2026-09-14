@@ -16,12 +16,11 @@ class HomepageController extends Controller
         $featuredProducts = Cache::remember('public.home.featured-products', now()->addSeconds(30), fn (): array => Product::query()
             ->active()
             ->where('stock', '>', 0)
+            ->where('is_featured', true)
             ->with(['brand:id,name,slug', 'category:id,name,slug', 'images'])
-            ->orderByDesc('is_featured')
             ->orderByDesc('is_bestseller')
             ->orderByDesc('is_new')
             ->latest()
-            ->take(3)
             ->get()
             ->toArray());
 

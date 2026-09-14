@@ -51,6 +51,26 @@ class User extends Authenticatable implements PasskeyUser
         return $this->hasMany(Order::class);
     }
 
+    /** @return HasMany<ServiceRequest, $this> */
+    public function serviceRequests(): HasMany
+    {
+        return $this->hasMany(ServiceRequest::class);
+    }
+
+    /** @return HasMany<SoftwareMembership, $this> */
+    public function softwareMemberships(): HasMany
+    {
+        return $this->hasMany(SoftwareMembership::class);
+    }
+
+    public function hasActiveSoftwareMembership(): bool
+    {
+        return $this->softwareMemberships()
+            ->where('status', 'active')
+            ->where('expires_at', '>', now())
+            ->exists();
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === SystemRole::Admin;

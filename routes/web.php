@@ -7,6 +7,8 @@ use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\HomepageSettingController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ServiceRequestController as AdminServiceRequestController;
+use App\Http\Controllers\Admin\SoftwareMembershipController as AdminSoftwareMembershipController;
 use App\Http\Controllers\Admin\SoftwareProgramController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\BrandCatalogController;
@@ -22,7 +24,9 @@ use App\Http\Controllers\ProductCatalogController;
 use App\Http\Controllers\ProgramCatalogController;
 use App\Http\Controllers\ProgramDownloadController;
 use App\Http\Controllers\ServiceCatalogController;
+use App\Http\Controllers\ServiceRequestController;
 use App\Http\Controllers\SoftwareCatalogController;
+use App\Http\Controllers\SoftwareMembershipController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use App\Http\Middleware\EnsureTeamMembership;
 use Illuminate\Support\Facades\Route;
@@ -50,6 +54,9 @@ Route::post('/carrito', [CartController::class, 'store'])->name('cart.store');
 Route::patch('/carrito/{product}', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/carrito/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
 Route::middleware('auth')->group(function () {
+    Route::post('/membresia-software', [SoftwareMembershipController::class, 'store'])->name('software-memberships.store');
+    Route::get('/mis-solicitudes', [ServiceRequestController::class, 'index'])->name('service-requests.index');
+    Route::post('/solicitudes-servicio', [ServiceRequestController::class, 'store'])->name('service-requests.store');
     Route::get('/finalizar-compra', [CheckoutController::class, 'create'])->name('checkout.create');
     Route::post('/finalizar-compra', [CheckoutController::class, 'store'])->name('checkout.store');
 });
@@ -85,8 +92,12 @@ Route::prefix('{current_team}')
                 ->parameters(['software' => 'software_program'])
                 ->except('show')
                 ->names('admin.software');
+            Route::get('administracion/membresias-software', [AdminSoftwareMembershipController::class, 'index'])->name('admin.software-memberships.index');
+            Route::put('administracion/membresias-software/{softwareMembership}', [AdminSoftwareMembershipController::class, 'update'])->name('admin.software-memberships.update');
             Route::get('administracion/clientes', [CustomerController::class, 'index'])->name('admin.customers.index');
             Route::get('administracion/clientes/{customer}', [CustomerController::class, 'show'])->name('admin.customers.show');
+            Route::get('administracion/solicitudes-servicio', [AdminServiceRequestController::class, 'index'])->name('admin.service-requests.index');
+            Route::put('administracion/solicitudes-servicio/{serviceRequest}', [AdminServiceRequestController::class, 'update'])->name('admin.service-requests.update');
             Route::get('administracion/usuarios', [UserController::class, 'index'])->name('admin.users.index');
 
             Route::middleware('system.role:admin')->group(function () {

@@ -208,6 +208,41 @@ export default function CompanySettings({
                                         settings.payment_test_mode ?? true,
                                     )}
                                 />
+                                <h3 className="border-t pt-4 font-semibold">
+                                    Membresía de programas
+                                </h3>
+                                <Toggle
+                                    name="software_membership_enabled"
+                                    label="Permitir membresías"
+                                    checked={Boolean(
+                                        settings.software_membership_enabled ??
+                                        true,
+                                    )}
+                                />
+                                <input
+                                    name="software_monthly_price"
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    defaultValue={String(
+                                        settings.software_monthly_price ??
+                                            '29.90',
+                                    )}
+                                    placeholder="Precio mensual"
+                                    className={input}
+                                />
+                                <input
+                                    name="software_annual_price"
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    defaultValue={String(
+                                        settings.software_annual_price ??
+                                            '299.00',
+                                    )}
+                                    placeholder="Precio anual"
+                                    className={input}
+                                />
                                 <input
                                     name="gateway_public_key"
                                     placeholder="Llave pública (vacío conserva la actual)"

@@ -44,6 +44,9 @@ class UpdateCompanySettingRequest extends FormRequest
             'bank_name' => ['nullable', 'string', 'max:120'],
             'bank_account' => ['nullable', 'string', 'max:120'],
             'whatsapp_checkout_enabled' => ['required', 'boolean'],
+            'software_membership_enabled' => ['sometimes', 'boolean'],
+            'software_monthly_price' => ['sometimes', 'numeric', 'min:0'],
+            'software_annual_price' => ['sometimes', 'numeric', 'min:0'],
         ];
     }
 }

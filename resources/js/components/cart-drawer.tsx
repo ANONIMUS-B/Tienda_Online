@@ -33,7 +33,8 @@ interface CartItem {
     id: number;
     name: string;
     slug: string;
-    price: number;
+    price?: number;
+    unit_price?: number;
     quantity: number;
     total: number;
     image: string;
@@ -56,24 +57,6 @@ export default function CartDrawer() {
         count: 0,
         subtotal: 0,
     };
-    const flash = (props.flash as any) || {};
-
-    // Auto-open drawer when a product is added to cart
-    useEffect(() => {
-        if (flash?.toast?.message && flash.toast.type === 'success') {
-            const msg = flash.toast.message.toLowerCase();
-            if (
-                msg.includes('carrito') ||
-                msg.includes('agregado') ||
-                msg.includes('añadido')
-            ) {
-                const openTimer = window.setTimeout(() => setIsOpen(true), 180);
-
-                return () => window.clearTimeout(openTimer);
-            }
-        }
-    }, [flash]);
-
     // Custom event listeners
     useEffect(() => {
         const handleOpen = () => setIsOpen(true);
@@ -132,6 +115,9 @@ export default function CartDrawer() {
             onFinish: () => setUpdatingId(null),
         });
     };
+
+    const unitPrice = (item: CartItem) =>
+        Number(item.price ?? item.unit_price ?? 0);
 
     if (!isOpen) return null;
 
@@ -291,7 +277,9 @@ export default function CartDrawer() {
                                                 {item.quantity > 1 && (
                                                     <p className="text-[10px] text-white/40">
                                                         S/{' '}
-                                                        {item.price.toLocaleString(
+                                                        {unitPrice(
+                                                            item,
+                                                        ).toLocaleString(
                                                             'es-PE',
                                                             {
                                                                 minimumFractionDigits: 2,

@@ -18,7 +18,30 @@ class CartController extends Controller
     {
         $items = $cart->items();
 
-        return Inertia::render('cart/index', ['cart' => ['items' => $items, 'count' => $items->sum('quantity'), 'subtotal' => round($items->sum('total'), 2)]]);
+        return Inertia::render('cart/index', ['cart' => [
+            'items' => $items->map(function (array $item): array {
+                $product = $item['product'];
+                $image = $product->images->firstWhere('is_primary', true) ?? $product->images->first();
+
+                return [
+                    'id' => $product->id,
+                    'slug' => $product->slug,
+                    'sku' => $product->sku,
+                    'name' => $product->name,
+                    'short_description' => $product->short_description,
+                    'brand' => $product->brand?->name,
+                    'category' => $product->category?->name,
+                    'image' => $image?->path,
+                    'stock' => $product->stock,
+                    'quantity' => $item['quantity'],
+                    'price' => $item['unit_price'],
+                    'unit_price' => $item['unit_price'],
+                    'total' => $item['total'],
+                ];
+            })->values()->all(),
+            'count' => $items->sum('quantity'),
+            'subtotal' => round($items->sum('total'), 2),
+        ]]);
     }
 
     public function store(StoreCartItemRequest $request, ShoppingCart $cart): RedirectResponse

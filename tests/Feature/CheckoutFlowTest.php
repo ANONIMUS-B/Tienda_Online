@@ -9,7 +9,18 @@ test('customers can add update and remove available products from the cart', fun
     $product = Product::factory()->create(['stock' => 5, 'price' => 100, 'promotional_price' => 80]);
 
     $this->post(route('cart.store'), ['product_id' => $product->id, 'quantity' => 2])->assertRedirect();
-    $this->get(route('cart.index'))->assertOk()->assertInertia(fn ($page) => $page->component('cart/index')->where('cart.count', 2)->where('cart.subtotal', 160));
+    $this->get(route('cart.index'))->assertOk()->assertInertia(fn ($page) => $page
+        ->component('cart/index')
+        ->where('cart.count', 2)
+        ->where('cart.subtotal', 160)
+        ->has('cart.items', 1)
+        ->where('cart.items.0.id', $product->id)
+        ->where('cart.items.0.slug', $product->slug)
+        ->where('cart.items.0.stock', 5)
+        ->where('cart.items.0.quantity', 2)
+        ->where('cart.items.0.price', 80.0)
+        ->where('cart.items.0.unit_price', 80.0)
+        ->where('cart.items.0.total', 160.0));
     $this->patch(route('cart.update', $product), ['quantity' => 3])->assertRedirect()->assertSessionHas('cart', [$product->id => 3]);
     $this->delete(route('cart.destroy', $product))->assertRedirect()->assertSessionHas('cart', []);
 });

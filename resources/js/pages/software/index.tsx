@@ -1,8 +1,10 @@
-import { Head, Link } from '@inertiajs/react';
-import { Code2, Download, Search, Sparkles } from 'lucide-react';
-import { contact, software } from '@/routes';
-import { show } from '@/routes/software';
-import { index as programsIndex, show as programShow } from '@/routes/programs';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { Code2, Download, FileText, Search, Sparkles } from 'lucide-react';
+import { useState } from 'react';
+import ProgramDetailModal from '@/components/program-detail-modal';
+import SoftwareQuoteModal from '@/components/software-quote-modal';
+import { software } from '@/routes';
+import { index as programsIndex } from '@/routes/programs';
 import type { SoftwareProgram } from '@/types/software';
 export default function SoftwareIndex({
     catalogType,
@@ -10,34 +12,66 @@ export default function SoftwareIndex({
     categories,
     platforms,
     filters,
+    membership,
 }: {
     catalogType: 'software' | 'programs';
-    programs: { data: SoftwareProgram[] };
+    programs: {
+        data: SoftwareProgram[];
+        links: { url: string | null; label: string; active: boolean }[];
+    };
     categories: string[];
     platforms: string[];
     filters: Record<string, string>;
+    membership?: {
+        enabled: boolean;
+        monthly_price: number;
+        annual_price: number;
+        yape_enabled: boolean;
+        transfer_enabled: boolean;
+        yape_number: string | null;
+        bank_name: string | null;
+        bank_account: string | null;
+        active: boolean;
+    };
 }) {
     const isPrograms = catalogType === 'programs';
+    const { auth } = usePage().props;
+    const [selectedProgram, setSelectedProgram] =
+        useState<SoftwareProgram | null>(null);
+    const [quoteOpen, setQuoteOpen] = useState(false);
+    const membershipOptions = membership ?? {
+        enabled: false,
+        monthly_price: 0,
+        annual_price: 0,
+        yape_enabled: false,
+        transfer_enabled: false,
+        yape_number: null,
+        bank_name: null,
+        bank_account: null,
+        active: false,
+    };
     return (
         <div className="bg-brand-background min-h-screen text-white">
             <Head
                 title={`${isPrograms ? 'Programas' : 'Software'} | JBTECHLINE`}
             />
             <main className="mx-auto max-w-7xl px-5 pt-24 pb-14 sm:pt-28">
-                <p className="text-xs font-bold tracking-[.2em] text-lime-400 uppercase">
-                    {isPrograms ? 'Programas disponibles' : 'Desarrollo propio'}
-                </p>
-                <h1 className="mt-3 text-3xl font-black sm:mt-4 sm:text-5xl">
-                    {isPrograms
-                        ? 'Herramientas para trabajar '
-                        : 'Software creado para ti '}
-                    <span className="text-lime-400">mejor.</span>
-                </h1>
-                <p className="mt-5 max-w-3xl text-white/50">
-                    {isPrograms
-                        ? 'Aquí encontrarás únicamente los programas publicados por el administrador. Inicia sesión o crea una cuenta para descargarlos.'
-                        : 'Conoce los sistemas de facturación, ventas y aplicaciones desarrolladas por JBTECHLINE. Solicita una demostración o cotiza una solución adaptada a tu negocio.'}
-                </p>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <h1 className="text-3xl font-black sm:text-4xl">
+                        {isPrograms
+                            ? 'Programas disponibles'
+                            : 'Software disponible'}
+                    </h1>
+                    {!isPrograms && (
+                        <button
+                            type="button"
+                            onClick={() => setQuoteOpen(true)}
+                            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-cyan-400 px-5 font-bold text-slate-900"
+                        >
+                            <FileText className="size-4" /> Cotizar desarrollo
+                        </button>
+                    )}
+                </div>
                 <form
                     action={(isPrograms ? programsIndex() : software()).url}
                     method="get"
@@ -78,14 +112,11 @@ export default function SoftwareIndex({
                 </form>
                 <div className="mt-7 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                     {programs.data.map((program) => (
-                        <Link
+                        <button
+                            type="button"
                             key={program.id}
-                            href={
-                                isPrograms
-                                    ? programShow(program.slug)
-                                    : show(program.slug)
-                            }
-                            className="group overflow-hidden rounded-3xl border border-white/10 bg-white/[.035]"
+                            onClick={() => setSelectedProgram(program)}
+                            className="group overflow-hidden rounded-3xl border border-white/10 bg-white/[.035] text-left"
                         >
                             <div className="aspect-video bg-white/5">
                                 {program.image_url ? (
@@ -131,29 +162,47 @@ export default function SoftwareIndex({
                                     <Download className="size-5 text-lime-400" />
                                 </div>
                             </div>
-                        </Link>
+                        </button>
                     ))}
                 </div>
-                {!isPrograms ? (
-                    <section className="mt-10 flex flex-col justify-between gap-6 rounded-[2rem] border border-lime-400/20 bg-lime-400/[.06] p-7 md:flex-row md:items-center">
-                        <div>
-                            <h2 className="text-2xl font-black">
-                                ¿Necesitas un software a medida?
-                            </h2>
-                            <p className="mt-2 text-white/50">
-                                Cotiza sistemas web, facturación, inventario,
-                                aplicaciones móviles e integraciones.
-                            </p>
-                        </div>
-                        <Link
-                            href={contact()}
-                            className="shrink-0 rounded-full bg-lime-400 px-7 py-4 font-bold text-black"
-                        >
-                            Cotizar desarrollo
-                        </Link>
-                    </section>
-                ) : null}
+                {programs.data.length === 0 && (
+                    <div className="mt-8 rounded-2xl border border-cyan-100 bg-cyan-50/50 p-10 text-center text-slate-500">
+                        No hay software publicado con estos filtros.
+                    </div>
+                )}
+                <nav
+                    className="mt-8 flex flex-wrap justify-center gap-2"
+                    aria-label="Páginas del catálogo"
+                >
+                    {programs.links.map((link, index) =>
+                        link.url ? (
+                            <Link
+                                key={`${link.label}-${index}`}
+                                href={link.url}
+                                preserveScroll
+                                className={`rounded-lg border px-3 py-2 text-sm ${link.active ? 'border-cyan-400 bg-cyan-400 font-bold text-slate-900' : 'border-cyan-100 bg-white text-slate-600'}`}
+                                dangerouslySetInnerHTML={{
+                                    __html: link.label,
+                                }}
+                            />
+                        ) : null,
+                    )}
+                </nav>
             </main>
+            {selectedProgram && (
+                <ProgramDetailModal
+                    program={selectedProgram}
+                    membership={membershipOptions}
+                    isAuthenticated={Boolean(auth.user)}
+                    onClose={() => setSelectedProgram(null)}
+                />
+            )}
+            {quoteOpen && (
+                <SoftwareQuoteModal
+                    isAuthenticated={Boolean(auth.user)}
+                    onClose={() => setQuoteOpen(false)}
+                />
+            )}
         </div>
     );
 }

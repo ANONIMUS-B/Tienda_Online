@@ -12,7 +12,10 @@ class ProgramDownloadController extends Controller
      */
     public function __invoke(SoftwareProgram $softwareProgram): Response
     {
-        abort_unless($softwareProgram->is_active && ! $softwareProgram->is_own && $softwareProgram->file_id, 404);
+        abort_unless($softwareProgram->is_active && $softwareProgram->file_id, 404);
+        $canDownload = ($softwareProgram->license_type === 'free' && $softwareProgram->download_enabled)
+            || request()->user()?->hasActiveSoftwareMembership();
+        abort_unless($canDownload, 403, 'Necesitas una membresía activa para descargar este programa.');
         $file = $softwareProgram->file()->firstOrFail();
         $softwareProgram->increment('downloads');
 

@@ -26,14 +26,17 @@ test('homepage renders the configured 3d hero content', function () {
 
 test('homepage displays available products with the highlighted products first', function () {
     $featured = Product::factory()->create(['name' => 'Laptop destacada', 'is_featured' => true, 'stock' => 3]);
+    $secondFeatured = Product::factory()->create(['name' => 'PC destacada', 'is_featured' => true, 'stock' => 2]);
+    Product::factory()->create(['name' => 'Producto no destacado', 'is_featured' => false, 'stock' => 4]);
     Product::factory()->create(['name' => 'Producto sin stock', 'stock' => 0]);
+    Cache::forget('public.home.featured-products');
 
     $this->get(route('home'))
         ->assertInertia(fn (Assert $page) => $page
             ->component('welcome')
-            ->has('featuredProducts', 1)
-            ->where('featuredProducts.0.id', $featured->id)
-            ->where('heroProduct.id', $featured->id),
+            ->has('featuredProducts', 2)
+            ->where('featuredProducts', fn ($products) => collect($products)->pluck('id')->sort()->values()->all() === collect([$featured->id, $secondFeatured->id])->sort()->values()->all())
+            ->where('heroProduct.is_featured', true),
         );
 });
 

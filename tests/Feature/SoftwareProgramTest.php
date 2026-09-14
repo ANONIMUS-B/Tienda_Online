@@ -14,7 +14,7 @@ test('visitors can browse and filter published software', function () {
 
 test('program downloads require a registered customer', function () {
     $file = MediaFile::query()->create(['id' => (string) str()->uuid(), 'mime_type' => 'application/zip', 'size' => 4, 'original_name' => 'programa.zip', 'contents' => base64_encode('demo')]);
-    $program = SoftwareProgram::factory()->create(['file_id' => $file->id]);
+    $program = SoftwareProgram::factory()->create(['file_id' => $file->id, 'download_enabled' => true]);
 
     $this->get(route('programs.download', $program))->assertRedirect(route('login'));
     $this->actingAs(User::factory()->create())->get(route('programs.download', $program))->assertOk()->assertDownload('programa.zip');

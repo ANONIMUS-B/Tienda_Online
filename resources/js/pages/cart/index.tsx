@@ -1,10 +1,33 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
-import { Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
-import { destroy, update } from '@/routes/cart';
-import { whatsapp } from '@/routes/cart';
-import { create as checkout } from '@/routes/checkout';
+import {
+    ArrowRight,
+    CheckCircle2,
+    Minus,
+    PackageCheck,
+    Plus,
+    ShieldCheck,
+    ShoppingBag,
+    Trash2,
+    Truck,
+} from 'lucide-react';
 import { login, products, register } from '@/routes';
-import type { CartItem } from '@/types/order';
+import { destroy, update, whatsapp } from '@/routes/cart';
+import { create as checkout } from '@/routes/checkout';
+
+type CartItem = {
+    id: number;
+    slug: string;
+    sku: string;
+    name: string;
+    short_description: string | null;
+    brand: string | null;
+    category: string | null;
+    image: string | null;
+    stock: number;
+    quantity: number;
+    unit_price: number;
+    total: number;
+};
 
 export default function Cart({
     cart,
@@ -12,6 +35,7 @@ export default function Cart({
     cart: { items: CartItem[]; count: number; subtotal: number };
 }) {
     const { auth } = usePage().props;
+
     return (
         <div className="bg-brand-background min-h-screen text-white">
             <Head title="Carrito | JBTECHLINE" />
@@ -21,7 +45,7 @@ export default function Cart({
                 </p>
                 <h1 className="mt-3 text-4xl font-black">Carrito de compras</h1>
                 {cart.items.length === 0 ? (
-                    <div className="mt-10 rounded-3xl border border-white/10 p-16 text-center">
+                    <div className="mt-10 rounded-3xl border border-white/10 p-10 text-center sm:p-16">
                         <ShoppingBag className="mx-auto size-12 text-lime-400" />
                         <p className="mt-5 text-white/55">
                             Tu carrito está vacío.
@@ -34,165 +58,208 @@ export default function Cart({
                         </Link>
                     </div>
                 ) : (
-                    <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_340px]">
+                    <div className="mt-8 grid gap-7 lg:grid-cols-[minmax(0,1fr)_350px]">
                         <div className="grid gap-4">
-                            {cart.items.map(
-                                ({ product, quantity, unit_price, total }) => (
-                                    <article
-                                        key={product.id}
-                                        className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-white/[.035] p-4 sm:flex-row sm:gap-5 sm:p-5"
-                                    >
-                                        <div className="h-40 w-full overflow-hidden rounded-2xl bg-white/5 sm:size-28">
-                                            {product.images[0] && (
-                                                <img
-                                                    src={product.images[0].path}
-                                                    alt={product.name}
-                                                    loading="lazy"
-                                                    decoding="async"
-                                                    className="size-full object-cover"
-                                                />
+                            {cart.items.map((item) => (
+                                <article
+                                    key={item.id}
+                                    className="grid gap-4 rounded-3xl border border-cyan-200 bg-cyan-50/45 p-4 sm:grid-cols-[120px_minmax(0,1fr)] sm:p-5"
+                                >
+                                    <div className="flex h-44 items-center justify-center overflow-hidden rounded-2xl bg-white sm:size-[120px]">
+                                        {item.image ? (
+                                            <img
+                                                src={item.image}
+                                                alt={item.name}
+                                                loading="lazy"
+                                                decoding="async"
+                                                className="size-full object-contain p-2"
+                                            />
+                                        ) : (
+                                            <PackageCheck className="size-10 text-cyan-300" />
+                                        )}
+                                    </div>
+                                    <div className="flex min-w-0 flex-col justify-between gap-4">
+                                        <div>
+                                            <p className="text-xs font-bold text-cyan-500">
+                                                {[item.brand, item.category]
+                                                    .filter(Boolean)
+                                                    .join(' · ')}
+                                            </p>
+                                            <h2 className="mt-1 text-lg font-black text-slate-800">
+                                                {item.name}
+                                            </h2>
+                                            <p className="mt-1 text-xs text-slate-500">
+                                                SKU: {item.sku}
+                                            </p>
+                                            {item.short_description && (
+                                                <p className="mt-2 line-clamp-2 text-sm text-slate-600">
+                                                    {item.short_description}
+                                                </p>
                                             )}
-                                        </div>
-                                        <div className="flex flex-1 flex-col justify-between">
-                                            <div>
-                                                <p className="text-xs text-lime-400">
-                                                    {product.sku}
-                                                </p>
-                                                <h2 className="mt-1 font-bold">
-                                                    {product.name}
-                                                </h2>
-                                                <p className="mt-1 text-sm text-white/45">
-                                                    S/{' '}
-                                                    {Number(unit_price).toFixed(
-                                                        2,
-                                                    )}
-                                                </p>
+                                            <div className="mt-3 flex flex-wrap gap-3 text-xs">
+                                                <strong className="text-cyan-700">
+                                                    Precio unitario: S/{' '}
+                                                    {Number(
+                                                        item.unit_price,
+                                                    ).toFixed(2)}
+                                                </strong>
+                                                <span className="flex items-center gap-1 text-emerald-600">
+                                                    <CheckCircle2 className="size-3.5" />
+                                                    {item.stock > 0
+                                                        ? `${item.stock} disponibles`
+                                                        : 'Agotado'}
+                                                </span>
                                             </div>
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-2">
-                                                    <Form
-                                                        {...update.form(
-                                                            product.slug,
+                                        </div>
+                                        <div className="flex flex-wrap items-center justify-between gap-4">
+                                            <div className="flex items-center gap-2">
+                                                <Form
+                                                    {...update.form(item.slug)}
+                                                >
+                                                    <input
+                                                        type="hidden"
+                                                        name="quantity"
+                                                        value={Math.max(
+                                                            1,
+                                                            item.quantity - 1,
                                                         )}
+                                                    />
+                                                    <button
+                                                        disabled={
+                                                            item.quantity <= 1
+                                                        }
+                                                        aria-label={`Disminuir cantidad de ${item.name}`}
+                                                        className="rounded-lg border border-cyan-200 bg-white p-2 text-cyan-700 disabled:opacity-30"
                                                     >
-                                                        <input
-                                                            type="hidden"
-                                                            name="quantity"
-                                                            value={Math.max(
-                                                                1,
-                                                                quantity - 1,
-                                                            )}
-                                                        />
-                                                        <button
-                                                            disabled={
-                                                                quantity <= 1
-                                                            }
-                                                            className="rounded-lg border border-white/10 p-2 disabled:opacity-30"
-                                                        >
-                                                            <Minus className="size-4" />
-                                                        </button>
-                                                    </Form>
-                                                    <span className="w-8 text-center font-bold">
-                                                        {quantity}
-                                                    </span>
-                                                    <Form
-                                                        {...update.form(
-                                                            product.slug,
-                                                        )}
+                                                        <Minus className="size-4" />
+                                                    </button>
+                                                </Form>
+                                                <span className="w-8 text-center font-black text-slate-800">
+                                                    {item.quantity}
+                                                </span>
+                                                <Form
+                                                    {...update.form(item.slug)}
+                                                >
+                                                    <input
+                                                        type="hidden"
+                                                        name="quantity"
+                                                        value={
+                                                            item.quantity + 1
+                                                        }
+                                                    />
+                                                    <button
+                                                        disabled={
+                                                            item.quantity >=
+                                                            item.stock
+                                                        }
+                                                        aria-label={`Aumentar cantidad de ${item.name}`}
+                                                        className="rounded-lg border border-cyan-200 bg-white p-2 text-cyan-700 disabled:opacity-30"
                                                     >
-                                                        <input
-                                                            type="hidden"
-                                                            name="quantity"
-                                                            value={quantity + 1}
-                                                        />
-                                                        <button
-                                                            disabled={
-                                                                quantity >=
-                                                                product.stock
-                                                            }
-                                                            className="rounded-lg border border-white/10 p-2 disabled:opacity-30"
-                                                        >
-                                                            <Plus className="size-4" />
-                                                        </button>
-                                                    </Form>
-                                                </div>
-                                                <div className="flex items-center gap-4">
-                                                    <strong>
+                                                        <Plus className="size-4" />
+                                                    </button>
+                                                </Form>
+                                            </div>
+                                            <div className="flex items-center gap-4">
+                                                <div className="text-right">
+                                                    <p className="text-xs text-slate-400">
+                                                        Total
+                                                    </p>
+                                                    <strong className="text-lg text-cyan-700">
                                                         S/{' '}
-                                                        {Number(total).toFixed(
-                                                            2,
-                                                        )}
+                                                        {Number(
+                                                            item.total,
+                                                        ).toFixed(2)}
                                                     </strong>
-                                                    <Form
-                                                        {...destroy.form(
-                                                            product.slug,
-                                                        )}
-                                                    >
-                                                        <button className="text-red-300">
-                                                            <Trash2 className="size-5" />
-                                                        </button>
-                                                    </Form>
                                                 </div>
+                                                <Form
+                                                    {...destroy.form(item.slug)}
+                                                >
+                                                    <button
+                                                        aria-label={`Eliminar ${item.name}`}
+                                                        className="rounded-lg p-2 text-red-400 hover:bg-red-50"
+                                                    >
+                                                        <Trash2 className="size-5" />
+                                                    </button>
+                                                </Form>
                                             </div>
                                         </div>
-                                    </article>
-                                ),
-                            )}
+                                    </div>
+                                </article>
+                            ))}
                         </div>
-                        <aside className="h-fit rounded-3xl border border-lime-400/20 bg-white/[.04] p-7">
-                            <h2 className="text-xl font-bold">Resumen</h2>
-                            <div className="mt-6 flex justify-between text-white/55">
+                        <aside className="h-fit rounded-3xl border border-cyan-200 bg-cyan-50/55 p-6 lg:sticky lg:top-24">
+                            <h2 className="text-xl font-black text-slate-800">
+                                Resumen
+                            </h2>
+                            <div className="mt-6 flex justify-between text-sm text-slate-600">
                                 <span>{cart.count} artículos</span>
                                 <span>
                                     S/ {Number(cart.subtotal).toFixed(2)}
                                 </span>
                             </div>
-                            <div className="mt-5 flex justify-between border-t border-white/10 pt-5 text-xl font-black">
+                            <div className="mt-5 flex justify-between border-t border-cyan-200 pt-5 text-xl font-black text-slate-800">
                                 <span>Subtotal</span>
                                 <span>
                                     S/ {Number(cart.subtotal).toFixed(2)}
                                 </span>
                             </div>
-                            <p className="mt-3 text-xs text-white/35">
-                                El envío se calcula al finalizar.
+                            <p className="mt-2 text-xs text-slate-500">
+                                El costo de envío se calcula al finalizar.
                             </p>
+                            <div className="mt-5 grid gap-3 border-y border-cyan-200 py-5 text-xs text-slate-600">
+                                <p className="flex items-center gap-2">
+                                    <Truck className="size-4 text-cyan-500" />
+                                    Envío o recojo según disponibilidad
+                                </p>
+                                <p className="flex items-center gap-2">
+                                    <ShieldCheck className="size-4 text-cyan-500" />
+                                    Compra protegida y datos seguros
+                                </p>
+                            </div>
                             {auth.user ? (
-                                <div className="mt-7 grid gap-3">
+                                <div className="mt-6 grid gap-3">
                                     {auth.user.role === 'user' && (
                                         <a
                                             href={whatsapp().url}
-                                            className="bg-brand-interactive text-brand-background flex justify-center rounded-full px-6 py-4 font-black"
+                                            className="flex justify-center rounded-full bg-emerald-500 px-6 py-4 font-black text-white"
                                         >
                                             Solicitar por WhatsApp
                                         </a>
                                     )}
                                     <Link
                                         href={checkout()}
-                                        className="flex justify-center rounded-full border border-lime-400 px-6 py-4 font-black text-lime-400"
+                                        className="flex items-center justify-center gap-2 rounded-full bg-cyan-400 px-6 py-4 font-black text-slate-950"
                                     >
-                                        Finalizar compra
+                                        Finalizar compra{' '}
+                                        <ArrowRight className="size-4" />
                                     </Link>
                                 </div>
                             ) : (
-                                <div className="mt-7 grid gap-3">
-                                    <p className="text-center text-sm text-white/50">
-                                        Debes ingresar o registrarte antes de
-                                        realizar el pedido.
+                                <div className="mt-6 grid gap-3">
+                                    <p className="text-center text-sm text-slate-600">
+                                        Ingresa o crea una cuenta para finalizar
+                                        el pedido.
                                     </p>
                                     <Link
                                         href={login()}
-                                        className="flex justify-center rounded-full bg-lime-400 px-6 py-4 font-black text-black"
+                                        className="flex justify-center rounded-full bg-cyan-400 px-6 py-4 font-black text-slate-950"
                                     >
                                         Iniciar sesión
                                     </Link>
                                     <Link
                                         href={register()}
-                                        className="flex justify-center rounded-full border border-white/15 px-6 py-4 font-bold"
+                                        className="flex justify-center rounded-full border border-cyan-300 px-6 py-4 font-bold text-cyan-700"
                                     >
                                         Crear cuenta
                                     </Link>
                                 </div>
                             )}
+                            <Link
+                                href={products()}
+                                className="mt-5 block text-center text-sm font-bold text-cyan-700"
+                            >
+                                Seguir comprando
+                            </Link>
                         </aside>
                     </div>
                 )}

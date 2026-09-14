@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['image_id', 'file_id', 'name', 'slug', 'category', 'platform', 'version', 'license_type', 'price', 'short_description', 'description', 'requirements', 'is_own', 'is_featured', 'is_active', 'downloads'])]
+#[Fillable(['image_id', 'file_id', 'name', 'slug', 'category', 'platform', 'version', 'license_type', 'price', 'short_description', 'description', 'requirements', 'installation_instructions', 'tutorial_url', 'download_enabled', 'is_own', 'is_featured', 'is_active', 'downloads'])]
 class SoftwareProgram extends Model
 {
     /** @use HasFactory<SoftwareProgramFactory> */
@@ -35,6 +35,6 @@ class SoftwareProgram extends Model
     /** @return array<string, string> */
     protected function casts(): array
     {
-        return ['price' => 'decimal:2', 'is_own' => 'boolean', 'is_featured' => 'boolean', 'is_active' => 'boolean', 'downloads' => 'integer'];
+        return ['price' => 'decimal:2', 'download_enabled' => 'boolean', 'is_own' => 'boolean', 'is_featured' => 'boolean', 'is_active' => 'boolean', 'downloads' => 'integer'];
     }
 }

@@ -9,6 +9,8 @@ import {
     ShoppingBag,
     Settings,
     Code2,
+    MessagesSquare,
+    KeyRound,
     Users,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
@@ -87,6 +89,13 @@ export function AppSidebar() {
                       icon: ShoppingBag,
                   },
                   {
+                      title: 'Solicitudes de servicio',
+                      href: page.props.currentTeam
+                          ? `/${page.props.currentTeam.slug}/administracion/solicitudes-servicio`
+                          : '/',
+                      icon: MessagesSquare,
+                  },
+                  {
                       title: 'Empresa y pagos',
                       href: page.props.currentTeam
                           ? companySettings(page.props.currentTeam.slug)
@@ -99,6 +108,13 @@ export function AppSidebar() {
                           ? softwareIndex(page.props.currentTeam.slug)
                           : '/',
                       icon: Code2,
+                  },
+                  {
+                      title: 'Membresías de software',
+                      href: page.props.currentTeam
+                          ? `/${page.props.currentTeam.slug}/administracion/membresias-software`
+                          : '/',
+                      icon: KeyRound,
                   },
                   {
                       title: 'Clientes',
@@ -118,11 +134,17 @@ export function AppSidebar() {
             : []),
     ];
 
-    const footerNavItems: NavItem[] = [{ title: 'Ver tienda pública', href: '/', icon: Globe2 }];
+    const footerNavItems: NavItem[] = [
+        { title: 'Ver tienda pública', href: '/', icon: Globe2 },
+    ];
 
     return (
-        <Sidebar collapsible="icon" variant="inset" className="border-r border-emerald-500/10">
-            <SidebarHeader className="border-b border-sidebar-border/60 p-3">
+        <Sidebar
+            collapsible="icon"
+            variant="inset"
+            className="border-r border-emerald-500/10"
+        >
+            <SidebarHeader className="border-sidebar-border/60 border-b p-3">
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
@@ -143,7 +165,7 @@ export function AppSidebar() {
                 <NavMain items={mainNavItems} />
             </SidebarContent>
 
-            <SidebarFooter className="border-t border-sidebar-border/60 p-3">
+            <SidebarFooter className="border-sidebar-border/60 border-t p-3">
                 <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>

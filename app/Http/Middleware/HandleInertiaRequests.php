@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Category;
+use App\Models\ServiceRequest;
 use App\Services\ShoppingCart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -52,6 +53,21 @@ class HandleInertiaRequests extends Middleware
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'cartCount' => fn () => array_sum(app(ShoppingCart::class)->quantities()),
+            'serviceNotifications' => fn () => $user?->role->value === 'user'
+                ? [
+                    'unread' => ServiceRequest::query()
+                        ->where('user_id', $user->id)
+                        ->whereNotNull('responded_at')
+                        ->whereNull('customer_read_at')
+                        ->count(),
+                    'latest' => ServiceRequest::query()
+                        ->where('user_id', $user->id)
+                        ->whereNotNull('responded_at')
+                        ->latest('responded_at')
+                        ->limit(5)
+                        ->get(['id', 'number', 'status', 'admin_response', 'responded_at']),
+                ]
+                : ['unread' => 0, 'latest' => []],
             'catalogCategories' => fn () => Cache::remember(
                 'public.navigation.categories',
                 now()->addMinute(),

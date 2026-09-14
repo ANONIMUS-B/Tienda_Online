@@ -1,9 +1,8 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Form, Head, Link, usePage } from '@inertiajs/react';
 import {
     ArrowLeft,
     ArrowRight,
     Boxes,
-    ChevronDown,
     Code2,
     Cpu,
     Headphones,
@@ -27,11 +26,7 @@ import { useState, type ComponentType } from 'react';
 import SearchPopover from '@/components/search-popover';
 
 import {
-    about,
     apps,
-    blog,
-    brands,
-    categories,
     contact,
     dashboard,
     home,
@@ -779,31 +774,33 @@ export default function PublicSection({
                 </header>
 
                 <main>
-                    <section className="relative overflow-hidden border-b border-white/8 pt-28 pb-14 sm:pt-32 sm:pb-18">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_45%,rgb(0_247_255/.12),transparent_28%)]" />
-                        <div className="pointer-events-none absolute inset-0 [background-image:linear-gradient(rgb(0_229_255/.1)_1px,transparent_1px),linear-gradient(90deg,rgb(0_229_255/.1)_1px,transparent_1px)] [background-size:48px_48px] opacity-20" />
-                        <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
-                            <Link
-                                href={home()}
-                                className="mb-6 inline-flex items-center gap-2 text-sm text-white/45 transition hover:text-lime-400"
-                            >
-                                <ArrowLeft className="size-4" /> Volver al
-                                inicio
-                            </Link>
-                            <p className="text-xs font-extrabold tracking-[.24em] text-lime-400 uppercase">
-                                {content.eyebrow}
-                            </p>
-                            <h1 className="mt-4 max-w-4xl text-4xl leading-[1.04] font-black tracking-[-.04em] sm:text-5xl lg:text-6xl">
-                                {content.title}{' '}
-                                <span className="bg-gradient-to-r from-lime-300 to-emerald-500 bg-clip-text text-transparent">
-                                    {content.accent}
-                                </span>
-                            </h1>
-                            <p className="mt-5 max-w-2xl text-lg leading-8 text-white/52">
-                                {content.description}
-                            </p>
-                        </div>
-                    </section>
+                    {section !== 'services' && (
+                        <section className="relative overflow-hidden border-b border-white/8 pt-28 pb-14 sm:pt-32 sm:pb-18">
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_45%,rgb(0_247_255/.12),transparent_28%)]" />
+                            <div className="pointer-events-none absolute inset-0 [background-image:linear-gradient(rgb(0_229_255/.1)_1px,transparent_1px),linear-gradient(90deg,rgb(0_229_255/.1)_1px,transparent_1px)] [background-size:48px_48px] opacity-20" />
+                            <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
+                                <Link
+                                    href={home()}
+                                    className="mb-6 inline-flex items-center gap-2 text-sm text-white/45 transition hover:text-lime-400"
+                                >
+                                    <ArrowLeft className="size-4" /> Volver al
+                                    inicio
+                                </Link>
+                                <p className="text-xs font-extrabold tracking-[.24em] text-lime-400 uppercase">
+                                    {content.eyebrow}
+                                </p>
+                                <h1 className="mt-4 max-w-4xl text-4xl leading-[1.04] font-black tracking-[-.04em] sm:text-5xl lg:text-6xl">
+                                    {content.title}{' '}
+                                    <span className="bg-gradient-to-r from-lime-300 to-emerald-500 bg-clip-text text-transparent">
+                                        {content.accent}
+                                    </span>
+                                </h1>
+                                <p className="mt-5 max-w-2xl text-lg leading-8 text-white/52">
+                                    {content.description}
+                                </p>
+                            </div>
+                        </section>
+                    )}
 
                     {section === 'search' && (
                         <section className="mx-auto max-w-4xl px-5 pt-10 lg:px-8">
@@ -832,115 +829,217 @@ export default function PublicSection({
                         </section>
                     )}
 
-                    <section className="mx-auto max-w-7xl px-5 py-14 sm:py-18 lg:px-8">
-                        {content.items.length === 0 && (
-                            <div className="rounded-3xl border border-white/9 bg-white/[.035] px-6 py-14 text-center text-white/50">
-                                Próximamente publicaremos nuestras categorías
-                                tecnológicas.
-                            </div>
-                        )}
-                        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-                            {content.items.map(
-                                (
-                                    {
-                                        title,
-                                        description,
-                                        icon: Icon,
-                                        label,
-                                        imagePath,
-                                    },
-                                    index,
-                                ) => (
-                                    <article
-                                        key={title}
-                                        className="group border-brand-support/20 hover:border-brand-primary/50 hover:bg-brand-interactive/10 rounded-3xl border bg-black/15 p-6 transition duration-300 hover:-translate-y-1"
-                                    >
-                                        <div className="flex items-start justify-between">
-                                            <div className="flex size-14 items-center justify-center rounded-2xl border border-lime-400/20 bg-lime-400/10 text-lime-400">
-                                                {imagePath ? (
-                                                    <img
-                                                        src={imagePath}
-                                                        alt=""
-                                                        className="size-full bg-white object-contain p-2"
-                                                    />
-                                                ) : (
-                                                    <Icon className="size-7" />
-                                                )}
-                                            </div>
-                                            <span className="text-xs font-bold tracking-wider text-white/20">
-                                                {label ?? `0${index + 1}`}
-                                            </span>
-                                        </div>
-                                        <h2 className="mt-5 text-xl font-bold">
-                                            {title}
-                                        </h2>
-                                        <p className="mt-3 leading-7 text-white/45">
-                                            {description}
-                                        </p>
-                                        <div className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-lime-400">
-                                            Solicitar información{' '}
-                                            <ArrowRight className="size-4 transition group-hover:translate-x-1" />
-                                        </div>
-                                    </article>
-                                ),
+                    {section !== 'services' && (
+                        <section className="mx-auto max-w-7xl px-5 py-14 sm:py-18 lg:px-8">
+                            {content.items.length === 0 && (
+                                <div className="rounded-3xl border border-white/9 bg-white/[.035] px-6 py-14 text-center text-white/50">
+                                    Próximamente publicaremos nuestras
+                                    categorías tecnológicas.
+                                </div>
                             )}
-                        </div>
-                    </section>
+                            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                                {content.items.map(
+                                    (
+                                        {
+                                            title,
+                                            description,
+                                            icon: Icon,
+                                            label,
+                                            imagePath,
+                                        },
+                                        index,
+                                    ) => (
+                                        <article
+                                            key={title}
+                                            className="group border-brand-support/20 hover:border-brand-primary/50 hover:bg-brand-interactive/10 rounded-3xl border bg-black/15 p-6 transition duration-300 hover:-translate-y-1"
+                                        >
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex size-14 items-center justify-center rounded-2xl border border-lime-400/20 bg-lime-400/10 text-lime-400">
+                                                    {imagePath ? (
+                                                        <img
+                                                            src={imagePath}
+                                                            alt=""
+                                                            className="size-full bg-white object-contain p-2"
+                                                        />
+                                                    ) : (
+                                                        <Icon className="size-7" />
+                                                    )}
+                                                </div>
+                                                <span className="text-xs font-bold tracking-wider text-white/20">
+                                                    {label ?? `0${index + 1}`}
+                                                </span>
+                                            </div>
+                                            <h2 className="mt-5 text-xl font-bold">
+                                                {title}
+                                            </h2>
+                                            <p className="mt-3 leading-7 text-white/45">
+                                                {description}
+                                            </p>
+                                            <div className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-lime-400">
+                                                Solicitar información{' '}
+                                                <ArrowRight className="size-4 transition group-hover:translate-x-1" />
+                                            </div>
+                                        </article>
+                                    ),
+                                )}
+                            </div>
+                        </section>
+                    )}
 
                     {section === 'services' && (
-                        <section className="mx-auto grid max-w-7xl gap-6 px-5 pb-14 sm:pb-18 lg:grid-cols-2 lg:px-8">
-                            <article className="rounded-[2rem] border border-white/10 bg-white/[.035] p-8">
-                                <p className="text-xs font-bold tracking-[.2em] text-lime-400 uppercase">
-                                    Problemas frecuentes
-                                </p>
-                                <h2 className="mt-3 text-2xl font-black">
-                                    Cuéntanos qué ocurre con tu equipo
-                                </h2>
-                                <div className="mt-6 grid gap-3 text-sm text-white/60 sm:grid-cols-2">
-                                    {[
-                                        'Está lento o se congela',
-                                        'Se calienta o hace ruido',
-                                        'No enciende o no carga',
-                                        'Pantalla azul o reinicios',
-                                        'Virus y ventanas extrañas',
-                                        'Necesita más memoria o SSD',
-                                    ].map((problem) => (
-                                        <div
-                                            key={problem}
-                                            className="rounded-xl border border-white/8 bg-black/20 p-4"
+                        <section className="mx-auto max-w-4xl px-5 pt-28 pb-10 sm:pt-32 sm:pb-14 lg:px-8">
+                            <article className="rounded-[2rem] border border-cyan-200 bg-white p-6 text-slate-700 shadow-sm sm:p-8">
+                                <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                                    <div>
+                                        <p className="text-xs font-bold tracking-[.2em] text-cyan-500 uppercase">
+                                            Servicio técnico
+                                        </p>
+                                        <h2 className="mt-2 text-2xl font-black text-slate-800">
+                                            Solicita atención
+                                        </h2>
+                                        <p className="mt-2 text-sm text-slate-500">
+                                            Describe el problema y te
+                                            responderemos en tu cuenta.
+                                        </p>
+                                    </div>
+                                    {auth.user && (
+                                        <Link
+                                            href="/mis-solicitudes"
+                                            className="text-sm font-bold text-cyan-600"
                                         >
-                                            {problem}
-                                        </div>
-                                    ))}
+                                            Revisar mis solicitudes →
+                                        </Link>
+                                    )}
                                 </div>
-                            </article>
-                            <article className="rounded-[2rem] border border-lime-400/20 bg-lime-400/[.05] p-8">
-                                <p className="text-xs font-bold tracking-[.2em] text-lime-400 uppercase">
-                                    Proceso transparente
-                                </p>
-                                <h2 className="mt-3 text-2xl font-black">
-                                    Así atendemos tu servicio
-                                </h2>
-                                <ol className="mt-6 space-y-4 text-sm text-white/60">
-                                    {[
-                                        'Nos describes el equipo y la falla.',
-                                        'Realizamos el diagnóstico y preparamos la cotización.',
-                                        'Trabajamos únicamente después de tu aprobación.',
-                                        'Probamos el equipo y explicamos el trabajo realizado.',
-                                    ].map((step, index) => (
-                                        <li key={step} className="flex gap-4">
-                                            <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-lime-400 font-black text-black">
-                                                {index + 1}
-                                            </span>
-                                            <span className="pt-1">{step}</span>
-                                        </li>
-                                    ))}
-                                </ol>
-                                <p className="mt-6 border-t border-white/10 pt-5 text-xs leading-5 text-white/40">
-                                    Antes de intervenir, recomendamos respaldar
-                                    tu información. Los repuestos y el tiempo
-                                    final se confirman después del diagnóstico.
-                                </p>
+                                {auth.user ? (
+                                    <Form
+                                        action="/solicitudes-servicio"
+                                        method="post"
+                                        resetOnSuccess
+                                        className="mt-6 grid gap-4 sm:grid-cols-2"
+                                    >
+                                        {({ errors, processing }) => (
+                                            <>
+                                                <label className="grid gap-2 text-sm font-semibold">
+                                                    Tipo de servicio
+                                                    <select
+                                                        name="service_type"
+                                                        required
+                                                        className="h-12 rounded-xl border border-cyan-200 bg-white px-4 font-normal outline-none focus:border-cyan-400"
+                                                    >
+                                                        <option value="">
+                                                            Selecciona una
+                                                            opción
+                                                        </option>
+                                                        <option>
+                                                            Mantenimiento
+                                                            preventivo
+                                                        </option>
+                                                        <option>
+                                                            Diagnóstico y
+                                                            reparación
+                                                        </option>
+                                                        <option>
+                                                            Instalación de
+                                                            programas
+                                                        </option>
+                                                        <option>
+                                                            Redes y conectividad
+                                                        </option>
+                                                        <option>
+                                                            Actualización de
+                                                            equipo
+                                                        </option>
+                                                        <option>
+                                                            Otro servicio
+                                                        </option>
+                                                    </select>
+                                                    {errors.service_type && (
+                                                        <span className="text-xs text-red-500">
+                                                            {
+                                                                errors.service_type
+                                                            }
+                                                        </span>
+                                                    )}
+                                                </label>
+                                                <label className="grid gap-2 text-sm font-semibold">
+                                                    Equipo o modelo
+                                                    <input
+                                                        name="device"
+                                                        placeholder="Ej.: Laptop HP 15"
+                                                        className="h-12 rounded-xl border border-cyan-200 px-4 font-normal outline-none focus:border-cyan-400"
+                                                    />
+                                                </label>
+                                                <label className="grid gap-2 text-sm font-semibold">
+                                                    Teléfono
+                                                    <input
+                                                        name="phone"
+                                                        type="tel"
+                                                        required
+                                                        placeholder="Ej.: 999 999 999"
+                                                        className="h-12 rounded-xl border border-cyan-200 px-4 font-normal outline-none focus:border-cyan-400"
+                                                    />
+                                                    {errors.phone && (
+                                                        <span className="text-xs text-red-500">
+                                                            {errors.phone}
+                                                        </span>
+                                                    )}
+                                                </label>
+                                                <label className="grid gap-2 text-sm font-semibold">
+                                                    Prioridad
+                                                    <select
+                                                        name="priority"
+                                                        defaultValue="normal"
+                                                        className="h-12 rounded-xl border border-cyan-200 bg-white px-4 font-normal outline-none focus:border-cyan-400"
+                                                    >
+                                                        <option value="normal">
+                                                            Normal
+                                                        </option>
+                                                        <option value="urgent">
+                                                            Urgente
+                                                        </option>
+                                                    </select>
+                                                </label>
+                                                <label className="grid gap-2 text-sm font-semibold sm:col-span-2">
+                                                    ¿Qué problema presenta?
+                                                    <textarea
+                                                        name="description"
+                                                        required
+                                                        minLength={15}
+                                                        rows={5}
+                                                        placeholder="Describe qué sucede, desde cuándo y cualquier mensaje de error..."
+                                                        className="rounded-xl border border-cyan-200 p-4 font-normal outline-none focus:border-cyan-400"
+                                                    />
+                                                    {errors.description && (
+                                                        <span className="text-xs text-red-500">
+                                                            {errors.description}
+                                                        </span>
+                                                    )}
+                                                </label>
+                                                <button
+                                                    disabled={processing}
+                                                    className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-cyan-400 px-6 font-bold text-slate-900 disabled:opacity-60 sm:col-span-2 sm:justify-self-start"
+                                                >
+                                                    <MessageCircle className="size-5" />
+                                                    {processing
+                                                        ? 'Enviando...'
+                                                        : 'Enviar solicitud'}
+                                                </button>
+                                            </>
+                                        )}
+                                    </Form>
+                                ) : (
+                                    <div className="mt-6 rounded-2xl bg-cyan-50 p-5 text-sm">
+                                        Inicia sesión para enviar tu problema y
+                                        revisar la respuesta del administrador.
+                                        <Link
+                                            href={login()}
+                                            className="ml-2 font-bold text-cyan-600"
+                                        >
+                                            Ingresar
+                                        </Link>
+                                    </div>
+                                )}
                             </article>
                         </section>
                     )}
@@ -952,11 +1051,11 @@ export default function PublicSection({
                                     Asesoría personalizada
                                 </p>
                                 <h2 className="mt-3 text-3xl font-black">
-                                    ¿Necesitas ayuda para elegir?
+                                    ¿Prefieres atención inmediata?
                                 </h2>
                                 <p className="mt-3 text-white/50">
-                                    Conversemos y encontremos juntos la solución
-                                    adecuada.
+                                    Escríbenos por WhatsApp para una consulta
+                                    rápida.
                                 </p>
                             </div>
                             <a
@@ -965,8 +1064,8 @@ export default function PublicSection({
                                 rel="noreferrer"
                                 className="inline-flex shrink-0 items-center justify-center gap-3 rounded-full bg-lime-400 px-7 py-4 font-extrabold text-black"
                             >
-                                <MessageCircle className="size-5" /> Hablar con
-                                un asesor
+                                <MessageCircle className="size-5" /> WhatsApp
+                                directo
                             </a>
                         </div>
                     </section>
