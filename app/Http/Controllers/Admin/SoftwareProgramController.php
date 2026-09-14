@@ -9,6 +9,7 @@ use App\Models\MediaFile;
 use App\Models\SoftwareProgram;
 use App\Models\Team;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -20,22 +21,28 @@ class SoftwareProgramController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $catalogType = $request->string('catalog')->toString() === 'programs' ? 'programs' : 'software';
+
         return Inertia::render('admin/software/index', [
             'programs' => SoftwareProgram::query()
                 ->select(['id', 'name', 'slug', 'category', 'platform', 'is_active', 'created_at'])
+                ->where('is_own', $catalogType === 'software')
                 ->latest()
                 ->paginate(25),
+            'catalogType' => $catalogType,
         ]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create(): Response
+    public function create(Request $request): Response
     {
-        return Inertia::render('admin/software/create');
+        return Inertia::render('admin/software/create', [
+            'catalogType' => $request->string('catalog')->toString() === 'programs' ? 'programs' : 'software',
+        ]);
     }
 
     /**
@@ -49,7 +56,7 @@ class SoftwareProgramController extends Controller
         SoftwareProgram::query()->create($data);
         Cache::flush();
 
-        return redirect()->route('admin.software.index', $request->route('current_team'));
+        return redirect()->route('admin.software.index', ['current_team' => $request->route('current_team'), 'catalog' => $data['is_own'] ? 'software' : 'programs']);
     }
 
     /**
@@ -57,7 +64,7 @@ class SoftwareProgramController extends Controller
      */
     public function edit(Team $currentTeam, SoftwareProgram $softwareProgram): Response
     {
-        return Inertia::render('admin/software/edit', ['program' => $softwareProgram]);
+        return Inertia::render('admin/software/edit', ['program' => $softwareProgram, 'catalogType' => $softwareProgram->is_own ? 'software' : 'programs']);
     }
 
     /**
@@ -75,7 +82,7 @@ class SoftwareProgramController extends Controller
         $softwareProgram->update($data);
         Cache::flush();
 
-        return redirect()->route('admin.software.index', $request->route('current_team'));
+        return redirect()->route('admin.software.index', ['current_team' => $request->route('current_team'), 'catalog' => $softwareProgram->is_own ? 'software' : 'programs']);
     }
 
     /**

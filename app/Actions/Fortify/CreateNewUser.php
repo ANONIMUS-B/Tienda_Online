@@ -10,6 +10,7 @@ use App\Enums\TeamRole;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 
 class CreateNewUser implements CreatesNewUsers
@@ -30,6 +31,15 @@ class CreateNewUser implements CreatesNewUsers
     {
         Validator::make($input, [
             ...$this->profileRules(),
+            'document_type' => ['required', Rule::in(['dni', 'ruc'])],
+            'document_number' => [
+                'required',
+                'digits_between:8,11',
+                Rule::when(($input['document_type'] ?? null) === 'dni', ['digits:8']),
+                Rule::when(($input['document_type'] ?? null) === 'ruc', ['digits:11']),
+                Rule::unique(User::class),
+            ],
+            'address' => ['required', 'string', 'max:255'],
             'password' => $this->passwordRules(),
         ])->validate();
 
@@ -37,6 +47,9 @@ class CreateNewUser implements CreatesNewUsers
             $user = User::create([
                 'name' => $input['name'],
                 'email' => $input['email'],
+                'document_type' => $input['document_type'],
+                'document_number' => $input['document_number'],
+                'address' => $input['address'],
                 'password' => $input['password'],
                 'role' => SystemRole::User,
             ]);

@@ -3,7 +3,7 @@ import { CheckCircle2, Clock3 } from 'lucide-react';
 
 type Membership = {
     id: number;
-    plan: 'monthly' | 'annual';
+    plan: 'monthly' | 'annual' | 'permanent';
     amount: string;
     payment_method: string;
     payment_reference: string;
@@ -53,7 +53,9 @@ export default function MembershipsIndex({
                                     <span className="bg-muted rounded-full px-2 py-1 text-xs">
                                         {membership.plan === 'annual'
                                             ? 'Anual'
-                                            : 'Mensual'}
+                                            : membership.plan === 'permanent'
+                                              ? 'Permanente'
+                                              : 'Mensual'}
                                     </span>
                                     <span className="bg-muted rounded-full px-2 py-1 text-xs">
                                         {membership.status}
@@ -76,6 +78,9 @@ export default function MembershipsIndex({
                                             membership.expires_at,
                                         ).toLocaleDateString('es-PE')}
                                     </p>
+                                )}
+                                {membership.status === 'active' && membership.plan === 'permanent' && (
+                                    <p className="mt-1 text-xs text-emerald-600">Acceso permanente, sin vencimiento</p>
                                 )}
                             </div>
                             {membership.status === 'pending' && (

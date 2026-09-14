@@ -6,10 +6,12 @@ export default function ProgramForm({
     action,
     method,
     program,
+    catalogType,
 }: {
     action: string;
     method: 'post' | 'put';
     program?: SoftwareProgram;
+    catalogType: 'software' | 'programs';
 }) {
     return (
         <Form
@@ -19,6 +21,7 @@ export default function ProgramForm({
         >
             {({ errors, processing }) => (
                 <>
+                    <input type="hidden" name="is_own" value={catalogType === 'software' ? '1' : '0'} />
                     <input
                         name="name"
                         defaultValue={program?.name}
@@ -119,11 +122,6 @@ export default function ProgramForm({
                             'download_enabled',
                             'Permitir descarga gratuita',
                             program?.download_enabled,
-                        ],
-                        [
-                            'is_own',
-                            'Desarrollado por nosotros',
-                            program?.is_own,
                         ],
                         ['is_featured', 'Destacado', program?.is_featured],
                         ['is_active', 'Publicado', program?.is_active ?? true],

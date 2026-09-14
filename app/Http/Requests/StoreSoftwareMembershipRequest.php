@@ -23,7 +23,6 @@ class StoreSoftwareMembershipRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'plan' => ['required', 'in:monthly,annual'],
             'payment_method' => ['required', 'in:yape,bank_transfer'],
             'payment_reference' => ['required', 'string', 'max:120'],
         ];

@@ -52,6 +52,7 @@ export default function PublicHeader() {
         cartCount = 0,
         catalogCategories = [],
         serviceNotifications = { unread: 0, latest: [] },
+        membershipNotice = null,
     } = page.props as any;
     const [open, setOpen] = useState(false);
     const [categoriesOpen, setCategoriesOpen] = useState(false);
@@ -61,6 +62,7 @@ export default function PublicHeader() {
     const dashboardUrl = currentTeam ? dashboard(currentTeam.slug) : '/';
     const isCustomer = auth.user?.role === 'user';
     const accountUrl = isCustomer ? cart() : dashboardUrl;
+    const notificationCount = serviceNotifications.unread + (membershipNotice ? 1 : 0);
     return (
         <>
             <header className="border-brand-primary/25 bg-brand-background/95 fixed inset-x-0 top-0 z-50 border-b shadow-lg shadow-black/10 backdrop-blur-xl">
@@ -126,13 +128,13 @@ export default function PublicHeader() {
                                     onClick={() =>
                                         setNotificationsOpen(!notificationsOpen)
                                     }
-                                    aria-label={`Respuestas de servicio: ${serviceNotifications.unread} sin leer`}
+                                    aria-label={`Notificaciones: ${notificationCount}`}
                                     className="relative rounded-full p-2.5 text-white/70 transition hover:text-lime-400"
                                 >
                                     <Bell className="size-5" />
-                                    {serviceNotifications.unread > 0 && (
+                                    {notificationCount > 0 && (
                                         <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-lime-400 text-[10px] font-black text-black">
-                                            {serviceNotifications.unread}
+                                            {notificationCount}
                                         </span>
                                     )}
                                 </button>
@@ -140,14 +142,19 @@ export default function PublicHeader() {
                                     <div className="absolute top-12 right-0 z-50 w-80 overflow-hidden rounded-2xl border border-cyan-200 bg-white text-slate-700 shadow-2xl">
                                         <div className="border-b border-cyan-100 px-4 py-3">
                                             <p className="font-bold">
-                                                Respuestas de soporte
+                                                Notificaciones
                                             </p>
                                             <p className="text-xs text-slate-500">
                                                 Seguimiento de tus solicitudes
                                             </p>
                                         </div>
-                                        {serviceNotifications.latest.length ===
-                                        0 ? (
+                                        {membershipNotice && (
+                                            <Link href={programs()} onClick={() => setNotificationsOpen(false)} className="block border-b border-cyan-50 bg-amber-50 px-4 py-3 transition hover:bg-amber-100">
+                                                <p className="text-xs font-bold text-amber-700">Membresía por vencer</p>
+                                                <p className="mt-1 text-sm">Vence el {new Date(membershipNotice.expires_at).toLocaleDateString('es-PE')}.</p>
+                                            </Link>
+                                        )}
+                                        {serviceNotifications.latest.length === 0 && !membershipNotice ? (
                                             <p className="px-4 py-6 text-center text-sm text-slate-500">
                                                 Aún no tienes respuestas.
                                             </p>

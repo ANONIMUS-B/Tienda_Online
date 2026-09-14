@@ -6,8 +6,8 @@ import type { SoftwareProgram } from '@/types/software';
 
 type Membership = {
     enabled: boolean;
-    monthly_price: number;
-    annual_price: number;
+    price: number;
+    period: 'monthly' | 'annual' | 'permanent';
     yape_enabled: boolean;
     transfer_enabled: boolean;
     yape_number: string | null;
@@ -154,21 +154,14 @@ export default function ProgramDetailModal({
                                                 Activar todas las descargas
                                             </div>
                                             <select
-                                                name="plan"
+                                                name="membership_summary"
+                                                disabled
                                                 required
                                                 className="h-11 rounded-xl border border-cyan-200 px-3"
                                             >
-                                                <option value="monthly">
-                                                    Mensual · S/{' '}
-                                                    {membership.monthly_price.toFixed(
-                                                        2,
-                                                    )}
-                                                </option>
-                                                <option value="annual">
-                                                    Anual · S/{' '}
-                                                    {membership.annual_price.toFixed(
-                                                        2,
-                                                    )}
+                                                <option>
+                                                    {membership.period === 'monthly' ? 'Mensual' : membership.period === 'annual' ? 'Anual' : 'Permanente'} · S/{' '}
+                                                    {membership.price.toFixed(2)}
                                                 </option>
                                             </select>
                                             <select

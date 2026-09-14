@@ -12,28 +12,30 @@ type ProgramPaginator = {
 export default function Index({
     programs,
     currentTeam,
+    catalogType,
 }: {
     programs: ProgramPaginator;
     currentTeam: { slug: string };
+    catalogType: 'software' | 'programs';
 }) {
+    const isSoftware = catalogType === 'software';
     return (
         <>
-            <Head title="Software" />
+            <Head title={isSoftware ? 'Software' : 'Programas'} />
             <div className="flex flex-col gap-6 p-4 md:p-8">
                 <div className="flex justify-between">
                     <div>
                         <h1 className="text-2xl font-semibold">
-                            Programas y software
+                            {isSoftware ? 'Software' : 'Programas'}
                         </h1>
                         <p className="text-muted-foreground">
-                            Archivos descargables, sistemas y aplicaciones
-                            propias.
+                            {isSoftware ? 'Soluciones propias y cotizaciones.' : 'Aplicaciones y archivos descargables.'}
                         </p>
                     </div>
                     <Button asChild>
-                        <Link href={create(currentTeam.slug)}>
+                        <Link href={`${create(currentTeam.slug).url}?catalog=${catalogType}`}>
                             <Plus />
-                            Nuevo programa
+                            {isSoftware ? 'Nuevo software' : 'Nuevo programa'}
                         </Link>
                     </Button>
                 </div>

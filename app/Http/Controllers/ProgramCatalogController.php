@@ -12,7 +12,7 @@ class ProgramCatalogController extends Controller
 {
     public function index(Request $request): Response
     {
-        $base = SoftwareProgram::query()->where('is_active', true);
+        $base = SoftwareProgram::query()->where('is_active', true)->where('is_own', false);
         $programs = (clone $base)->with('image:id')->when($request->filled('q'), fn ($q) => $q->where(fn ($x) => $x->where('name', 'like', '%'.$request->string('q').'%')->orWhere('short_description', 'like', '%'.$request->string('q').'%')))->when($request->filled('category'), fn ($q) => $q->where('category', $request->string('category')))->when($request->filled('platform'), fn ($q) => $q->where('platform', $request->string('platform')))->latest()->paginate(12)->withQueryString();
         $programs->through(fn (SoftwareProgram $program) => $this->item($program));
 
@@ -27,7 +27,7 @@ class ProgramCatalogController extends Controller
 
     public function show(SoftwareProgram $softwareProgram): Response
     {
-        abort_unless($softwareProgram->is_active, 404);
+        abort_unless($softwareProgram->is_active && ! $softwareProgram->is_own, 404);
 
         return Inertia::render('software/show', ['catalogType' => 'programs', 'program' => $this->item($softwareProgram)]);
     }
@@ -48,8 +48,8 @@ class ProgramCatalogController extends Controller
 
         return [
             'enabled' => (bool) ($settings?->software_membership_enabled ?? true),
-            'monthly_price' => (float) ($settings?->software_monthly_price ?? 29.90),
-            'annual_price' => (float) ($settings?->software_annual_price ?? 299),
+            'price' => (float) ($settings?->software_membership_price ?? 29.90),
+            'period' => $settings?->software_membership_period ?? 'monthly',
             'yape_enabled' => (bool) ($settings?->payment_yape_enabled ?? true),
             'transfer_enabled' => (bool) ($settings?->payment_transfer_enabled ?? true),
             'yape_number' => $settings?->yape_number,

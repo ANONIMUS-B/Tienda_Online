@@ -87,6 +87,27 @@ export default function Register({ passwordRules, teamInvitation }: Props) {
                                 />
                             </div>
 
+                            <div className="grid gap-3 sm:grid-cols-[140px_1fr]">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="document_type" className="text-xs font-bold tracking-wide text-white/80 uppercase">Documento</Label>
+                                    <select id="document_type" name="document_type" required defaultValue="dni" className="h-11 rounded-xl border border-white/14 bg-slate-950 px-4 text-sm text-white">
+                                        <option value="dni">DNI</option>
+                                        <option value="ruc">RUC</option>
+                                    </select>
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="document_number" className="text-xs font-bold tracking-wide text-white/80 uppercase">Número</Label>
+                                    <Input id="document_number" name="document_number" required inputMode="numeric" placeholder="DNI o RUC" className="h-11 rounded-xl border-white/14 bg-white/5 px-4 text-white" />
+                                    <InputError message={errors.document_number} className="text-xs text-red-400" />
+                                </div>
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="address" className="text-xs font-bold tracking-wide text-white/80 uppercase">Dirección</Label>
+                                <Input id="address" name="address" required autoComplete="street-address" placeholder="Dirección de entrega o fiscal" className="h-11 rounded-xl border-white/14 bg-white/5 px-4 text-white" />
+                                <InputError message={errors.address} className="text-xs text-red-400" />
+                            </div>
+
                             {/* Password */}
                             <div className="grid gap-2">
                                 <Label

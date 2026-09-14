@@ -18,6 +18,11 @@ export type Order = {
     number: string;
     status: string;
     payment_status: string;
+    receipt_type: 'boleta' | 'factura';
+    receipt_status: 'pending' | 'issued' | 'sent' | 'rejected';
+    receipt_series: string | null;
+    receipt_number: string | null;
+    receipt_url: string | null;
     payment_method: string;
     shipping_method: string;
     customer_name: string;

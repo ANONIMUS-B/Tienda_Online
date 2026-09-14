@@ -220,29 +220,29 @@ export default function CompanySettings({
                                     )}
                                 />
                                 <input
-                                    name="software_monthly_price"
+                                    name="software_membership_price"
                                     type="number"
                                     step="0.01"
                                     min="0"
                                     defaultValue={String(
-                                        settings.software_monthly_price ??
+                                        settings.software_membership_price ??
                                             '29.90',
                                     )}
-                                    placeholder="Precio mensual"
+                                    placeholder="Monto de la membresía"
                                     className={input}
                                 />
-                                <input
-                                    name="software_annual_price"
-                                    type="number"
-                                    step="0.01"
-                                    min="0"
+                                <select
+                                    name="software_membership_period"
                                     defaultValue={String(
-                                        settings.software_annual_price ??
-                                            '299.00',
+                                        settings.software_membership_period ??
+                                            'monthly',
                                     )}
-                                    placeholder="Precio anual"
                                     className={input}
-                                />
+                                >
+                                    <option value="monthly">Mensual</option>
+                                    <option value="annual">Anual</option>
+                                    <option value="permanent">Permanente</option>
+                                </select>
                                 <input
                                     name="gateway_public_key"
                                     placeholder="Llave pública (vacío conserva la actual)"

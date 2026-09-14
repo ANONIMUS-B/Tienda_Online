@@ -31,3 +31,15 @@ test('administrators can upload programs into shared storage', function () {
     expect($program->file_id)->not->toBeNull();
     $this->assertDatabaseHas('media_files', ['id' => $program->file_id]);
 });
+
+test('software and programs use separate administration lists', function () {
+    $admin = User::factory()->create();
+    SoftwareProgram::factory()->create(['name' => 'Sistema propio', 'is_own' => true]);
+    SoftwareProgram::factory()->create(['name' => 'Programa descargable', 'is_own' => false]);
+
+    $this->actingAs($admin)->get(route('admin.software.index', ['current_team' => $admin->currentTeam, 'catalog' => 'software']))
+        ->assertInertia(fn ($page) => $page->where('catalogType', 'software')->has('programs.data', 1)->where('programs.data.0.name', 'Sistema propio'));
+
+    $this->actingAs($admin)->get(route('admin.software.index', ['current_team' => $admin->currentTeam, 'catalog' => 'programs']))
+        ->assertInertia(fn ($page) => $page->where('catalogType', 'programs')->has('programs.data', 1)->where('programs.data.0.name', 'Programa descargable'));
+});

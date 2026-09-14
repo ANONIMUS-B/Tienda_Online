@@ -23,6 +23,14 @@ class UpdateOrderRequest extends FormRequest
      */
     public function rules(): array
     {
-        return ['status' => ['required', Rule::in(['pending', 'confirmed', 'preparing', 'shipped', 'delivered', 'cancelled'])], 'payment_status' => ['required', Rule::in(['pending', 'paid', 'failed', 'refunded'])]];
+        return [
+            'status' => ['required', Rule::in(['pending', 'confirmed', 'preparing', 'shipped', 'delivered', 'cancelled'])],
+            'payment_status' => ['required', Rule::in(['pending', 'paid', 'failed', 'refunded'])],
+            'receipt_type' => ['sometimes', Rule::in(['boleta', 'factura'])],
+            'receipt_status' => ['sometimes', Rule::in(['pending', 'issued', 'sent', 'rejected'])],
+            'receipt_series' => ['nullable', 'string', 'max:10'],
+            'receipt_number' => ['nullable', 'string', 'max:20'],
+            'receipt_url' => ['nullable', 'url', 'max:255'],
+        ];
     }
 }

@@ -159,6 +159,27 @@ export default function AuthModal({ mode, onModeChange }: AuthModalProps) {
                                         <InputError message={errors.name} />
                                     </label>
 
+                                    <div className="grid grid-cols-[110px_1fr] gap-3">
+                                        <label className="grid gap-1.5 text-sm font-bold text-slate-700">
+                                            Documento
+                                            <select name="document_type" required defaultValue="dni" className={inputClassName}>
+                                                <option value="dni">DNI</option>
+                                                <option value="ruc">RUC</option>
+                                            </select>
+                                        </label>
+                                        <label className="grid gap-1.5 text-sm font-bold text-slate-700">
+                                            Número
+                                            <input name="document_number" required inputMode="numeric" placeholder="DNI o RUC" className={inputClassName} />
+                                            <InputError message={errors.document_number} />
+                                        </label>
+                                    </div>
+
+                                    <label className="grid gap-1.5 text-sm font-bold text-slate-700">
+                                        Dirección
+                                        <input name="address" required autoComplete="street-address" placeholder="Dirección de entrega o fiscal" className={inputClassName} />
+                                        <InputError message={errors.address} />
+                                    </label>
+
                                     <label className="grid gap-1.5 text-sm font-bold text-slate-700">
                                         <span className="flex items-center gap-2">
                                             <Mail className="size-4 text-cyan-500" />

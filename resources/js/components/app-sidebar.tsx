@@ -103,9 +103,16 @@ export function AppSidebar() {
                       icon: Settings,
                   },
                   {
-                      title: 'Software y programas',
+                      title: 'Software',
                       href: page.props.currentTeam
-                          ? softwareIndex(page.props.currentTeam.slug)
+                          ? `${softwareIndex(page.props.currentTeam.slug).url}?catalog=software`
+                          : '/',
+                      icon: Code2,
+                  },
+                  {
+                      title: 'Programas',
+                      href: page.props.currentTeam
+                          ? `${softwareIndex(page.props.currentTeam.slug).url}?catalog=programs`
                           : '/',
                       icon: Code2,
                   },

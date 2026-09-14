@@ -5,9 +5,11 @@ import type { SoftwareProgram } from '@/types/software';
 export default function Edit({
     program,
     currentTeam,
+    catalogType,
 }: {
     program: SoftwareProgram;
     currentTeam: { slug: string };
+    catalogType: 'software' | 'programs';
 }) {
     return (
         <>
@@ -25,6 +27,7 @@ export default function Edit({
                     }
                     method="put"
                     program={program}
+                    catalogType={catalogType}
                 />
             </div>
         </>

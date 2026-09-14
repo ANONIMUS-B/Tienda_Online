@@ -24,8 +24,8 @@ export default function SoftwareIndex({
     filters: Record<string, string>;
     membership?: {
         enabled: boolean;
-        monthly_price: number;
-        annual_price: number;
+        price: number;
+        period: 'monthly' | 'annual' | 'permanent';
         yape_enabled: boolean;
         transfer_enabled: boolean;
         yape_number: string | null;
@@ -41,8 +41,8 @@ export default function SoftwareIndex({
     const [quoteOpen, setQuoteOpen] = useState(false);
     const membershipOptions = membership ?? {
         enabled: false,
-        monthly_price: 0,
-        annual_price: 0,
+        price: 0,
+        period: 'monthly',
         yape_enabled: false,
         transfer_enabled: false,
         yape_number: null,

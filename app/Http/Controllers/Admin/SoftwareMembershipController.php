@@ -23,9 +23,11 @@ class SoftwareMembershipController extends Controller
     {
         $status = $request->string('status')->toString();
         $startsAt = $status === 'active' ? now() : null;
-        $expiresAt = $status === 'active'
-            ? ($softwareMembership->plan === 'annual' ? now()->addYear() : now()->addMonth())
-            : null;
+        $expiresAt = match (true) {
+            $status !== 'active', $softwareMembership->plan === 'permanent' => null,
+            $softwareMembership->plan === 'annual' => now()->addYear(),
+            default => now()->addMonth(),
+        };
 
         $softwareMembership->update([
             'status' => $status,

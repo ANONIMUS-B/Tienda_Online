@@ -23,11 +23,12 @@ class SoftwareMembershipController extends Controller
             ValidationException::withMessages(['plan' => 'Ya tienes una membresía activa o pendiente de revisión.']),
         );
 
-        $plan = $request->string('plan')->toString();
-        $amount = $plan === 'annual' ? $settings->software_annual_price : $settings->software_monthly_price;
+        $plan = $settings->software_membership_period ?: 'monthly';
+        $amount = $settings->software_membership_price ?? 29.90;
 
         $request->user()->softwareMemberships()->create([
             ...$request->validated(),
+            'plan' => $plan,
             'amount' => $amount,
             'status' => 'pending',
         ]);

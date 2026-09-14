@@ -38,7 +38,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property-read Collection<int, Membership> $teamMemberships
  * @property-read Collection<int, Team> $teams
  */
-#[Fillable(['name', 'email', 'password', 'current_team_id', 'role', 'is_active'])]
+#[Fillable(['name', 'email', 'document_type', 'document_number', 'address', 'password', 'current_team_id', 'role', 'is_active'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements PasskeyUser
 {
@@ -67,7 +67,7 @@ class User extends Authenticatable implements PasskeyUser
     {
         return $this->softwareMemberships()
             ->where('status', 'active')
-            ->where('expires_at', '>', now())
+            ->where(fn ($query) => $query->whereNull('expires_at')->orWhere('expires_at', '>', now()))
             ->exists();
     }
 

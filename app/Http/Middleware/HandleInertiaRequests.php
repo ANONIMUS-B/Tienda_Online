@@ -68,6 +68,14 @@ class HandleInertiaRequests extends Middleware
                         ->get(['id', 'number', 'status', 'admin_response', 'responded_at']),
                 ]
                 : ['unread' => 0, 'latest' => []],
+            'membershipNotice' => fn () => $user?->role->value === 'user'
+                ? $user->softwareMemberships()
+                    ->where('status', 'active')
+                    ->whereNotNull('expires_at')
+                    ->whereBetween('expires_at', [now(), now()->addDays(7)])
+                    ->orderBy('expires_at')
+                    ->first(['id', 'plan', 'expires_at'])
+                : null,
             'catalogCategories' => fn () => Cache::remember(
                 'public.navigation.categories',
                 now()->addMinute(),

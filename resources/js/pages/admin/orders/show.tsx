@@ -6,10 +6,14 @@ import type { Order } from '@/types/order';
 export default function OrderDetail({
     order,
     currentTeam,
+    customerOrderUrl,
 }: {
     order: Order;
     currentTeam: { slug: string };
+    customerOrderUrl: string;
 }) {
+    const receiptMessage = encodeURIComponent(`Hola ${order.customer_name}, revisa tu pedido ${order.number}${order.receipt_url ? ` y tu comprobante: ${order.receipt_url}` : `: ${customerOrderUrl}`}`);
+    const whatsappNumber = order.customer_phone.replace(/\D/g, '');
     return (
         <>
             <Head title={order.number} />
@@ -109,9 +113,29 @@ export default function OrderDetail({
                                             Reembolsado
                                         </option>
                                     </select>
+                                    <h2 className="border-t pt-4 font-semibold">Comprobante</h2>
+                                    <select name="receipt_type" defaultValue={order.receipt_type ?? 'boleta'} className="rounded-md border bg-transparent p-2">
+                                        <option value="boleta">Boleta</option>
+                                        <option value="factura">Factura</option>
+                                    </select>
+                                    <select name="receipt_status" defaultValue={order.receipt_status ?? 'pending'} className="rounded-md border bg-transparent p-2">
+                                        <option value="pending">Pendiente de emisión</option>
+                                        <option value="issued">Emitido y aceptado</option>
+                                        <option value="sent">Enviado al cliente</option>
+                                        <option value="rejected">Rechazado</option>
+                                    </select>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <input name="receipt_series" defaultValue={order.receipt_series ?? ''} placeholder="Serie" className="rounded-md border bg-transparent p-2" />
+                                        <input name="receipt_number" defaultValue={order.receipt_number ?? ''} placeholder="Correlativo" className="rounded-md border bg-transparent p-2" />
+                                    </div>
+                                    <input name="receipt_url" type="url" defaultValue={order.receipt_url ?? ''} placeholder="Enlace del comprobante" className="rounded-md border bg-transparent p-2" />
                                     <Button disabled={processing}>
                                         Guardar cambios
                                     </Button>
+                                    <div className="grid grid-cols-2 gap-2 text-center text-xs font-semibold">
+                                        <a href={`https://wa.me/${whatsappNumber}?text=${receiptMessage}`} target="_blank" rel="noreferrer" className="rounded-md border p-2">WhatsApp</a>
+                                        <a href={`mailto:${order.customer_email}?subject=${encodeURIComponent(`Comprobante ${order.number}`)}&body=${receiptMessage}`} className="rounded-md border p-2">Correo</a>
+                                    </div>
                                 </>
                             )}
                         </Form>

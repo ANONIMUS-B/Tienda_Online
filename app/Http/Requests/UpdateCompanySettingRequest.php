@@ -45,8 +45,8 @@ class UpdateCompanySettingRequest extends FormRequest
             'bank_account' => ['nullable', 'string', 'max:120'],
             'whatsapp_checkout_enabled' => ['required', 'boolean'],
             'software_membership_enabled' => ['sometimes', 'boolean'],
-            'software_monthly_price' => ['sometimes', 'numeric', 'min:0'],
-            'software_annual_price' => ['sometimes', 'numeric', 'min:0'],
+            'software_membership_price' => ['sometimes', 'numeric', 'min:0'],
+            'software_membership_period' => ['sometimes', Rule::in(['monthly', 'annual', 'permanent'])],
         ];
     }
 }

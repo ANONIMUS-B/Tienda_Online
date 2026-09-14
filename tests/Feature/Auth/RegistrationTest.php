@@ -38,6 +38,9 @@ test('new users can register', function () {
     $response = $this->post(route('register.store'), [
         'name' => 'Test User',
         'email' => 'test@example.com',
+        'document_type' => 'dni',
+        'document_number' => '12345678',
+        'address' => 'Av. Principal 123',
         'password' => 'password',
         'password_confirmation' => 'password',
     ]);
@@ -46,6 +49,8 @@ test('new users can register', function () {
 
     $user = User::where('email', 'test@example.com')->first();
     expect($user->role)->toBe(SystemRole::User);
+    expect($user->document_type)->toBe('dni');
+    expect($user->document_number)->toBe('12345678');
     expect($user->teamRole($user->currentTeam))->toBe(TeamRole::Customer);
     $response->assertRedirect(route('cart.index'));
 });
@@ -54,6 +59,9 @@ test('customers registered from the storefront cannot access administration', fu
     $this->post(route('register.store'), [
         'name' => 'Store Customer',
         'email' => 'customer@example.com',
+        'document_type' => 'ruc',
+        'document_number' => '20123456789',
+        'address' => 'Jr. Comercio 456',
         'password' => 'password',
         'password_confirmation' => 'password',
     ]);

@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Order;
 use App\Models\Team;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -25,7 +26,10 @@ class OrderController extends Controller
      */
     public function show(Team $currentTeam, Order $order): Response
     {
-        return Inertia::render('admin/orders/show', ['order' => $order->load('items')]);
+        return Inertia::render('admin/orders/show', [
+            'order' => $order->load('items'),
+            'customerOrderUrl' => URL::signedRoute('orders.show', ['number' => $order->number]),
+        ]);
     }
 
     /**
@@ -33,7 +37,11 @@ class OrderController extends Controller
      */
     public function update(UpdateOrderRequest $request, Team $currentTeam, Order $order): RedirectResponse
     {
-        $order->update($request->validated());
+        $attributes = $request->validated();
+        if (($attributes['receipt_status'] ?? null) === 'issued' && ! $order->receipt_issued_at) {
+            $attributes['receipt_issued_at'] = now();
+        }
+        $order->update($attributes);
 
         return back()->with('success', 'Pedido actualizado.');
     }

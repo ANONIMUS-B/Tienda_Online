@@ -9,11 +9,18 @@ use App\Models\User;
 
 test('customers request a configured software membership', function () {
     $customer = User::factory()->create(['role' => SystemRole::User]);
-    CompanySetting::query()->create(['company_name' => 'JBTECHLINE', 'software_membership_enabled' => true, 'software_monthly_price' => 35, 'software_annual_price' => 350, 'payment_yape_enabled' => true, 'payment_transfer_enabled' => false]);
+    CompanySetting::query()->create(['company_name' => 'JBTECHLINE', 'software_membership_enabled' => true, 'software_membership_price' => 350, 'software_membership_period' => 'annual', 'payment_yape_enabled' => true, 'payment_transfer_enabled' => false]);
 
-    $this->actingAs($customer)->post(route('software-memberships.store'), ['plan' => 'annual', 'payment_method' => 'yape', 'payment_reference' => 'OP-12345'])->assertRedirect();
+    $this->actingAs($customer)->post(route('software-memberships.store'), ['payment_method' => 'yape', 'payment_reference' => 'OP-12345'])->assertRedirect();
 
     $this->assertDatabaseHas('software_memberships', ['user_id' => $customer->id, 'plan' => 'annual', 'amount' => 350, 'status' => 'pending']);
+});
+
+test('permanent memberships remain active without an expiration date', function () {
+    $customer = User::factory()->create(['role' => SystemRole::User]);
+    SoftwareMembership::factory()->for($customer)->create(['plan' => 'permanent', 'status' => 'active', 'starts_at' => now(), 'expires_at' => null]);
+
+    expect($customer->hasActiveSoftwareMembership())->toBeTrue();
 });
 
 test('administrators activate memberships using the selected billing period', function () {
