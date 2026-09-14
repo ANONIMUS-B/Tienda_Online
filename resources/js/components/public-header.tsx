@@ -39,22 +39,14 @@ export default function PublicHeader() {
     return (
         <header className="fixed inset-x-0 top-0 z-50 border-b border-emerald-300/10 bg-[#0d1714]/95 shadow-lg shadow-black/10 backdrop-blur-xl">
             <div className="mx-auto flex h-20 max-w-[1500px] items-center justify-between px-5 lg:px-8">
-                <Link href={home()} prefetch className="flex items-center gap-3">
+                <Link href={home()} prefetch className="flex items-center">
                     <img
                         src="/images/brand/jbtechline-logo.png"
-                        alt="JBTECHLINE"
+                        alt="JBTECHLINE - Tu aliado tecnológico"
                         loading="eager"
                         draggable={false}
-                        className="h-16 w-20 object-contain"
+                        className="h-12 w-auto max-w-[240px] object-contain sm:h-14 lg:h-16"
                     />
-                    <div className="hidden sm:block">
-                        <p className="text-lg leading-none font-black">
-                            JB<span className="text-lime-400">TECHLINE</span>
-                        </p>
-                        <p className="mt-1 text-[9px] tracking-[.2em] text-white/45 uppercase">
-                            Tu aliado tecnológico
-                        </p>
-                    </div>
                 </Link>
                 <nav className="hidden items-center gap-4 xl:flex">
                     <Link
@@ -64,35 +56,13 @@ export default function PublicHeader() {
                     >
                         Inicio
                     </Link>
-                    <div className="group relative">
-                        <Link
-                            href={products()}
-                            prefetch
-                            className={`flex items-center gap-1 py-3 text-xs font-medium transition hover:text-lime-400 ${currentPath.startsWith('/productos') || currentPath.startsWith('/categorias') || currentPath.startsWith('/marcas') ? 'text-lime-400' : 'text-white/65'}`}
-                        >
-                            Productos <ChevronDown className="size-3" />
-                        </Link>
-                        <div className="invisible absolute top-full left-0 z-50 w-44 translate-y-1 rounded-xl border border-white/10 bg-[#13201c] p-2 opacity-0 shadow-xl transition group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-                            <Link
-                                href={products()}
-                                className="block rounded-lg px-3 py-2 text-xs text-white/70 hover:bg-white/8 hover:text-lime-400"
-                            >
-                                Ver productos
-                            </Link>
-                            <Link
-                                href={categories()}
-                                className="block rounded-lg px-3 py-2 text-xs text-white/70 hover:bg-white/8 hover:text-lime-400"
-                            >
-                                Categorías
-                            </Link>
-                            <Link
-                                href={brands()}
-                                className="block rounded-lg px-3 py-2 text-xs text-white/70 hover:bg-white/8 hover:text-lime-400"
-                            >
-                                Marcas
-                            </Link>
-                        </div>
-                    </div>
+                    <Link
+                        href={products()}
+                        prefetch
+                        className={`text-xs font-medium transition hover:text-lime-400 ${currentPath.startsWith('/productos') ? 'text-lime-400' : 'text-white/65'}`}
+                    >
+                        Productos
+                    </Link>
                     {navigation.map(([label, route]) => (
                         <Link
                             key={label}
@@ -180,22 +150,6 @@ export default function PublicHeader() {
                     >
                         Productos
                     </Link>
-                    <div className="ml-4 border-l border-white/10 pl-2">
-                        <Link
-                            href={categories()}
-                            onClick={() => setOpen(false)}
-                            className="block rounded-xl px-4 py-2 text-sm text-white/60"
-                        >
-                            Categorías
-                        </Link>
-                        <Link
-                            href={brands()}
-                            onClick={() => setOpen(false)}
-                            className="block rounded-xl px-4 py-2 text-sm text-white/60"
-                        >
-                            Marcas
-                        </Link>
-                    </div>
                     {navigation.map(([label, route]) => (
                         <Link
                             key={label}

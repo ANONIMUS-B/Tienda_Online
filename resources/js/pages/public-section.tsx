@@ -648,34 +648,12 @@ export default function PublicSection({
                             >
                                 Inicio
                             </Link>
-                            <div className="group relative">
-                                <Link
-                                    href={products()}
-                                    className="flex items-center gap-1 py-3 text-xs font-medium text-white/60 transition hover:text-lime-400"
-                                >
-                                    Productos <ChevronDown className="size-3" />
-                                </Link>
-                                <div className="invisible absolute top-full left-0 z-50 w-44 translate-y-1 rounded-xl border border-white/10 bg-[#0b120d] p-2 opacity-0 shadow-xl transition group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-                                    <Link
-                                        href={products()}
-                                        className="block rounded-lg px-3 py-2 text-xs text-white/70 hover:bg-white/8 hover:text-lime-400"
-                                    >
-                                        Ver productos
-                                    </Link>
-                                    <Link
-                                        href={categories()}
-                                        className="block rounded-lg px-3 py-2 text-xs text-white/70 hover:bg-white/8 hover:text-lime-400"
-                                    >
-                                        Categorías
-                                    </Link>
-                                    <Link
-                                        href={brands()}
-                                        className="block rounded-lg px-3 py-2 text-xs text-white/70 hover:bg-white/8 hover:text-lime-400"
-                                    >
-                                        Marcas
-                                    </Link>
-                                </div>
-                            </div>
+                            <Link
+                                href={products()}
+                                className={`text-xs font-medium transition hover:text-lime-400 ${page.url.startsWith('/productos') ? 'text-lime-400' : 'text-white/60'}`}
+                            >
+                                Productos
+                            </Link>
                             {navigation.map((item) => (
                                 <Link
                                     key={item.label}
@@ -753,22 +731,6 @@ export default function PublicSection({
                             >
                                 Productos
                             </Link>
-                            <div className="ml-4 border-l border-white/10 pl-2">
-                                <Link
-                                    href={categories()}
-                                    onClick={() => setMenuOpen(false)}
-                                    className="block rounded-xl px-4 py-2 text-sm text-white/60"
-                                >
-                                    Categorías
-                                </Link>
-                                <Link
-                                    href={brands()}
-                                    onClick={() => setMenuOpen(false)}
-                                    className="block rounded-xl px-4 py-2 text-sm text-white/60"
-                                >
-                                    Marcas
-                                </Link>
-                            </div>
                             {navigation.map((item) => (
                                 <Link
                                     key={item.label}

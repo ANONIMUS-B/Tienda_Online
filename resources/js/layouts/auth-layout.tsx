@@ -41,22 +41,14 @@ export default function AuthLayout({
                 <div className="grid w-full gap-8 lg:grid-cols-12 lg:items-center">
                     {/* Left Panel: 3D Showcase (Desktop) */}
                     <div className="hidden flex-col justify-center gap-8 lg:col-span-6 lg:flex xl:col-span-7">
-                        <div className="flex items-center gap-3">
-                            <div className="flex size-14 items-center justify-center rounded-2xl border border-lime-400/30 bg-lime-400/10 shadow-[0_0_30px_rgba(163,230,53,0.2)]">
+                        <div className="flex items-center">
+                            <Link href={home()}>
                                 <img
                                     src="/images/brand/jbtechline-logo.png"
-                                    alt="JBTECHLINE"
-                                    className="size-10 object-contain"
+                                    alt="JBTECHLINE - Tu aliado tecnológico"
+                                    className="h-14 w-auto max-w-[240px] object-contain"
                                 />
-                            </div>
-                            <div>
-                                <h1 className="text-2xl leading-none font-black tracking-tight text-white">
-                                    JB<span className="text-lime-400">TECHLINE</span>
-                                </h1>
-                                <p className="mt-1 text-[10px] font-bold tracking-[.25em] text-lime-400/80 uppercase">
-                                    Tu aliado tecnológico 3D
-                                </p>
-                            </div>
+                            </Link>
                         </div>
 
                         <div className="max-w-lg space-y-3">
@@ -141,15 +133,12 @@ export default function AuthLayout({
 
                                 {/* Mobile Logo Header */}
                                 <div className="mb-6 flex flex-col items-center text-center lg:hidden">
-                                    <Link href={home()} className="mb-3 flex items-center gap-2">
+                                    <Link href={home()} className="mb-3 flex items-center justify-center">
                                         <img
                                             src="/images/brand/jbtechline-logo.png"
                                             alt="JBTECHLINE"
-                                            className="h-10 w-12 object-contain"
+                                            className="h-10 w-auto max-w-[200px] object-contain"
                                         />
-                                        <span className="text-xl font-black tracking-tight text-white">
-                                            JB<span className="text-lime-400">TECHLINE</span>
-                                        </span>
                                     </Link>
                                 </div>
 
