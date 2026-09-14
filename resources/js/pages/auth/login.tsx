@@ -62,7 +62,8 @@ export default function Login({
                                     htmlFor="email"
                                     className="flex items-center gap-1.5 text-xs font-bold tracking-wide text-white/80 uppercase"
                                 >
-                                    <Mail className="size-3.5 text-lime-400" /> Correo Electrónico
+                                    <Mail className="size-3.5 text-lime-400" />{' '}
+                                    Correo Electrónico
                                 </Label>
                                 <div className="relative">
                                     <Input
@@ -77,7 +78,10 @@ export default function Login({
                                         className="h-11 rounded-xl border-white/14 bg-white/5 px-4 text-sm text-white placeholder:text-white/35 focus:border-lime-400/80 focus:bg-black/40 focus:ring-2 focus:ring-lime-400/30"
                                     />
                                 </div>
-                                <InputError message={errors.email} className="mt-1 text-xs text-red-400" />
+                                <InputError
+                                    message={errors.email}
+                                    className="mt-1 text-xs text-red-400"
+                                />
                             </div>
 
                             {/* Password Field */}
@@ -87,7 +91,8 @@ export default function Login({
                                         htmlFor="password"
                                         className="flex items-center gap-1.5 text-xs font-bold tracking-wide text-white/80 uppercase"
                                     >
-                                        <Lock className="size-3.5 text-lime-400" /> Contraseña
+                                        <Lock className="size-3.5 text-lime-400" />{' '}
+                                        Contraseña
                                     </Label>
                                     {canResetPassword && (
                                         <Link
@@ -108,7 +113,10 @@ export default function Login({
                                     placeholder="••••••••••••"
                                     className="h-11 rounded-xl border-white/14 bg-white/5 px-4 text-sm text-white placeholder:text-white/35 focus:border-lime-400/80 focus:bg-black/40 focus:ring-2 focus:ring-lime-400/30"
                                 />
-                                <InputError message={errors.password} className="mt-1 text-xs text-red-400" />
+                                <InputError
+                                    message={errors.password}
+                                    className="mt-1 text-xs text-red-400"
+                                />
                             </div>
 
                             {/* Remember Me Checkbox */}
@@ -130,7 +138,7 @@ export default function Login({
                             {/* Submit CTA Button */}
                             <Button
                                 type="submit"
-                                className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-lime-400 text-sm font-extrabold text-black shadow-[0_0_25px_rgba(163,230,53,0.3)] transition-all hover:scale-[1.01] hover:bg-lime-300 hover:shadow-[0_0_35px_rgba(163,230,53,0.5)] active:scale-[0.99] disabled:opacity-50"
+                                className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-lime-400 text-sm font-extrabold text-black shadow-[0_0_25px_rgb(0_247_255/.35)] transition-all hover:scale-[1.01] hover:bg-lime-300 hover:shadow-[0_0_35px_rgb(0_247_255/.55)] active:scale-[0.99] disabled:opacity-50"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
@@ -139,7 +147,8 @@ export default function Login({
                                     <Spinner className="size-5 text-black" />
                                 ) : (
                                     <>
-                                        <LogIn className="size-4" /> Iniciar Sesión
+                                        <LogIn className="size-4" /> Iniciar
+                                        Sesión
                                     </>
                                 )}
                             </Button>

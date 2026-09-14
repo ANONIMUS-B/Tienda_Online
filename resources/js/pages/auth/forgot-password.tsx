@@ -28,7 +28,8 @@ export default function ForgotPassword({ status }: { status?: string }) {
                                     htmlFor="email"
                                     className="flex items-center gap-1.5 text-xs font-bold tracking-wide text-white/80 uppercase"
                                 >
-                                    <Mail className="size-3.5 text-lime-400" /> Correo Electrónico
+                                    <Mail className="size-3.5 text-lime-400" />{' '}
+                                    Correo Electrónico
                                 </Label>
                                 <Input
                                     id="email"
@@ -39,12 +40,15 @@ export default function ForgotPassword({ status }: { status?: string }) {
                                     placeholder="tu@correo.com"
                                     className="h-11 rounded-xl border-white/14 bg-white/5 px-4 text-sm text-white placeholder:text-white/35 focus:border-lime-400/80 focus:bg-black/40 focus:ring-2 focus:ring-lime-400/30"
                                 />
-                                <InputError message={errors.email} className="mt-1 text-xs text-red-400" />
+                                <InputError
+                                    message={errors.email}
+                                    className="mt-1 text-xs text-red-400"
+                                />
                             </div>
 
                             <Button
                                 type="submit"
-                                className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-lime-400 text-sm font-extrabold text-black shadow-[0_0_25px_rgba(163,230,53,0.3)] transition-all hover:scale-[1.01] hover:bg-lime-300 hover:shadow-[0_0_35px_rgba(163,230,53,0.5)] active:scale-[0.99] disabled:opacity-50"
+                                className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-lime-400 text-sm font-extrabold text-black shadow-[0_0_25px_rgb(0_247_255/.35)] transition-all hover:scale-[1.01] hover:bg-lime-300 hover:shadow-[0_0_35px_rgb(0_247_255/.55)] active:scale-[0.99] disabled:opacity-50"
                                 disabled={processing}
                                 data-test="email-password-reset-link-button"
                             >
@@ -52,7 +56,8 @@ export default function ForgotPassword({ status }: { status?: string }) {
                                     <Spinner className="size-5 text-black" />
                                 ) : (
                                     <>
-                                        <Send className="size-4" /> Enviar enlace de recuperación
+                                        <Send className="size-4" /> Enviar
+                                        enlace de recuperación
                                     </>
                                 )}
                             </Button>
@@ -63,7 +68,8 @@ export default function ForgotPassword({ status }: { status?: string }) {
                                 href={login()}
                                 className="inline-flex items-center gap-1.5 font-bold text-lime-400 transition hover:text-lime-300 hover:underline"
                             >
-                                <ArrowLeft className="size-3.5" /> Volver a iniciar sesión
+                                <ArrowLeft className="size-3.5" /> Volver a
+                                iniciar sesión
                             </Link>
                         </div>
                     </>
@@ -75,5 +81,6 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
 ForgotPassword.layout = {
     title: 'Recuperar contraseña',
-    description: 'Ingresa tu correo registrado para recibir un enlace seguro de restablecimiento',
+    description:
+        'Ingresa tu correo registrado para recibir un enlace seguro de restablecimiento',
 };

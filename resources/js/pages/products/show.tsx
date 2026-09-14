@@ -8,7 +8,7 @@ export default function ProductShow({ product }: { product: Product }) {
     return (
         <>
             <Head title={`${product.name} | JBTECHLINE`} />
-            <div className="min-h-screen bg-[#101a17] text-white">
+            <div className="bg-brand-background min-h-screen text-white">
                 <div className="hidden">
                     <header className="border-b border-white/10">
                         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5">
@@ -25,7 +25,7 @@ export default function ProductShow({ product }: { product: Product }) {
                         </div>
                     </header>
                 </div>
-                <main className="mx-auto max-w-7xl px-5 pt-28 pb-12">
+                <main className="mx-auto max-w-7xl px-5 pt-24 pb-12 sm:pt-28">
                     <Link
                         href={products()}
                         className="inline-flex items-center gap-2 text-sm text-white/50"
@@ -33,7 +33,7 @@ export default function ProductShow({ product }: { product: Product }) {
                         <ArrowLeft className="size-4" />
                         Volver a productos
                     </Link>
-                    <div className="mt-8 grid gap-12 lg:grid-cols-2">
+                    <div className="mt-6 grid gap-8 sm:mt-8 lg:grid-cols-2 lg:gap-12">
                         <div>
                             <div className="aspect-square overflow-hidden rounded-[2rem] border border-white/10 bg-white/5">
                                 {product.images[0] && (
@@ -63,7 +63,7 @@ export default function ProductShow({ product }: { product: Product }) {
                             <p className="text-sm font-bold text-lime-400">
                                 {product.brand?.name} · {product.category?.name}
                             </p>
-                            <h1 className="mt-4 text-4xl font-black sm:text-5xl">
+                            <h1 className="mt-3 text-3xl font-black sm:mt-4 sm:text-5xl">
                                 {product.name}
                             </h1>
                             <p className="mt-5 text-lg leading-8 text-white/55">

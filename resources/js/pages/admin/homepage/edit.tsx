@@ -134,7 +134,7 @@ export default function EditHomepage({
                                 </div>
                             </div>
 
-                            <aside className="overflow-hidden rounded-xl border bg-[#071008] text-white">
+                            <aside className="bg-brand-background overflow-hidden rounded-xl border text-white">
                                 <div className="bg-[radial-gradient(circle_at_center,rgba(113,255,46,.18),transparent_60%)] p-6">
                                     <p className="text-xs tracking-[.2em] text-lime-400 uppercase">
                                         Vista previa

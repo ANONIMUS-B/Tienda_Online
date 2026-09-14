@@ -19,15 +19,15 @@ export default function SoftwareIndex({
 }) {
     const isPrograms = catalogType === 'programs';
     return (
-        <div className="min-h-screen bg-[#101a17] text-white">
+        <div className="bg-brand-background min-h-screen text-white">
             <Head
                 title={`${isPrograms ? 'Programas' : 'Software'} | JBTECHLINE`}
             />
-            <main className="mx-auto max-w-7xl px-5 pt-32 pb-20">
+            <main className="mx-auto max-w-7xl px-5 pt-24 pb-14 sm:pt-28">
                 <p className="text-xs font-bold tracking-[.2em] text-lime-400 uppercase">
                     {isPrograms ? 'Programas disponibles' : 'Desarrollo propio'}
                 </p>
-                <h1 className="mt-4 text-5xl font-black">
+                <h1 className="mt-3 text-3xl font-black sm:mt-4 sm:text-5xl">
                     {isPrograms
                         ? 'Herramientas para trabajar '
                         : 'Software creado para ti '}
@@ -41,7 +41,7 @@ export default function SoftwareIndex({
                 <form
                     action={(isPrograms ? programsIndex() : software()).url}
                     method="get"
-                    className="mt-10 grid gap-3 rounded-3xl border border-white/10 bg-white/[.04] p-4 md:grid-cols-[1fr_220px_220px_auto]"
+                    className="mt-7 grid gap-3 rounded-3xl border border-white/10 bg-white/[.04] p-4 md:grid-cols-[1fr_220px_220px_auto]"
                 >
                     <div className="relative">
                         <Search className="absolute top-3.5 left-4 size-4 text-white/35" />
@@ -55,7 +55,7 @@ export default function SoftwareIndex({
                     <select
                         name="category"
                         defaultValue={filters.category}
-                        className="rounded-xl border border-white/10 bg-[#182722] px-4"
+                        className="border-brand-support/20 bg-brand-background h-11 rounded-xl border px-4"
                     >
                         <option value="">Todas las categorías</option>
                         {categories.map((x) => (
@@ -65,18 +65,18 @@ export default function SoftwareIndex({
                     <select
                         name="platform"
                         defaultValue={filters.platform}
-                        className="rounded-xl border border-white/10 bg-[#182722] px-4"
+                        className="border-brand-support/20 bg-brand-background h-11 rounded-xl border px-4"
                     >
                         <option value="">Todas las plataformas</option>
                         {platforms.map((x) => (
                             <option key={x}>{x}</option>
                         ))}
                     </select>
-                    <button className="rounded-xl bg-lime-400 px-6 font-bold text-black">
+                    <button className="h-11 rounded-xl bg-lime-400 px-6 font-bold text-black">
                         Filtrar
                     </button>
                 </form>
-                <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div className="mt-7 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                     {programs.data.map((program) => (
                         <Link
                             key={program.id}
@@ -134,23 +134,25 @@ export default function SoftwareIndex({
                         </Link>
                     ))}
                 </div>
-                {!isPrograms ? <section className="mt-16 flex flex-col justify-between gap-6 rounded-[2rem] border border-lime-400/20 bg-lime-400/[.06] p-8 md:flex-row md:items-center">
-                    <div>
-                        <h2 className="text-2xl font-black">
-                            ¿Necesitas un software a medida?
-                        </h2>
-                        <p className="mt-2 text-white/50">
-                            Cotiza sistemas web, facturación, inventario,
-                            aplicaciones móviles e integraciones.
-                        </p>
-                    </div>
-                    <Link
-                        href={contact()}
-                        className="shrink-0 rounded-full bg-lime-400 px-7 py-4 font-bold text-black"
-                    >
-                        Cotizar desarrollo
-                    </Link>
-                </section> : null}
+                {!isPrograms ? (
+                    <section className="mt-10 flex flex-col justify-between gap-6 rounded-[2rem] border border-lime-400/20 bg-lime-400/[.06] p-7 md:flex-row md:items-center">
+                        <div>
+                            <h2 className="text-2xl font-black">
+                                ¿Necesitas un software a medida?
+                            </h2>
+                            <p className="mt-2 text-white/50">
+                                Cotiza sistemas web, facturación, inventario,
+                                aplicaciones móviles e integraciones.
+                            </p>
+                        </div>
+                        <Link
+                            href={contact()}
+                            className="shrink-0 rounded-full bg-lime-400 px-7 py-4 font-bold text-black"
+                        >
+                            Cotizar desarrollo
+                        </Link>
+                    </section>
+                ) : null}
             </main>
         </div>
     );

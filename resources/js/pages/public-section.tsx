@@ -620,7 +620,7 @@ export default function PublicSection({
             <Head title={`${content.eyebrow} | JBTECHLINE`}>
                 <meta name="description" content={content.description} />
             </Head>
-            <div className="min-h-screen bg-[#101a17] text-white selection:bg-lime-400 selection:text-black">
+            <div className="bg-brand-background selection:bg-brand-primary selection:text-brand-background min-h-screen text-white">
                 <header className="hidden">
                     <div className="mx-auto flex h-20 max-w-[1500px] items-center justify-between px-5 lg:px-8">
                         <Link href={home()} className="flex items-center gap-3">
@@ -665,7 +665,7 @@ export default function PublicSection({
                             ))}
                         </nav>
                         <div className="hidden items-center gap-1 lg:flex">
-                                <SearchPopover showLabel />
+                            <SearchPopover showLabel />
                             <Link
                                 href={cart()}
                                 className="rounded-full p-2.5 text-white/70 hover:bg-white/8 hover:text-lime-400"
@@ -681,7 +681,12 @@ export default function PublicSection({
                                     >
                                         {isCustomer ? 'Mi carrito' : 'Mi panel'}
                                     </Link>
-                                    <Link href={logout()} method="post" as="button" className="rounded-full border border-white/15 px-4 py-2.5 text-sm font-semibold text-white/70 hover:text-red-300">
+                                    <Link
+                                        href={logout()}
+                                        method="post"
+                                        as="button"
+                                        className="rounded-full border border-white/15 px-4 py-2.5 text-sm font-semibold text-white/70 hover:text-red-300"
+                                    >
                                         Cerrar sesión
                                     </Link>
                                 </>
@@ -716,7 +721,7 @@ export default function PublicSection({
                         </button>
                     </div>
                     {menuOpen && (
-                        <nav className="flex flex-col border-t border-white/8 bg-[#08100b] px-5 py-5 lg:hidden">
+                        <nav className="bg-brand-background flex flex-col border-t border-white/8 px-5 py-5 lg:hidden">
                             <Link
                                 href={home()}
                                 onClick={() => setMenuOpen(false)}
@@ -751,8 +756,22 @@ export default function PublicSection({
                             </div>
                             {auth.user && (
                                 <div className="mt-3 grid gap-2">
-                                    {!isCustomer && <Link href={dashboardUrl} className="rounded-xl border border-lime-400/40 px-4 py-3 text-center font-bold text-lime-400">Mi panel</Link>}
-                                    <Link href={logout()} method="post" as="button" className="rounded-xl border border-red-300/30 px-4 py-3 text-center font-semibold text-red-300">Cerrar sesión</Link>
+                                    {!isCustomer && (
+                                        <Link
+                                            href={dashboardUrl}
+                                            className="rounded-xl border border-lime-400/40 px-4 py-3 text-center font-bold text-lime-400"
+                                        >
+                                            Mi panel
+                                        </Link>
+                                    )}
+                                    <Link
+                                        href={logout()}
+                                        method="post"
+                                        as="button"
+                                        className="rounded-xl border border-red-300/30 px-4 py-3 text-center font-semibold text-red-300"
+                                    >
+                                        Cerrar sesión
+                                    </Link>
                                 </div>
                             )}
                         </nav>
@@ -760,13 +779,13 @@ export default function PublicSection({
                 </header>
 
                 <main>
-                    <section className="relative overflow-hidden border-b border-white/8 py-24 sm:py-32">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_45%,rgba(91,255,0,.14),transparent_28%)]" />
-                        <div className="pointer-events-none absolute inset-0 [background-image:linear-gradient(rgba(132,255,75,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(132,255,75,.08)_1px,transparent_1px)] [background-size:48px_48px] opacity-20" />
+                    <section className="relative overflow-hidden border-b border-white/8 pt-28 pb-14 sm:pt-32 sm:pb-18">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_45%,rgb(0_247_255/.12),transparent_28%)]" />
+                        <div className="pointer-events-none absolute inset-0 [background-image:linear-gradient(rgb(0_229_255/.1)_1px,transparent_1px),linear-gradient(90deg,rgb(0_229_255/.1)_1px,transparent_1px)] [background-size:48px_48px] opacity-20" />
                         <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
                             <Link
                                 href={home()}
-                                className="mb-10 inline-flex items-center gap-2 text-sm text-white/45 transition hover:text-lime-400"
+                                className="mb-6 inline-flex items-center gap-2 text-sm text-white/45 transition hover:text-lime-400"
                             >
                                 <ArrowLeft className="size-4" /> Volver al
                                 inicio
@@ -774,20 +793,20 @@ export default function PublicSection({
                             <p className="text-xs font-extrabold tracking-[.24em] text-lime-400 uppercase">
                                 {content.eyebrow}
                             </p>
-                            <h1 className="mt-5 max-w-4xl text-5xl leading-[1.04] font-black tracking-[-.04em] sm:text-6xl lg:text-7xl">
+                            <h1 className="mt-4 max-w-4xl text-4xl leading-[1.04] font-black tracking-[-.04em] sm:text-5xl lg:text-6xl">
                                 {content.title}{' '}
                                 <span className="bg-gradient-to-r from-lime-300 to-emerald-500 bg-clip-text text-transparent">
                                     {content.accent}
                                 </span>
                             </h1>
-                            <p className="mt-7 max-w-2xl text-lg leading-8 text-white/52">
+                            <p className="mt-5 max-w-2xl text-lg leading-8 text-white/52">
                                 {content.description}
                             </p>
                         </div>
                     </section>
 
                     {section === 'search' && (
-                        <section className="mx-auto max-w-4xl px-5 pt-16 lg:px-8">
+                        <section className="mx-auto max-w-4xl px-5 pt-10 lg:px-8">
                             <form
                                 action={search().url}
                                 method="get"
@@ -813,7 +832,7 @@ export default function PublicSection({
                         </section>
                     )}
 
-                    <section className="mx-auto max-w-7xl px-5 py-24 lg:px-8">
+                    <section className="mx-auto max-w-7xl px-5 py-14 sm:py-18 lg:px-8">
                         {content.items.length === 0 && (
                             <div className="rounded-3xl border border-white/9 bg-white/[.035] px-6 py-14 text-center text-white/50">
                                 Próximamente publicaremos nuestras categorías
@@ -834,7 +853,7 @@ export default function PublicSection({
                                 ) => (
                                     <article
                                         key={title}
-                                        className="group rounded-3xl border border-white/9 bg-white/[.035] p-7 transition duration-300 hover:-translate-y-1 hover:border-lime-400/35 hover:bg-lime-400/[.05]"
+                                        className="group border-brand-support/20 hover:border-brand-primary/50 hover:bg-brand-interactive/10 rounded-3xl border bg-black/15 p-6 transition duration-300 hover:-translate-y-1"
                                     >
                                         <div className="flex items-start justify-between">
                                             <div className="flex size-14 items-center justify-center rounded-2xl border border-lime-400/20 bg-lime-400/10 text-lime-400">
@@ -852,13 +871,13 @@ export default function PublicSection({
                                                 {label ?? `0${index + 1}`}
                                             </span>
                                         </div>
-                                        <h2 className="mt-8 text-xl font-bold">
+                                        <h2 className="mt-5 text-xl font-bold">
                                             {title}
                                         </h2>
                                         <p className="mt-3 leading-7 text-white/45">
                                             {description}
                                         </p>
-                                        <div className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-lime-400">
+                                        <div className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-lime-400">
                                             Solicitar información{' '}
                                             <ArrowRight className="size-4 transition group-hover:translate-x-1" />
                                         </div>
@@ -869,31 +888,65 @@ export default function PublicSection({
                     </section>
 
                     {section === 'services' && (
-                        <section className="mx-auto grid max-w-7xl gap-6 px-5 pb-24 lg:grid-cols-2 lg:px-8">
+                        <section className="mx-auto grid max-w-7xl gap-6 px-5 pb-14 sm:pb-18 lg:grid-cols-2 lg:px-8">
                             <article className="rounded-[2rem] border border-white/10 bg-white/[.035] p-8">
-                                <p className="text-xs font-bold tracking-[.2em] text-lime-400 uppercase">Problemas frecuentes</p>
-                                <h2 className="mt-3 text-2xl font-black">Cuéntanos qué ocurre con tu equipo</h2>
+                                <p className="text-xs font-bold tracking-[.2em] text-lime-400 uppercase">
+                                    Problemas frecuentes
+                                </p>
+                                <h2 className="mt-3 text-2xl font-black">
+                                    Cuéntanos qué ocurre con tu equipo
+                                </h2>
                                 <div className="mt-6 grid gap-3 text-sm text-white/60 sm:grid-cols-2">
-                                    {['Está lento o se congela', 'Se calienta o hace ruido', 'No enciende o no carga', 'Pantalla azul o reinicios', 'Virus y ventanas extrañas', 'Necesita más memoria o SSD'].map((problem) => (
-                                        <div key={problem} className="rounded-xl border border-white/8 bg-black/20 p-4">{problem}</div>
+                                    {[
+                                        'Está lento o se congela',
+                                        'Se calienta o hace ruido',
+                                        'No enciende o no carga',
+                                        'Pantalla azul o reinicios',
+                                        'Virus y ventanas extrañas',
+                                        'Necesita más memoria o SSD',
+                                    ].map((problem) => (
+                                        <div
+                                            key={problem}
+                                            className="rounded-xl border border-white/8 bg-black/20 p-4"
+                                        >
+                                            {problem}
+                                        </div>
                                     ))}
                                 </div>
                             </article>
                             <article className="rounded-[2rem] border border-lime-400/20 bg-lime-400/[.05] p-8">
-                                <p className="text-xs font-bold tracking-[.2em] text-lime-400 uppercase">Proceso transparente</p>
-                                <h2 className="mt-3 text-2xl font-black">Así atendemos tu servicio</h2>
+                                <p className="text-xs font-bold tracking-[.2em] text-lime-400 uppercase">
+                                    Proceso transparente
+                                </p>
+                                <h2 className="mt-3 text-2xl font-black">
+                                    Así atendemos tu servicio
+                                </h2>
                                 <ol className="mt-6 space-y-4 text-sm text-white/60">
-                                    {['Nos describes el equipo y la falla.', 'Realizamos el diagnóstico y preparamos la cotización.', 'Trabajamos únicamente después de tu aprobación.', 'Probamos el equipo y explicamos el trabajo realizado.'].map((step, index) => (
-                                        <li key={step} className="flex gap-4"><span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-lime-400 font-black text-black">{index + 1}</span><span className="pt-1">{step}</span></li>
+                                    {[
+                                        'Nos describes el equipo y la falla.',
+                                        'Realizamos el diagnóstico y preparamos la cotización.',
+                                        'Trabajamos únicamente después de tu aprobación.',
+                                        'Probamos el equipo y explicamos el trabajo realizado.',
+                                    ].map((step, index) => (
+                                        <li key={step} className="flex gap-4">
+                                            <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-lime-400 font-black text-black">
+                                                {index + 1}
+                                            </span>
+                                            <span className="pt-1">{step}</span>
+                                        </li>
                                     ))}
                                 </ol>
-                                <p className="mt-6 border-t border-white/10 pt-5 text-xs leading-5 text-white/40">Antes de intervenir, recomendamos respaldar tu información. Los repuestos y el tiempo final se confirman después del diagnóstico.</p>
+                                <p className="mt-6 border-t border-white/10 pt-5 text-xs leading-5 text-white/40">
+                                    Antes de intervenir, recomendamos respaldar
+                                    tu información. Los repuestos y el tiempo
+                                    final se confirman después del diagnóstico.
+                                </p>
                             </article>
                         </section>
                     )}
 
-                    <section className="px-5 pb-24 lg:px-8">
-                        <div className="mx-auto flex max-w-7xl flex-col gap-8 overflow-hidden rounded-[2.5rem] border border-lime-400/20 bg-gradient-to-r from-[#173a0d] to-[#071008] px-7 py-12 sm:px-12 lg:flex-row lg:items-center lg:justify-between">
+                    <section className="px-5 pb-14 sm:pb-18 lg:px-8">
+                        <div className="border-brand-primary/30 to-brand-interactive/10 mx-auto flex max-w-7xl flex-col gap-6 overflow-hidden rounded-[2.5rem] border bg-gradient-to-r from-white px-7 py-9 sm:px-12 lg:flex-row lg:items-center lg:justify-between">
                             <div>
                                 <p className="text-xs font-extrabold tracking-[.2em] text-lime-300 uppercase">
                                     Asesoría personalizada

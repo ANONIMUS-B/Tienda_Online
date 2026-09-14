@@ -19,9 +19,9 @@ export default function Checkout({
 }) {
     const { auth } = usePage().props;
     return (
-        <div className="min-h-screen bg-[#101a17] text-white">
+        <div className="bg-brand-background min-h-screen text-white">
             <Head title="Finalizar compra | JBTECHLINE" />
-            <main className="mx-auto max-w-6xl px-5 pt-32 pb-20">
+            <main className="mx-auto max-w-6xl px-5 pt-24 pb-14 sm:pt-28">
                 <p className="text-xs font-bold tracking-[.2em] text-lime-400 uppercase">
                     Paso final
                 </p>
@@ -48,7 +48,7 @@ export default function Checkout({
                 )}
                 <Form
                     {...store.form()}
-                    className="mt-10 grid gap-8 lg:grid-cols-[1fr_360px]"
+                    className="mt-8 grid gap-6 sm:mt-10 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-8"
                 >
                     {({ errors, processing }) => (
                         <>

@@ -13,9 +13,9 @@ export default function Cart({
 }) {
     const { auth } = usePage().props;
     return (
-        <div className="min-h-screen bg-[#101a17] text-white">
+        <div className="bg-brand-background min-h-screen text-white">
             <Head title="Carrito | JBTECHLINE" />
-            <main className="mx-auto max-w-6xl px-5 pt-32 pb-20">
+            <main className="mx-auto max-w-6xl px-5 pt-24 pb-14 sm:pt-28">
                 <p className="text-xs font-bold tracking-[.2em] text-lime-400 uppercase">
                     Tu compra
                 </p>
@@ -40,9 +40,9 @@ export default function Cart({
                                 ({ product, quantity, unit_price, total }) => (
                                     <article
                                         key={product.id}
-                                        className="flex gap-5 rounded-3xl border border-white/10 bg-white/[.035] p-5"
+                                        className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-white/[.035] p-4 sm:flex-row sm:gap-5 sm:p-5"
                                     >
-                                        <div className="size-28 overflow-hidden rounded-2xl bg-white/5">
+                                        <div className="h-40 w-full overflow-hidden rounded-2xl bg-white/5 sm:size-28">
                                             {product.images[0] && (
                                                 <img
                                                     src={product.images[0].path}
@@ -161,7 +161,7 @@ export default function Cart({
                                     {auth.user.role === 'user' && (
                                         <a
                                             href={whatsapp().url}
-                                            className="flex justify-center rounded-full bg-[#25D366] px-6 py-4 font-black text-black"
+                                            className="bg-brand-interactive text-brand-background flex justify-center rounded-full px-6 py-4 font-black"
                                         >
                                             Solicitar por WhatsApp
                                         </a>

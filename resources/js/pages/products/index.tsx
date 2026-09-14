@@ -20,9 +20,9 @@ export default function ProductCatalog({
     filters = {},
 }: {
     products: Paginator;
-    categories: Option[];
-    brands: Option[];
-    filters: Record<string, string>;
+    categories?: Option[];
+    brands?: Option[];
+    filters?: Record<string, string>;
 }) {
     const categoryOptions = Array.isArray(categories) ? categories : [];
     const brandOptions = Array.isArray(brands) ? brands : [];
@@ -30,7 +30,7 @@ export default function ProductCatalog({
     return (
         <>
             <Head title="Productos | JBTECHLINE" />
-            <div className="min-h-screen bg-[#101a17] text-white">
+            <div className="bg-brand-background min-h-screen text-white">
                 <div className="hidden">
                     <header className="border-b border-white/10">
                         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5">
@@ -51,18 +51,18 @@ export default function ProductCatalog({
                         </div>
                     </header>
                 </div>
-                <main className="mx-auto max-w-7xl px-5 pt-32 pb-16">
+                <main className="mx-auto max-w-7xl px-5 pt-24 pb-12 sm:pt-28">
                     <p className="text-xs font-bold tracking-[.2em] text-lime-400 uppercase">
                         Catálogo tecnológico
                     </p>
-                    <h1 className="mt-4 text-5xl font-black">
+                    <h1 className="mt-3 text-3xl font-black sm:mt-4 sm:text-5xl">
                         Productos para{' '}
                         <span className="text-lime-400">avanzar.</span>
                     </h1>
                     <form
                         action={products().url}
                         method="get"
-                        className="mt-10 grid gap-3 rounded-3xl border border-white/10 bg-white/[.04] p-4 md:grid-cols-[1fr_220px_220px_auto]"
+                        className="mt-7 grid gap-3 rounded-3xl border border-white/10 bg-white/[.04] p-4 md:grid-cols-[1fr_220px_220px_auto]"
                     >
                         <div className="relative">
                             <Search className="absolute top-3.5 left-4 size-4 text-white/35" />
@@ -76,7 +76,7 @@ export default function ProductCatalog({
                         <select
                             name="category"
                             defaultValue={filters.category}
-                            className="rounded-xl border border-white/10 bg-[#182722] px-4"
+                            className="border-brand-support/20 bg-brand-background h-11 rounded-xl border px-4"
                         >
                             <option value="">Todas las categorías</option>
                             {categoryOptions.map((x) => (
@@ -88,7 +88,7 @@ export default function ProductCatalog({
                         <select
                             name="brand"
                             defaultValue={filters.brand}
-                            className="rounded-xl border border-white/10 bg-[#182722] px-4"
+                            className="border-brand-support/20 bg-brand-background h-11 rounded-xl border px-4"
                         >
                             <option value="">Todas las marcas</option>
                             {brandOptions.map((x) => (
@@ -97,16 +97,16 @@ export default function ProductCatalog({
                                 </option>
                             ))}
                         </select>
-                        <button className="flex items-center justify-center gap-2 rounded-xl bg-lime-400 px-6 font-bold text-black">
+                        <button className="flex h-11 items-center justify-center gap-2 rounded-xl bg-lime-400 px-6 font-bold text-black">
                             <Filter className="size-4" />
                             Filtrar
                         </button>
                     </form>
-                    <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         {result.data.map((product) => (
                             <article
                                 key={product.id}
-                                className="group overflow-hidden rounded-3xl border border-white/10 bg-[#071008]/90 transition duration-300 hover:border-lime-400/50 hover:shadow-[0_15px_35px_rgba(0,0,0,0.6)]"
+                                className="group border-brand-support/20 hover:border-brand-primary/70 overflow-hidden rounded-3xl border bg-black/25 transition duration-300 hover:shadow-[0_15px_35px_rgba(0,0,0,0.35)]"
                             >
                                 <Link href={show(product.slug)}>
                                     <div className="relative flex aspect-square items-center justify-center overflow-hidden bg-gradient-to-b from-white/5 via-lime-400/5 to-transparent p-6">
@@ -129,7 +129,7 @@ export default function ProductCatalog({
                                             {product.brand?.name ??
                                                 product.category?.name}
                                         </p>
-                                        <h2 className="mt-1.5 font-bold text-white transition-colors group-hover:text-lime-300 line-clamp-1">
+                                        <h2 className="mt-1.5 line-clamp-1 font-bold text-white transition-colors group-hover:text-lime-300">
                                             {product.name}
                                         </h2>
                                         <p className="mt-2 line-clamp-2 text-xs text-white/45">
@@ -148,7 +148,7 @@ export default function ProductCatalog({
                                                         product.price}
                                                 </p>
                                             </div>
-                                            <span className="flex size-10 items-center justify-center rounded-full bg-lime-400 text-black shadow-[0_0_15px_rgba(163,230,53,0.3)] transition hover:scale-105 hover:bg-lime-300">
+                                            <span className="flex size-10 items-center justify-center rounded-full bg-lime-400 text-black shadow-[0_0_15px_rgb(0_247_255/.35)] transition hover:scale-105 hover:bg-lime-300">
                                                 <ShoppingCart className="size-4" />
                                             </span>
                                         </div>

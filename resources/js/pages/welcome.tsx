@@ -3,18 +3,14 @@ import {
     ArrowRight,
     Bot,
     Check,
-    ChevronDown,
-    ChevronRight,
     CircuitBoard,
     Code2,
-    Cpu,
     Headphones,
     Laptop,
     LogOut,
     Menu,
     MessageCircle,
     PackageCheck,
-    Printer,
     ShieldCheck,
     ShoppingCart,
     Smartphone,
@@ -29,11 +25,7 @@ import type { HeroContent } from '@/types/homepage';
 import SearchPopover from '@/components/search-popover';
 
 import {
-    about,
     apps,
-    blog,
-    brands,
-    categories as categoriesPage,
     contact,
     dashboard,
     home,
@@ -56,29 +48,6 @@ const navigation = [
     { label: 'Programas', route: programs },
     { label: 'Apps', route: apps },
     { label: 'Contacto', route: contact },
-];
-
-const categories = [
-    {
-        name: 'Laptops y PCs',
-        text: 'Equipos para trabajo, estudio y alto rendimiento.',
-        icon: Laptop,
-    },
-    {
-        name: 'Componentes',
-        text: 'Potencia y mejora cada parte de tu equipo.',
-        icon: Cpu,
-    },
-    {
-        name: 'Impresión',
-        text: 'Impresoras, suministros y soluciones empresariales.',
-        icon: Printer,
-    },
-    {
-        name: 'Smartphones',
-        text: 'Tecnología móvil y accesorios esenciales.',
-        icon: Smartphone,
-    },
 ];
 
 const services = [
@@ -150,7 +119,7 @@ export default function Welcome({
                     content="JBTECHLINE: productos tecnológicos, software, soporte técnico y soluciones empresariales."
                 />
             </Head>
-            <div className="min-h-screen overflow-hidden bg-[#101a17] text-white selection:bg-lime-400 selection:text-black">
+            <div className="bg-brand-background selection:bg-brand-primary selection:text-brand-background min-h-screen overflow-hidden text-white">
                 <header className="hidden">
                     <div className="mx-auto flex h-20 max-w-[1500px] items-center justify-between px-5 lg:px-8">
                         <a
@@ -219,8 +188,14 @@ export default function Welcome({
                                     >
                                         {isCustomer ? 'Mi carrito' : 'Mi panel'}
                                     </Link>
-                                    <Link href={logout()} method="post" as="button" className="flex items-center gap-2 rounded-full border border-white/15 px-4 py-2.5 text-sm font-semibold text-white/75 hover:text-red-300">
-                                        <LogOut className="size-4" /> Cerrar sesión
+                                    <Link
+                                        href={logout()}
+                                        method="post"
+                                        as="button"
+                                        className="flex items-center gap-2 rounded-full border border-white/15 px-4 py-2.5 text-sm font-semibold text-white/75 hover:text-red-300"
+                                    >
+                                        <LogOut className="size-4" /> Cerrar
+                                        sesión
                                     </Link>
                                 </>
                             ) : (
@@ -255,7 +230,7 @@ export default function Welcome({
                         </button>
                     </div>
                     {menuOpen && (
-                        <div className="border-t border-white/8 bg-[#08100b] px-5 py-5 lg:hidden">
+                        <div className="bg-brand-background border-t border-white/8 px-5 py-5 lg:hidden">
                             <nav className="flex flex-col gap-1">
                                 <Link
                                     href={home()}
@@ -295,7 +270,11 @@ export default function Welcome({
                                         href={auth.user ? accountUrl : login()}
                                         className="flex-1 rounded-xl border border-white/15 px-4 py-3 text-center text-sm font-semibold"
                                     >
-                                        {auth.user ? (isCustomer ? 'Mi carrito' : 'Mi panel') : 'Ingresar'}
+                                        {auth.user
+                                            ? isCustomer
+                                                ? 'Mi carrito'
+                                                : 'Mi panel'
+                                            : 'Ingresar'}
                                     </Link>
                                     {!auth.user && (
                                         <Link
@@ -306,8 +285,14 @@ export default function Welcome({
                                         </Link>
                                     )}
                                     {auth.user && (
-                                        <Link href={logout()} method="post" as="button" className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-red-300/30 px-4 py-3 text-sm font-semibold text-red-300">
-                                            <LogOut className="size-4" /> Cerrar sesión
+                                        <Link
+                                            href={logout()}
+                                            method="post"
+                                            as="button"
+                                            className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-red-300/30 px-4 py-3 text-sm font-semibold text-red-300"
+                                        >
+                                            <LogOut className="size-4" /> Cerrar
+                                            sesión
                                         </Link>
                                     )}
                                 </div>
@@ -319,23 +304,25 @@ export default function Welcome({
                 <main>
                     <section
                         id="inicio"
-                        className="relative min-h-screen overflow-hidden pt-24"
+                        className="relative overflow-hidden pt-20"
                     >
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_55%_58%,rgba(66,210,0,.18),transparent_28%),radial-gradient(circle_at_88%_18%,rgba(255,255,255,.08),transparent_22%),linear-gradient(155deg,#080b09_20%,#111511_55%,#061008)]" />
-                        <div className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-[#14440c]/80 via-[#0b2808]/35 to-transparent" />
-                        <div className="pointer-events-none absolute inset-0 [background-image:linear-gradient(rgba(132,255,75,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(132,255,75,.08)_1px,transparent_1px)] [mask-image:linear-gradient(to_bottom,transparent,black_48%,transparent)] [background-size:64px_64px] opacity-20" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_55%_58%,rgb(0_247_255/.2),transparent_28%),radial-gradient(circle_at_88%_18%,rgb(0_207_232/.13),transparent_22%),linear-gradient(155deg,#FFFFFF_20%,#F5FDFF_55%,#FFFFFF)]" />
+                        <div className="via-brand-interactive/8 absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-white to-transparent" />
+                        <div className="pointer-events-none absolute inset-0 [background-image:linear-gradient(rgb(0_229_255/.1)_1px,transparent_1px),linear-gradient(90deg,rgb(0_229_255/.1)_1px,transparent_1px)] [mask-image:linear-gradient(to_bottom,transparent,black_48%,transparent)] [background-size:64px_64px] opacity-20" />
 
-                        <div className="relative mx-auto min-h-[780px] max-w-7xl px-5 py-10 lg:px-8">
+                        <div className="relative mx-auto min-h-[520px] max-w-7xl px-4 py-5 sm:min-h-[600px] sm:px-5 sm:py-6 lg:min-h-[680px] lg:px-8">
                             {/* Watermark Background Title (Non-overlapping, pointer-events-none) */}
-                            <div className="pointer-events-none select-none absolute inset-x-0 top-12 z-0 text-center opacity-10">
+                            <div className="pointer-events-none absolute inset-x-0 top-12 z-0 text-center opacity-10 select-none">
                                 <p className="text-[clamp(3.5rem,8vw,7.5rem)] leading-none font-black tracking-widest text-white uppercase drop-shadow-[0_0_50px_rgba(255,255,255,0.2)]">
                                     {heroProduct
-                                        ? heroProduct.category?.name ?? 'TECNOLOGÍA 3D'
+                                        ? (heroProduct.category?.name ??
+                                          'TECNOLOGÍA 3D')
                                         : hero.hero_title}
                                 </p>
                                 <p className="mt-2 text-[clamp(2.5rem,6vw,5.5rem)] leading-none font-black tracking-widest text-lime-400 uppercase">
                                     {heroProduct
-                                        ? heroProduct.brand?.name ?? 'JBTECHLINE'
+                                        ? (heroProduct.brand?.name ??
+                                          'JBTECHLINE')
                                         : hero.hero_accent}
                                 </p>
                             </div>
@@ -346,7 +333,7 @@ export default function Welcome({
                                 <div className="pointer-events-none absolute top-1/2 left-1/2 size-[360px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-lime-400/20 blur-[100px] sm:size-[460px]" />
 
                                 {/* Floating 3D Image */}
-                                <div className="relative z-20 mx-auto w-full max-w-[480px]">
+                                <div className="relative z-20 mx-auto w-full max-w-[300px] sm:max-w-[400px] lg:max-w-[480px]">
                                     <img
                                         src={
                                             heroProduct?.images[0]?.path ??
@@ -357,7 +344,7 @@ export default function Welcome({
                                                 ? heroProduct.name
                                                 : 'Centro tecnológico modular 3D'
                                         }
-                                        className="relative mx-auto max-h-[380px] w-full animate-[hero-float_6s_ease-in-out_infinite] object-contain drop-shadow-[0_45px_65px_rgba(0,0,0,0.85)] filter brightness-105"
+                                        className="relative mx-auto max-h-[260px] w-full animate-[hero-float_6s_ease-in-out_infinite] object-contain brightness-105 drop-shadow-[0_30px_45px_rgba(0,0,0,0.3)] filter sm:max-h-[320px] lg:max-h-[380px]"
                                     />
                                 </div>
 
@@ -365,11 +352,12 @@ export default function Welcome({
                                 {heroProduct && (
                                     <Link
                                         href={productShow(heroProduct.slug)}
-                                        className="group relative z-30 mt-6 flex w-[min(90vw,440px)] items-center justify-between gap-4 rounded-2xl border border-lime-400/35 bg-[#071008]/90 p-4 shadow-[0_20px_50px_rgba(0,0,0,0.7)] backdrop-blur-2xl transition duration-300 hover:scale-[1.02] hover:border-lime-400 hover:bg-[#09160a] hover:shadow-[0_0_30px_rgba(163,230,53,0.3)]"
+                                        className="group border-brand-primary/45 bg-brand-background/90 hover:border-brand-primary hover:bg-brand-background relative z-30 mt-4 flex w-full max-w-[440px] flex-col items-stretch justify-between gap-3 rounded-2xl border p-4 shadow-[0_20px_50px_rgba(0,0,0,0.15)] backdrop-blur-2xl transition duration-300 hover:scale-[1.01] hover:shadow-[0_0_30px_rgb(0_247_255/.3)] sm:mt-6 sm:flex-row sm:items-center"
                                     >
                                         <div className="min-w-0 flex-1">
                                             <span className="inline-flex items-center gap-1.5 rounded-full border border-lime-400/30 bg-lime-400/10 px-2.5 py-0.5 text-[9px] font-extrabold tracking-wider text-lime-300 uppercase">
-                                                <Zap className="size-3 text-lime-400" /> Producto Destacado
+                                                <Zap className="size-3 text-lime-400" />{' '}
+                                                Producto Destacado
                                             </span>
                                             <h2 className="mt-1.5 truncate text-sm font-extrabold text-white transition-colors group-hover:text-lime-300">
                                                 {heroProduct.name}
@@ -377,7 +365,8 @@ export default function Welcome({
                                             <p className="truncate text-[11px] text-white/50">
                                                 {heroProduct.brand?.name
                                                     ? `Marca: ${heroProduct.brand.name}`
-                                                    : heroProduct.category?.name}
+                                                    : heroProduct.category
+                                                          ?.name}
                                             </p>
                                         </div>
                                         <div className="flex shrink-0 flex-col items-end gap-1.5">
@@ -387,7 +376,8 @@ export default function Welcome({
                                                     heroProduct.price}
                                             </span>
                                             <span className="inline-flex items-center gap-1 rounded-full bg-lime-400 px-3 py-1 text-[10px] font-extrabold text-black transition hover:bg-lime-300">
-                                                Ver Producto <ArrowRight className="size-3" />
+                                                Ver Producto{' '}
+                                                <ArrowRight className="size-3" />
                                             </span>
                                         </div>
                                     </Link>
@@ -399,14 +389,14 @@ export default function Welcome({
                                 href={hero.hero_primary_url}
                                 className="group absolute top-1/3 left-6 z-20 hidden w-56 items-center gap-3 rounded-2xl border border-white/14 bg-black/40 p-4 shadow-xl backdrop-blur-xl transition hover:border-lime-400/50 hover:bg-black/60 lg:flex"
                             >
-                                <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-lime-400/15 text-lime-300 group-hover:scale-105 transition-transform">
+                                <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-lime-400/15 text-lime-300 transition-transform group-hover:scale-105">
                                     <Laptop className="size-6" />
                                 </div>
                                 <div>
                                     <p className="text-[9px] font-bold tracking-widest text-white/40 uppercase">
                                         Catálogo Oficial
                                     </p>
-                                    <p className="mt-0.5 text-xs font-black text-white uppercase group-hover:text-lime-400 transition-colors">
+                                    <p className="mt-0.5 text-xs font-black text-white uppercase transition-colors group-hover:text-lime-400">
                                         Productos Tech
                                     </p>
                                 </div>
@@ -417,21 +407,21 @@ export default function Welcome({
                                 href={hero.hero_secondary_url}
                                 className="group absolute top-1/3 right-6 z-20 hidden w-56 items-center gap-3 rounded-2xl border border-white/14 bg-black/40 p-4 shadow-xl backdrop-blur-xl transition hover:border-lime-400/50 hover:bg-black/60 lg:flex"
                             >
-                                <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-lime-400/15 text-lime-300 group-hover:scale-105 transition-transform">
+                                <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-lime-400/15 text-lime-300 transition-transform group-hover:scale-105">
                                     <CircuitBoard className="size-6" />
                                 </div>
                                 <div>
                                     <p className="text-[9px] font-bold tracking-widest text-white/40 uppercase">
                                         Asesoría 360°
                                     </p>
-                                    <p className="mt-0.5 text-xs font-black text-white uppercase group-hover:text-lime-400 transition-colors">
+                                    <p className="mt-0.5 text-xs font-black text-white uppercase transition-colors group-hover:text-lime-400">
                                         Servicios & Tech
                                     </p>
                                 </div>
                             </Link>
 
                             {/* Bottom Rating & Guarantee Badges */}
-                            <div className="mt-12 flex flex-col items-center justify-between gap-6 border-t border-white/10 pt-8 sm:flex-row">
+                            <div className="mt-8 flex flex-col items-center justify-between gap-5 border-t border-white/10 pt-6 sm:flex-row">
                                 <div className="flex items-center gap-3">
                                     <div className="flex gap-1 text-lime-400">
                                         {Array.from({ length: 5 }).map(
@@ -444,7 +434,10 @@ export default function Welcome({
                                         )}
                                     </div>
                                     <p className="text-xs font-semibold text-white/60">
-                                        <span className="text-white font-bold">4.9/5</span> Valoración de Clientes
+                                        <span className="font-bold text-white">
+                                            4.9/5
+                                        </span>{' '}
+                                        Valoración de Clientes
                                     </p>
                                 </div>
 
@@ -452,7 +445,8 @@ export default function Welcome({
                                     href={hero.hero_primary_url}
                                     className="inline-flex items-center gap-2 rounded-full border border-lime-400/30 bg-lime-400/10 px-6 py-2.5 text-xs font-extrabold tracking-wider text-lime-300 uppercase backdrop-blur transition hover:border-lime-400 hover:bg-lime-400 hover:text-black"
                                 >
-                                    Explorar Catálogo de Productos <ArrowRight className="size-4" />
+                                    Explorar Catálogo de Productos{' '}
+                                    <ArrowRight className="size-4" />
                                 </Link>
 
                                 <div className="flex items-center gap-2 text-xs font-semibold text-white/60">
@@ -463,63 +457,9 @@ export default function Welcome({
                         </div>
                     </section>
 
-                    <section className="border-y border-white/8 bg-white/[.025]">
-                        <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-white/8 px-5 py-7 md:grid-cols-4 lg:px-8">
-                            {[
-                                ['+10', 'Categorías tecnológicas'],
-                                ['360°', 'Asesoría integral'],
-                                ['24/7', 'Catálogo disponible'],
-                                ['100%', 'Enfoque en soluciones'],
-                            ].map(([value, label]) => (
-                                <div
-                                    key={label}
-                                    className="px-4 py-3 text-center"
-                                >
-                                    <p className="text-2xl font-black text-lime-400">
-                                        {value}
-                                    </p>
-                                    <p className="mt-1 text-xs text-white/45">
-                                        {label}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-
-                    <section
-                        id="categorias"
-                        className="mx-auto max-w-7xl px-5 py-24 lg:px-8"
-                    >
-                        <SectionHeading
-                            eyebrow="Explora por categoría"
-                            title="Todo lo que necesitas, en un solo lugar"
-                            text="Encuentra equipos y soluciones seleccionadas para cada necesidad tecnológica."
-                        />
-                        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                            {categories.map(({ name, text, icon: Icon }) => (
-                                <a
-                                    href="#productos"
-                                    key={name}
-                                    className="group rounded-3xl border border-white/9 bg-white/[.035] p-7 transition hover:-translate-y-1 hover:border-lime-400/35"
-                                >
-                                    <div className="mb-8 flex size-13 items-center justify-center rounded-2xl border border-lime-400/20 bg-lime-400/10 text-lime-400">
-                                        <Icon className="size-6" />
-                                    </div>
-                                    <h3 className="text-lg font-bold">
-                                        {name}
-                                    </h3>
-                                    <p className="mt-2 text-sm leading-6 text-white/45">
-                                        {text}
-                                    </p>
-                                    <ChevronRight className="mt-6 size-5 text-white/25 transition group-hover:translate-x-1 group-hover:text-lime-400" />
-                                </a>
-                            ))}
-                        </div>
-                    </section>
-
                     <section
                         id="productos"
-                        className="border-y border-white/8 bg-[#14211d] py-24"
+                        className="border-brand-support/15 border-y bg-black/15 py-14 sm:py-18"
                     >
                         <div className="mx-auto max-w-7xl px-5 lg:px-8">
                             <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
@@ -537,17 +477,17 @@ export default function Welcome({
                                     <ArrowRight className="size-4" />
                                 </Link>
                             </div>
-                            <div className="mt-12 grid gap-5 md:grid-cols-3">
+                            <div className="mt-8 grid gap-5 md:grid-cols-3">
                                 {featuredProducts.map((product) => (
                                     <article
                                         key={product.id}
-                                        className="group overflow-hidden rounded-3xl border border-white/10 bg-[#071008]/90 transition duration-300 hover:border-lime-400/50 hover:shadow-[0_15px_35px_rgba(0,0,0,0.6)]"
+                                        className="group border-brand-support/20 hover:border-brand-primary/70 overflow-hidden rounded-3xl border bg-black/25 transition duration-300 hover:shadow-[0_15px_35px_rgba(0,0,0,0.35)]"
                                     >
                                         <Link
                                             href={productShow(product.slug)}
                                             className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden bg-gradient-to-b from-white/5 via-lime-400/5 to-transparent p-6"
                                         >
-                                            <span className="absolute top-4 left-4 z-10 inline-flex items-center gap-1 rounded-full border border-lime-400/40 bg-[#071008]/85 px-3 py-1 text-[10px] font-extrabold tracking-wider text-lime-300 uppercase shadow-md backdrop-blur-md">
+                                            <span className="border-brand-primary/50 bg-brand-background/90 text-brand-primary absolute top-4 left-4 z-10 inline-flex items-center gap-1 rounded-full border px-3 py-1 text-[10px] font-extrabold tracking-wider uppercase shadow-md backdrop-blur-md">
                                                 {product.is_featured
                                                     ? 'Destacado'
                                                     : product.is_bestseller
@@ -574,7 +514,7 @@ export default function Welcome({
                                             </p>
                                             <Link
                                                 href={productShow(product.slug)}
-                                                className="mt-1.5 block text-base font-extrabold text-white transition-colors hover:text-lime-300 line-clamp-1"
+                                                className="mt-1.5 line-clamp-1 block text-base font-extrabold text-white transition-colors hover:text-lime-300"
                                             >
                                                 {product.name}
                                             </Link>
@@ -609,7 +549,7 @@ export default function Welcome({
                                                     />
                                                     <button
                                                         type="submit"
-                                                        className="flex size-11 items-center justify-center rounded-full bg-lime-400 text-black shadow-[0_0_15px_rgba(163,230,53,0.3)] transition hover:scale-105 hover:bg-lime-300 hover:shadow-[0_0_25px_rgba(163,230,53,0.5)] active:scale-95"
+                                                        className="flex size-11 items-center justify-center rounded-full bg-lime-400 text-black shadow-[0_0_15px_rgb(0_247_255/.35)] transition hover:scale-105 hover:bg-lime-300 hover:shadow-[0_0_25px_rgb(0_247_255/.55)] active:scale-95"
                                                         aria-label={`Agregar ${product.name} al carrito`}
                                                     >
                                                         <ShoppingCart className="size-4" />
@@ -631,14 +571,14 @@ export default function Welcome({
 
                     <section
                         id="servicios"
-                        className="mx-auto max-w-7xl px-5 py-24 lg:px-8"
+                        className="mx-auto max-w-7xl px-5 py-14 sm:py-18 lg:px-8"
                     >
                         <SectionHeading
                             eyebrow="Más que tecnología"
                             title="Soluciones que trabajan contigo"
                             text="Experiencia técnica y visión de negocio para acompañarte en cada etapa."
                         />
-                        <div className="mt-12 grid gap-4 md:grid-cols-2">
+                        <div className="mt-8 grid gap-4 md:grid-cols-2">
                             {services.map(
                                 ({ title, text, icon: Icon }, index) => (
                                     <article
@@ -667,11 +607,11 @@ export default function Welcome({
 
                     <section
                         id="software"
-                        className="border-y border-white/8 bg-gradient-to-br from-[#183024] to-[#101a17] py-24"
+                        className="border-brand-support/15 from-brand-interactive/25 to-brand-background border-y bg-gradient-to-br py-14 sm:py-18"
                     >
-                        <div className="mx-auto grid max-w-7xl items-center gap-14 px-5 lg:grid-cols-2 lg:px-8">
-                            <div className="relative min-h-[420px] overflow-hidden rounded-[2.5rem] border border-white/10 bg-black/30 p-7">
-                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(115,255,42,.16),transparent_55%)]" />
+                        <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 lg:grid-cols-2 lg:px-8">
+                            <div className="relative min-h-[360px] overflow-hidden rounded-[2.5rem] border border-white/10 bg-black/30 p-7 sm:min-h-[400px]">
+                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgb(0_247_255/.14),transparent_55%)]" />
                                 <div className="relative grid h-full grid-cols-2 gap-4">
                                     <div className="col-span-2 rounded-3xl border border-lime-400/20 bg-lime-400/8 p-6">
                                         <Bot className="size-8 text-lime-400" />
@@ -740,16 +680,16 @@ export default function Welcome({
 
                     <section
                         id="nosotros"
-                        className="mx-auto max-w-7xl px-5 py-24 lg:px-8"
+                        className="mx-auto max-w-7xl px-5 py-14 sm:py-18 lg:px-8"
                     >
                         <SectionHeading
                             eyebrow="¿Por qué JBTECHLINE?"
                             title="Tu aliado estratégico en tecnología"
                             text="No solo vendemos productos: conectamos cada desafío con la solución correcta."
                         />
-                        <div className="mt-12 grid gap-px overflow-hidden rounded-3xl border border-white/9 bg-white/9 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="mt-8 grid gap-px overflow-hidden rounded-3xl border border-white/9 bg-white/9 sm:grid-cols-2 lg:grid-cols-4">
                             {benefits.map(({ title, text, icon: Icon }) => (
-                                <div key={title} className="bg-[#070b08] p-7">
+                                <div key={title} className="bg-black/25 p-7">
                                     <Icon className="size-7 text-lime-400" />
                                     <h3 className="mt-6 font-bold">{title}</h3>
                                     <p className="mt-2 text-sm leading-6 text-white/42">
@@ -760,8 +700,11 @@ export default function Welcome({
                         </div>
                     </section>
 
-                    <section id="contacto" className="px-5 pb-24 lg:px-8">
-                        <div className="relative mx-auto max-w-7xl overflow-hidden rounded-[2.5rem] border border-lime-400/20 bg-gradient-to-r from-[#173a0d] via-[#0e260d] to-[#071008] px-7 py-14 sm:px-12 lg:flex lg:items-center lg:justify-between lg:px-16">
+                    <section
+                        id="contacto"
+                        className="px-5 pb-14 sm:pb-18 lg:px-8"
+                    >
+                        <div className="border-brand-primary/30 via-brand-background to-brand-interactive/10 relative mx-auto max-w-7xl overflow-hidden rounded-[2.5rem] border bg-gradient-to-r from-white px-7 py-10 sm:px-12 lg:flex lg:items-center lg:justify-between lg:px-16">
                             <div className="absolute -top-36 -right-28 size-96 rounded-full bg-lime-400/12 blur-3xl" />
                             <div className="relative max-w-2xl">
                                 <p className="text-xs font-extrabold tracking-[.22em] text-lime-300 uppercase">
@@ -862,10 +805,10 @@ function SectionHeading({
             <p className="text-xs font-extrabold tracking-[.24em] text-lime-400 uppercase">
                 {eyebrow}
             </p>
-            <h2 className="mt-4 text-3xl font-black tracking-tight sm:text-4xl">
+            <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
                 {title}
             </h2>
-            <p className="mt-4 leading-7 text-white/48">{text}</p>
+            <p className="mt-3 leading-7 text-white/48">{text}</p>
         </div>
     );
 }

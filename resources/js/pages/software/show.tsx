@@ -15,16 +15,16 @@ export default function SoftwareShow({
 }) {
     const isPrograms = catalogType === 'programs';
     return (
-        <div className="min-h-screen bg-[#101a17] text-white">
+        <div className="bg-brand-background min-h-screen text-white">
             <Head title={`${program.name} | Software JBTECHLINE`} />
-            <main className="mx-auto max-w-6xl px-5 pt-32 pb-20">
+            <main className="mx-auto max-w-6xl px-5 pt-24 pb-14 sm:pt-28">
                 <Link
                     href={isPrograms ? programsIndex() : software()}
                     className="text-sm text-white/45"
                 >
                     ← Volver al software
                 </Link>
-                <div className="mt-8 grid gap-10 lg:grid-cols-2">
+                <div className="mt-6 grid gap-8 sm:mt-8 lg:grid-cols-2 lg:gap-10">
                     <div className="aspect-video overflow-hidden rounded-[2rem] border border-white/10 bg-white/5">
                         {program.image_url && (
                             <img
@@ -39,7 +39,7 @@ export default function SoftwareShow({
                             {program.category} · {program.platform} · v
                             {program.version}
                         </p>
-                        <h1 className="mt-4 text-4xl font-black">
+                        <h1 className="mt-3 text-3xl font-black sm:mt-4 sm:text-4xl">
                             {program.name}
                         </h1>
                         <p className="mt-5 text-lg leading-8 text-white/55">

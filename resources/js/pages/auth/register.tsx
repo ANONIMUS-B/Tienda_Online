@@ -42,7 +42,8 @@ export default function Register({ passwordRules, teamInvitation }: Props) {
                                     htmlFor="name"
                                     className="flex items-center gap-1.5 text-xs font-bold tracking-wide text-white/80 uppercase"
                                 >
-                                    <User className="size-3.5 text-lime-400" /> Nombre Completo
+                                    <User className="size-3.5 text-lime-400" />{' '}
+                                    Nombre Completo
                                 </Label>
                                 <Input
                                     id="name"
@@ -67,7 +68,8 @@ export default function Register({ passwordRules, teamInvitation }: Props) {
                                     htmlFor="email"
                                     className="flex items-center gap-1.5 text-xs font-bold tracking-wide text-white/80 uppercase"
                                 >
-                                    <Mail className="size-3.5 text-lime-400" /> Correo Electrónico
+                                    <Mail className="size-3.5 text-lime-400" />{' '}
+                                    Correo Electrónico
                                 </Label>
                                 <Input
                                     id="email"
@@ -79,7 +81,10 @@ export default function Register({ passwordRules, teamInvitation }: Props) {
                                     placeholder="tu@correo.com"
                                     className="h-11 rounded-xl border-white/14 bg-white/5 px-4 text-sm text-white placeholder:text-white/35 focus:border-lime-400/80 focus:bg-black/40 focus:ring-2 focus:ring-lime-400/30"
                                 />
-                                <InputError message={errors.email} className="mt-1 text-xs text-red-400" />
+                                <InputError
+                                    message={errors.email}
+                                    className="mt-1 text-xs text-red-400"
+                                />
                             </div>
 
                             {/* Password */}
@@ -88,7 +93,8 @@ export default function Register({ passwordRules, teamInvitation }: Props) {
                                     htmlFor="password"
                                     className="flex items-center gap-1.5 text-xs font-bold tracking-wide text-white/80 uppercase"
                                 >
-                                    <Lock className="size-3.5 text-lime-400" /> Contraseña
+                                    <Lock className="size-3.5 text-lime-400" />{' '}
+                                    Contraseña
                                 </Label>
                                 <PasswordInput
                                     id="password"
@@ -100,7 +106,10 @@ export default function Register({ passwordRules, teamInvitation }: Props) {
                                     passwordrules={passwordRules}
                                     className="h-11 rounded-xl border-white/14 bg-white/5 px-4 text-sm text-white placeholder:text-white/35 focus:border-lime-400/80 focus:bg-black/40 focus:ring-2 focus:ring-lime-400/30"
                                 />
-                                <InputError message={errors.password} className="mt-1 text-xs text-red-400" />
+                                <InputError
+                                    message={errors.password}
+                                    className="mt-1 text-xs text-red-400"
+                                />
                             </div>
 
                             {/* Confirm Password */}
@@ -109,7 +118,8 @@ export default function Register({ passwordRules, teamInvitation }: Props) {
                                     htmlFor="password_confirmation"
                                     className="flex items-center gap-1.5 text-xs font-bold tracking-wide text-white/80 uppercase"
                                 >
-                                    <ShieldCheck className="size-3.5 text-lime-400" /> Confirmar Contraseña
+                                    <ShieldCheck className="size-3.5 text-lime-400" />{' '}
+                                    Confirmar Contraseña
                                 </Label>
                                 <PasswordInput
                                     id="password_confirmation"
@@ -130,7 +140,7 @@ export default function Register({ passwordRules, teamInvitation }: Props) {
                             {/* Submit Button */}
                             <Button
                                 type="submit"
-                                className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-lime-400 text-sm font-extrabold text-black shadow-[0_0_25px_rgba(163,230,53,0.3)] transition-all hover:scale-[1.01] hover:bg-lime-300 hover:shadow-[0_0_35px_rgba(163,230,53,0.5)] active:scale-[0.99] disabled:opacity-50"
+                                className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-lime-400 text-sm font-extrabold text-black shadow-[0_0_25px_rgb(0_247_255/.35)] transition-all hover:scale-[1.01] hover:bg-lime-300 hover:shadow-[0_0_35px_rgb(0_247_255/.55)] active:scale-[0.99] disabled:opacity-50"
                                 tabIndex={5}
                                 data-test="register-user-button"
                             >
@@ -138,7 +148,8 @@ export default function Register({ passwordRules, teamInvitation }: Props) {
                                     <Spinner className="size-5 text-black" />
                                 ) : (
                                     <>
-                                        <UserPlus className="size-4" /> Registrar mi cuenta
+                                        <UserPlus className="size-4" />{' '}
+                                        Registrar mi cuenta
                                     </>
                                 )}
                             </Button>
@@ -174,5 +185,6 @@ export default function Register({ passwordRules, teamInvitation }: Props) {
 
 Register.layout = {
     title: 'Crea tu cuenta de cliente',
-    description: 'Únete para hacer pedidos, descargar software y gestionar tu soporte',
+    description:
+        'Únete para hacer pedidos, descargar software y gestionar tu soporte',
 };
