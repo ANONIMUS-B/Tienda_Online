@@ -3,13 +3,10 @@ import {
     ArrowRight,
     ChevronDown,
     ChevronRight,
-    Cpu,
-    Laptop,
     LogOut,
     Menu,
-    Printer,
+    Package,
     ShoppingCart,
-    Smartphone,
     X,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -38,40 +35,22 @@ const navigation = [
     ['Contacto', contact],
 ] as const;
 
-const categoryGroups = [
-    {
-        name: 'Laptops y PCs',
-        slug: 'laptops-y-pcs',
-        icon: Laptop,
-        items: ['Laptops', 'Computadoras', 'Equipos empresariales'],
-    },
-    {
-        name: 'Componentes',
-        slug: 'componentes',
-        icon: Cpu,
-        items: [
-            'Procesadores',
-            'Tarjetas de video',
-            'Memorias y almacenamiento',
-        ],
-    },
-    {
-        name: 'Impresión',
-        slug: 'impresion',
-        icon: Printer,
-        items: ['Impresoras', 'Tóner y tintas', 'Suministros'],
-    },
-    {
-        name: 'Smartphones',
-        slug: 'smartphones',
-        icon: Smartphone,
-        items: ['Celulares', 'Accesorios', 'Carga y conectividad'],
-    },
-] as const;
+type CatalogCategory = {
+    id: number;
+    name: string;
+    slug: string;
+    image_path: string | null;
+    children: Array<{ id: number; name: string; slug: string }>;
+};
 
 export default function PublicHeader() {
     const page = usePage();
-    const { auth, currentTeam, cartCount = 0 } = page.props as any;
+    const {
+        auth,
+        currentTeam,
+        cartCount = 0,
+        catalogCategories = [],
+    } = page.props as any;
     const [open, setOpen] = useState(false);
     const [categoriesOpen, setCategoriesOpen] = useState(false);
     const [authModal, setAuthModal] = useState<AuthModalMode | null>(null);
@@ -331,10 +310,10 @@ export default function PublicHeader() {
                             </button>
                         </div>
                         <div className="grid gap-px bg-white/8 sm:grid-cols-2 xl:grid-cols-4">
-                            {categoryGroups.map(
-                                ({ name, slug, icon: Icon, items }) => (
+                            {(catalogCategories as CatalogCategory[]).map(
+                                ({ id, name, slug, image_path, children }) => (
                                     <section
-                                        key={slug}
+                                        key={id}
                                         className="bg-brand-background p-5 sm:p-6"
                                     >
                                         <Link
@@ -345,8 +324,16 @@ export default function PublicHeader() {
                                             }}
                                             className="group flex items-center gap-3"
                                         >
-                                            <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-lime-400/10 text-lime-400 transition group-hover:bg-lime-400 group-hover:text-black">
-                                                <Icon className="size-5" />
+                                            <span className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-lime-400/10 text-lime-400 transition group-hover:bg-lime-400 group-hover:text-black">
+                                                {image_path ? (
+                                                    <img
+                                                        src={image_path}
+                                                        alt=""
+                                                        className="size-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <Package className="size-5" />
+                                                )}
                                             </span>
                                             <span className="font-extrabold group-hover:text-lime-400">
                                                 {name}
@@ -354,10 +341,10 @@ export default function PublicHeader() {
                                             <ChevronRight className="ml-auto size-4 text-white/25 transition group-hover:translate-x-1 group-hover:text-lime-400" />
                                         </Link>
                                         <div className="mt-5 grid gap-1">
-                                            {items.map((item) => (
+                                            {children.map((child) => (
                                                 <Link
-                                                    key={item}
-                                                    href={`${products().url}?q=${encodeURIComponent(item)}`}
+                                                    key={child.id}
+                                                    href={`${products().url}?category=${child.slug}`}
                                                     onClick={() => {
                                                         setCategoriesOpen(
                                                             false,
@@ -366,9 +353,23 @@ export default function PublicHeader() {
                                                     }}
                                                     className="rounded-lg px-3 py-2 text-sm text-white/50 transition hover:bg-white/5 hover:text-white"
                                                 >
-                                                    {item}
+                                                    {child.name}
                                                 </Link>
                                             ))}
+                                            {children.length === 0 && (
+                                                <Link
+                                                    href={`${products().url}?category=${slug}`}
+                                                    onClick={() => {
+                                                        setCategoriesOpen(
+                                                            false,
+                                                        );
+                                                        setOpen(false);
+                                                    }}
+                                                    className="rounded-lg px-3 py-2 text-sm text-white/50 transition hover:bg-white/5 hover:text-white"
+                                                >
+                                                    Ver productos
+                                                </Link>
+                                            )}
                                         </div>
                                     </section>
                                 ),

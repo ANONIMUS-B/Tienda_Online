@@ -67,7 +67,9 @@ export default function CartDrawer() {
                 msg.includes('agregado') ||
                 msg.includes('añadido')
             ) {
-                setIsOpen(true);
+                const openTimer = window.setTimeout(() => setIsOpen(true), 180);
+
+                return () => window.clearTimeout(openTimer);
             }
         }
     }, [flash]);

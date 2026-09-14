@@ -2,8 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Category;
 use App\Services\ShoppingCart;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Middleware;
 
@@ -50,6 +52,18 @@ class HandleInertiaRequests extends Middleware
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'cartCount' => fn () => array_sum(app(ShoppingCart::class)->quantities()),
+            'catalogCategories' => fn () => Cache::remember(
+                'public.navigation.categories',
+                now()->addMinute(),
+                fn (): array => Category::query()
+                    ->active()
+                    ->whereNull('parent_id')
+                    ->with(['children' => fn ($query) => $query->active()])
+                    ->orderBy('sort_order')
+                    ->orderBy('name')
+                    ->get(['id', 'parent_id', 'name', 'slug', 'image_path'])
+                    ->toArray(),
+            ),
             'cart' => function () {
                 $items = app(ShoppingCart::class)->items();
 

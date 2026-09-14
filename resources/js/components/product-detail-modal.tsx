@@ -193,7 +193,11 @@ export default function ProductDetailModal({
                         )}
 
                         <div className="mt-7 grid gap-3 sm:grid-cols-2">
-                            <Form {...addToCart.form()} className="contents">
+                            <Form
+                                {...addToCart.form()}
+                                className="contents"
+                                onSuccess={onClose}
+                            >
                                 <input
                                     type="hidden"
                                     name="product_id"

@@ -5,6 +5,7 @@ use App\Models\Category;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('administrators can create principal categories', function () {
@@ -86,10 +87,15 @@ test('administrators can update and remove categories', function () {
 });
 
 test('public catalog only displays active categories and active children', function () {
-    $visible = Category::factory()->create(['name' => 'Cómputo', 'sort_order' => 1]);
+    $visible = Category::factory()->create([
+        'name' => 'Cómputo',
+        'image_path' => '/images/categories/computo.webp',
+        'sort_order' => 1,
+    ]);
     Category::factory()->for($visible, 'parent')->create(['name' => 'Laptops']);
     Category::factory()->for($visible, 'parent')->inactive()->create(['name' => 'Oculta']);
     Category::factory()->inactive()->create(['name' => 'No publicada']);
+    Cache::forget('public.navigation.categories');
 
     $this->get(route('categories'))
         ->assertOk()
@@ -98,7 +104,11 @@ test('public catalog only displays active categories and active children', funct
             ->has('categories', 1)
             ->where('categories.0.name', 'Cómputo')
             ->has('categories.0.children', 1)
-            ->where('categories.0.children.0.name', 'Laptops'),
+            ->where('categories.0.children.0.name', 'Laptops')
+            ->has('catalogCategories', 1)
+            ->where('catalogCategories.0.name', 'Cómputo')
+            ->where('catalogCategories.0.image_path', '/images/categories/computo.webp')
+            ->has('catalogCategories.0.children', 1),
         );
 });
 
