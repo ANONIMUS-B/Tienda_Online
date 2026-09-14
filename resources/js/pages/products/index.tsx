@@ -1,12 +1,13 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { Filter, Search, ShoppingCart } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import ProductDetailModal from '@/components/product-detail-modal';
 import {
     brands as brandsPage,
     categories as categoriesPage,
     home,
     products,
 } from '@/routes';
-import { show } from '@/routes/products';
 import type { Product } from '@/types/product';
 type Paginator = {
     data: Product[];
@@ -26,6 +27,41 @@ export default function ProductCatalog({
 }) {
     const categoryOptions = Array.isArray(categories) ? categories : [];
     const brandOptions = Array.isArray(brands) ? brands : [];
+    const [searchQuery, setSearchQuery] = useState(filters.q ?? '');
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(
+        null,
+    );
+    const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(
+        () => () => {
+            if (searchTimer.current) {
+                clearTimeout(searchTimer.current);
+            }
+        },
+        [],
+    );
+
+    function searchAsYouType(value: string) {
+        setSearchQuery(value);
+
+        if (searchTimer.current) {
+            clearTimeout(searchTimer.current);
+        }
+
+        searchTimer.current = setTimeout(() => {
+            router.get(
+                products().url,
+                { ...filters, q: value || undefined },
+                {
+                    only: ['products', 'filters'],
+                    preserveScroll: true,
+                    preserveState: true,
+                    replace: true,
+                },
+            );
+        }, 250);
+    }
 
     return (
         <>
@@ -62,13 +98,16 @@ export default function ProductCatalog({
                     <form
                         action={products().url}
                         method="get"
-                        className="mt-7 grid gap-3 rounded-3xl border border-white/10 bg-white/[.04] p-4 md:grid-cols-[1fr_220px_220px_auto]"
+                        className="sticky top-20 z-30 mt-7 grid grid-cols-2 gap-3 rounded-3xl border border-cyan-200 bg-white/95 p-4 shadow-lg shadow-cyan-950/8 backdrop-blur-xl lg:grid-cols-[minmax(240px,1fr)_170px_170px_125px_125px_auto]"
                     >
-                        <div className="relative">
+                        <div className="relative col-span-2 lg:col-span-1">
                             <Search className="absolute top-3.5 left-4 size-4 text-white/35" />
                             <input
                                 name="q"
-                                defaultValue={filters.q}
+                                value={searchQuery}
+                                onChange={(event) =>
+                                    searchAsYouType(event.target.value)
+                                }
                                 placeholder="Buscar producto o SKU"
                                 className="h-11 w-full rounded-xl border border-white/10 bg-black/30 pr-4 pl-11"
                             />
@@ -97,18 +136,46 @@ export default function ProductCatalog({
                                 </option>
                             ))}
                         </select>
-                        <button className="flex h-11 items-center justify-center gap-2 rounded-xl bg-lime-400 px-6 font-bold text-black">
+                        <label className="sr-only" htmlFor="min_price">
+                            Precio mínimo
+                        </label>
+                        <input
+                            id="min_price"
+                            type="number"
+                            name="min_price"
+                            min="0"
+                            step="0.01"
+                            defaultValue={filters.min_price}
+                            placeholder="Precio mín."
+                            className="h-11 rounded-xl border border-cyan-200 bg-white px-4 text-slate-800 placeholder:text-slate-400"
+                        />
+                        <label className="sr-only" htmlFor="max_price">
+                            Precio máximo
+                        </label>
+                        <input
+                            id="max_price"
+                            type="number"
+                            name="max_price"
+                            min="0"
+                            step="0.01"
+                            defaultValue={filters.max_price}
+                            placeholder="Precio máx."
+                            className="h-11 rounded-xl border border-cyan-200 bg-white px-4 text-slate-800 placeholder:text-slate-400"
+                        />
+                        <button className="col-span-2 flex h-11 items-center justify-center gap-2 rounded-xl bg-lime-400 px-6 font-bold text-black lg:col-span-1">
                             <Filter className="size-4" />
                             Filtrar
                         </button>
                     </form>
                     <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         {result.data.map((product) => (
-                            <article
+                            <button
+                                type="button"
                                 key={product.id}
+                                onClick={() => setSelectedProduct(product)}
                                 className="group border-brand-support/20 hover:border-brand-primary/70 overflow-hidden rounded-3xl border bg-black/25 transition duration-300 hover:shadow-[0_15px_35px_rgba(0,0,0,0.35)]"
                             >
-                                <Link href={show(product.slug)}>
+                                <div className="text-left">
                                     <div className="relative flex aspect-square items-center justify-center overflow-hidden bg-gradient-to-b from-white/5 via-lime-400/5 to-transparent p-6">
                                         {product.images[0] ? (
                                             <img
@@ -153,8 +220,8 @@ export default function ProductCatalog({
                                             </span>
                                         </div>
                                     </div>
-                                </Link>
-                            </article>
+                                </div>
+                            </button>
                         ))}
                         {result.data.length === 0 && (
                             <p className="col-span-full rounded-3xl border border-white/10 p-14 text-center text-white/45">
@@ -178,6 +245,10 @@ export default function ProductCatalog({
                     </div>
                 </main>
             </div>
+            <ProductDetailModal
+                product={selectedProduct}
+                onClose={() => setSelectedProduct(null)}
+            />
         </>
     );
 }

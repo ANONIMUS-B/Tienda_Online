@@ -3,9 +3,11 @@
 use App\Enums\TeamRole;
 use App\Models\HomepageSetting;
 use App\Models\Product;
+use App\Models\SoftwareProgram;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('homepage renders the configured 3d hero content', function () {
@@ -32,6 +34,25 @@ test('homepage displays available products with the highlighted products first',
             ->has('featuredProducts', 1)
             ->where('featuredProducts.0.id', $featured->id)
             ->where('heroProduct.id', $featured->id),
+        );
+});
+
+test('homepage displays only active public programs', function () {
+    $availableProgram = SoftwareProgram::factory()->create([
+        'name' => 'Programa disponible',
+        'is_active' => true,
+        'is_own' => false,
+    ]);
+    SoftwareProgram::factory()->create(['is_active' => false, 'is_own' => false]);
+    SoftwareProgram::factory()->create(['is_active' => true, 'is_own' => true]);
+    Cache::forget('public.home.programs');
+
+    $this->get(route('home'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('welcome')
+            ->has('programs', 1)
+            ->where('programs.0.id', $availableProgram->id)
+            ->where('programs.0.name', 'Programa disponible'),
         );
 });
 

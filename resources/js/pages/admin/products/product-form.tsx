@@ -27,6 +27,7 @@ export default function ProductForm({
               .map(([key, value]) => `${key}: ${value}`)
               .join('\n')
         : '';
+    const benefits = product?.benefits?.join('\n') ?? '';
     return (
         <Form
             {...form}
@@ -111,6 +112,32 @@ export default function ProductForm({
                         value={specifications}
                         error={errors.specifications_text}
                     />
+                    <TextArea
+                        label="Beneficios (uno por línea)"
+                        name="benefits_text"
+                        value={benefits}
+                        error={errors.benefits_text}
+                    />
+                    <div className="grid gap-5 md:grid-cols-3">
+                        <Field
+                            label="Garantía"
+                            name="warranty_info"
+                            value={product?.warranty_info ?? ''}
+                            error={errors.warranty_info}
+                        />
+                        <Field
+                            label="Envío"
+                            name="shipping_info"
+                            value={product?.shipping_info ?? ''}
+                            error={errors.shipping_info}
+                        />
+                        <Field
+                            label="Métodos de pago"
+                            name="payment_info"
+                            value={product?.payment_info ?? ''}
+                            error={errors.payment_info}
+                        />
+                    </div>
                     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                         <Field
                             label="Precio"

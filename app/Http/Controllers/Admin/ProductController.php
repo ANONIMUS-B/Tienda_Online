@@ -123,6 +123,7 @@ class ProductController extends Controller
     private function attributes(array $data): array
     {
         $text = (string) Arr::pull($data, 'specifications_text', '');
+        $benefitsText = (string) Arr::pull($data, 'benefits_text', '');
         $data['slug'] = Str::slug((string) $data['slug']);
         $specifications = [];
 
@@ -135,6 +136,11 @@ class ProductController extends Controller
         }
 
         $data['specifications'] = $specifications;
+        $data['benefits'] = collect(preg_split('/\R/', $benefitsText) ?: [])
+            ->map(fn (string $benefit): string => trim($benefit))
+            ->filter()
+            ->values()
+            ->all();
 
         return $data;
     }

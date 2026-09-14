@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['category_id', 'brand_id', 'type', 'sku', 'name', 'slug', 'short_description', 'description', 'specifications', 'price', 'promotional_price', 'stock', 'minimum_stock', 'is_featured', 'is_bestseller', 'is_new', 'is_active'])]
+#[Fillable(['category_id', 'brand_id', 'type', 'sku', 'name', 'slug', 'short_description', 'description', 'specifications', 'benefits', 'warranty_info', 'shipping_info', 'payment_info', 'price', 'promotional_price', 'stock', 'minimum_stock', 'is_featured', 'is_bestseller', 'is_new', 'is_active'])]
 class Product extends Model
 {
     /** @use HasFactory<ProductFactory> */
@@ -60,6 +60,6 @@ class Product extends Model
     /** @return array<string, string> */
     protected function casts(): array
     {
-        return ['specifications' => 'array', 'price' => 'decimal:2', 'promotional_price' => 'decimal:2', 'stock' => 'integer', 'minimum_stock' => 'integer', 'is_featured' => 'boolean', 'is_bestseller' => 'boolean', 'is_new' => 'boolean', 'is_active' => 'boolean'];
+        return ['specifications' => 'array', 'benefits' => 'array', 'price' => 'decimal:2', 'promotional_price' => 'decimal:2', 'stock' => 'integer', 'minimum_stock' => 'integer', 'is_featured' => 'boolean', 'is_bestseller' => 'boolean', 'is_new' => 'boolean', 'is_active' => 'boolean'];
     }
 }

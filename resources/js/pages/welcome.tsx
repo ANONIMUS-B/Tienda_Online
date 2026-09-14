@@ -5,7 +5,6 @@ import {
     Check,
     CircuitBoard,
     Code2,
-    Headphones,
     Laptop,
     LogOut,
     Menu,
@@ -13,10 +12,7 @@ import {
     PackageCheck,
     ShieldCheck,
     ShoppingCart,
-    Smartphone,
-    Star,
     Store,
-    Wrench,
     X,
     Zap,
 } from 'lucide-react';
@@ -37,10 +33,11 @@ import {
     software as softwarePage,
 } from '@/routes';
 import { index as cart } from '@/routes/cart';
-import { index as programs } from '@/routes/programs';
+import { index as programs, show as programShow } from '@/routes/programs';
 import { store as addToCart } from '@/routes/cart';
 import { show as productShow } from '@/routes/products';
 import type { Product } from '@/types/product';
+import type { SoftwareProgram } from '@/types/software';
 
 const navigation = [
     { label: 'Servicios', route: servicesPage },
@@ -48,29 +45,6 @@ const navigation = [
     { label: 'Programas', route: programs },
     { label: 'Apps', route: apps },
     { label: 'Contacto', route: contact },
-];
-
-const services = [
-    {
-        title: 'Soporte técnico',
-        text: 'Diagnóstico y solución profesional para tus equipos.',
-        icon: Headphones,
-    },
-    {
-        title: 'Mantenimiento',
-        text: 'Prevención, limpieza y optimización de PC, laptops e impresoras.',
-        icon: Wrench,
-    },
-    {
-        title: 'Software empresarial',
-        text: 'Ventas, inventarios, POS y soluciones para cada negocio.',
-        icon: Code2,
-    },
-    {
-        title: 'Desarrollo de apps',
-        text: 'Aplicaciones web y móviles creadas para tus objetivos.',
-        icon: Smartphone,
-    },
 ];
 
 const benefits = [
@@ -100,10 +74,12 @@ export default function Welcome({
     hero,
     featuredProducts,
     heroProduct,
+    programs: availablePrograms,
 }: {
     hero: HeroContent;
     featuredProducts: Product[];
     heroProduct: Product | null;
+    programs: SoftwareProgram[];
 }) {
     const { auth, currentTeam } = usePage().props;
     const [menuOpen, setMenuOpen] = useState(false);
@@ -419,41 +395,6 @@ export default function Welcome({
                                     </p>
                                 </div>
                             </Link>
-
-                            {/* Bottom Rating & Guarantee Badges */}
-                            <div className="mt-8 flex flex-col items-center justify-between gap-5 border-t border-white/10 pt-6 sm:flex-row">
-                                <div className="flex items-center gap-3">
-                                    <div className="flex gap-1 text-lime-400">
-                                        {Array.from({ length: 5 }).map(
-                                            (_, index) => (
-                                                <Star
-                                                    key={index}
-                                                    className="size-3.5 fill-current"
-                                                />
-                                            ),
-                                        )}
-                                    </div>
-                                    <p className="text-xs font-semibold text-white/60">
-                                        <span className="font-bold text-white">
-                                            4.9/5
-                                        </span>{' '}
-                                        Valoración de Clientes
-                                    </p>
-                                </div>
-
-                                <Link
-                                    href={hero.hero_primary_url}
-                                    className="inline-flex items-center gap-2 rounded-full border border-lime-400/30 bg-lime-400/10 px-6 py-2.5 text-xs font-extrabold tracking-wider text-lime-300 uppercase backdrop-blur transition hover:border-lime-400 hover:bg-lime-400 hover:text-black"
-                                >
-                                    Explorar Catálogo de Productos{' '}
-                                    <ArrowRight className="size-4" />
-                                </Link>
-
-                                <div className="flex items-center gap-2 text-xs font-semibold text-white/60">
-                                    <ShieldCheck className="size-4 text-lime-400" />
-                                    <span>Garantía Oficial JBTECHLINE</span>
-                                </div>
-                            </div>
                         </div>
                     </section>
 
@@ -464,9 +405,8 @@ export default function Welcome({
                         <div className="mx-auto max-w-7xl px-5 lg:px-8">
                             <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
                                 <SectionHeading
-                                    eyebrow="Selección destacada"
-                                    title="Tecnología recomendada para ti"
-                                    text="Productos disponibles seleccionados para ti."
+                                    eyebrow="Destacados"
+                                    title="Productos recomendados"
                                     align="left"
                                 />
                                 <Link
@@ -570,38 +510,61 @@ export default function Welcome({
                     </section>
 
                     <section
-                        id="servicios"
+                        id="programas"
                         className="mx-auto max-w-7xl px-5 py-14 sm:py-18 lg:px-8"
                     >
                         <SectionHeading
-                            eyebrow="Más que tecnología"
-                            title="Soluciones que trabajan contigo"
-                            text="Experiencia técnica y visión de negocio para acompañarte en cada etapa."
+                            eyebrow="Programas"
+                            title="Descargas disponibles"
                         />
-                        <div className="mt-8 grid gap-4 md:grid-cols-2">
-                            {services.map(
-                                ({ title, text, icon: Icon }, index) => (
-                                    <article
-                                        key={title}
-                                        className="flex gap-5 rounded-3xl border border-white/9 bg-white/[.03] p-7 hover:border-lime-400/30"
-                                    >
-                                        <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-lime-300 to-emerald-600 text-black">
-                                            <Icon className="size-6" />
-                                        </div>
-                                        <div>
-                                            <p className="text-xs font-bold text-lime-400/60">
-                                                0{index + 1}
-                                            </p>
-                                            <h3 className="mt-1 text-xl font-bold">
-                                                {title}
-                                            </h3>
-                                            <p className="mt-2 leading-6 text-white/45">
-                                                {text}
-                                            </p>
-                                        </div>
-                                    </article>
-                                ),
+                        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                            {availablePrograms.map((program) => (
+                                <Link
+                                    key={program.id}
+                                    href={programShow(program.slug)}
+                                    className="group overflow-hidden rounded-3xl border border-white/9 bg-white/[.03] transition hover:border-lime-400/40"
+                                >
+                                    <div className="aspect-video bg-cyan-50">
+                                        {program.image_url ? (
+                                            <img
+                                                src={program.image_url}
+                                                alt={program.name}
+                                                className="size-full object-cover transition group-hover:scale-105"
+                                            />
+                                        ) : (
+                                            <div className="flex size-full items-center justify-center">
+                                                <Code2 className="size-12 text-cyan-400" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="p-5">
+                                        <p className="text-xs font-bold text-lime-400">
+                                            {[
+                                                program.category,
+                                                program.platform,
+                                            ]
+                                                .filter(Boolean)
+                                                .join(' · ')}
+                                        </p>
+                                        <h3 className="mt-2 line-clamp-1 text-lg font-black">
+                                            {program.name}
+                                        </h3>
+                                    </div>
+                                </Link>
+                            ))}
+                            {availablePrograms.length === 0 && (
+                                <p className="col-span-full py-8 text-center text-sm text-white/50">
+                                    Próximamente nuevos programas.
+                                </p>
                             )}
+                        </div>
+                        <div className="mt-6 text-center">
+                            <Link
+                                href={programs()}
+                                className="inline-flex items-center gap-2 font-bold text-lime-400"
+                            >
+                                Ver programas <ArrowRight className="size-4" />
+                            </Link>
                         </div>
                     </section>
 
@@ -791,7 +754,7 @@ function SectionHeading({
 }: {
     eyebrow: string;
     title: string;
-    text: string;
+    text?: string;
     align?: 'left' | 'center';
 }) {
     return (
@@ -808,7 +771,7 @@ function SectionHeading({
             <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
                 {title}
             </h2>
-            <p className="mt-3 leading-7 text-white/48">{text}</p>
+            {text && <p className="mt-3 leading-7 text-white/48">{text}</p>}
         </div>
     );
 }

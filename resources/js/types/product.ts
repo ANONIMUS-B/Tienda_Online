@@ -15,6 +15,10 @@ export type Product = {
     short_description: string | null;
     description: string | null;
     specifications: Record<string, string> | null;
+    benefits: string[] | null;
+    warranty_info: string | null;
+    shipping_info: string | null;
+    payment_info: string | null;
     price: string;
     promotional_price: string | null;
     stock: number;
