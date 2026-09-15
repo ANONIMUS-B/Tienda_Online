@@ -596,7 +596,7 @@ export default function PublicSection({
                         title: brand.name,
                         description:
                             brand.description ??
-                            'TecnologÃ­a confiable disponible con asesorÃ­a especializada.',
+                            'Tecnología confiable disponible con asesoría especializada.',
                         icon: Store,
                         label: 'Marca oficial',
                         imagePath: brand.logo_path,

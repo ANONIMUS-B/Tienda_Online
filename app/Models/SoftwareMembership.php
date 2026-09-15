@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['user_id', 'approved_by', 'plan', 'amount', 'payment_method', 'payment_reference', 'status', 'starts_at', 'expires_at'])]
 class SoftwareMembership extends Model
@@ -24,6 +25,12 @@ class SoftwareMembership extends Model
     public function approver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    /** @return HasMany<ElectronicDocument, $this> */
+    public function electronicDocuments(): HasMany
+    {
+        return $this->hasMany(ElectronicDocument::class);
     }
 
     /** @return array<string, string> */

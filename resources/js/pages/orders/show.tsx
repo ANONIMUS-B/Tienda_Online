@@ -3,6 +3,12 @@ import { CheckCircle2 } from 'lucide-react';
 import { products } from '@/routes';
 import type { Order } from '@/types/order';
 export default function OrderShow({ order }: { order: Order }) {
+    const paymentLabels: Record<string, string> = {
+        pending: 'pendiente de verificación',
+        paid: 'pagado',
+        failed: 'fallido',
+        refunded: 'reembolsado',
+    };
     return (
         <div className="bg-brand-background min-h-screen text-white">
             <Head title={`Pedido ${order.number}`} />
@@ -38,13 +44,24 @@ export default function OrderShow({ order }: { order: Order }) {
                         <span>S/ {order.total}</span>
                     </div>
                     <p className="mt-3 text-sm text-amber-300">
-                        Pago: pendiente de verificación.
+                        Pago:{' '}
+                        {paymentLabels[order.payment_status] ??
+                            order.payment_status}
+                        .
                     </p>
-                    {order.receipt_url && ['issued', 'sent'].includes(order.receipt_status) && (
-                        <a href={order.receipt_url} target="_blank" rel="noreferrer" className="mt-5 inline-flex rounded-full border border-cyan-300 px-7 py-3 font-bold text-cyan-200">
-                            Ver comprobante {order.receipt_type}
-                        </a>
-                    )}
+                    {order.receipt_url &&
+                        ['issued', 'accepted', 'sent'].includes(
+                            order.receipt_status,
+                        ) && (
+                            <a
+                                href={order.receipt_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="mt-5 inline-flex rounded-full border border-cyan-300 px-7 py-3 font-bold text-cyan-200"
+                            >
+                                Ver comprobante {order.receipt_type}
+                            </a>
+                        )}
                     <Link
                         href={products()}
                         className="mt-8 inline-flex rounded-full bg-lime-400 px-7 py-3 font-bold text-black"

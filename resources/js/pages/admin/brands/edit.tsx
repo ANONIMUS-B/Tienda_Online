@@ -2,6 +2,7 @@ import { Head } from '@inertiajs/react';
 import BrandForm from './brand-form';
 import { edit, index } from '@/routes/admin/brands';
 import type { BrandSummary } from '@/types/brand';
+import AdminFormModal from '@/components/admin/admin-form-modal';
 
 export default function EditBrand({
     currentTeam,
@@ -13,7 +14,7 @@ export default function EditBrand({
     return (
         <>
             <Head title={`Editar ${brand.name}`} />
-            <div className="flex flex-col gap-6 p-4 md:p-8">
+            <AdminFormModal title="Editar marca" backHref={index(currentTeam.slug).url}>
                 <div>
                     <h1 className="text-2xl font-semibold">Editar marca</h1>
                     <p className="text-muted-foreground mt-1 text-sm">
@@ -22,7 +23,7 @@ export default function EditBrand({
                     </p>
                 </div>
                 <BrandForm currentTeam={currentTeam} brand={brand} />
-            </div>
+            </AdminFormModal>
         </>
     );
 }

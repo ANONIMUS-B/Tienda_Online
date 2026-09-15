@@ -76,6 +76,9 @@ class HandleInertiaRequests extends Middleware
                     ->orderBy('expires_at')
                     ->first(['id', 'plan', 'expires_at'])
                 : null,
+            'accountNotifications' => fn () => $user?->role->value === 'user'
+                ? ['unread' => $user->unreadNotifications()->count(), 'latest' => $user->notifications()->limit(5)->get()]
+                : ['unread' => 0, 'latest' => []],
             'catalogCategories' => fn () => Cache::remember(
                 'public.navigation.categories',
                 now()->addMinute(),
@@ -123,6 +126,7 @@ class HandleInertiaRequests extends Middleware
                 'toast' => fn () => $request->session()->has('success')
                     ? ['type' => 'success', 'message' => $request->session()->get('success')]
                     : null,
+                'whatsappUrl' => fn () => $request->session()->get('whatsapp_url'),
             ],
         ];
     }

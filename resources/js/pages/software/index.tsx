@@ -153,11 +153,9 @@ export default function SoftwareIndex({
                                     <b>
                                         {program.license_type === 'free'
                                             ? 'Gratis'
-                                            : program.price
-                                              ? `S/ ${program.price}`
-                                              : isPrograms
-                                                ? 'Licencia requerida'
-                                                : 'Cotizar'}
+                                            : isPrograms
+                                              ? 'Incluido con membresía'
+                                              : 'Cotizar'}
                                     </b>
                                     <Download className="size-5 text-lime-400" />
                                 </div>

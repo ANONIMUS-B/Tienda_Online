@@ -3,6 +3,20 @@ import { ArrowLeft, Mail } from 'lucide-react';
 import { index } from '@/routes/admin/customers';
 import { show as orderShow } from '@/routes/admin/orders';
 import type { Order } from '@/types/order';
+const orderStatuses: Record<string, string> = {
+    pending: 'Pendiente',
+    confirmed: 'Confirmado',
+    preparing: 'En preparación',
+    shipped: 'Enviado',
+    delivered: 'Entregado',
+    cancelled: 'Cancelado',
+};
+const paymentStatuses: Record<string, string> = {
+    pending: 'Pago pendiente',
+    paid: 'Pagado',
+    failed: 'Pago fallido',
+    refunded: 'Reembolsado',
+};
 export default function Customer({
     customer,
     orders,
@@ -15,7 +29,7 @@ export default function Customer({
     return (
         <>
             <Head title={customer.name} />
-            <div className="flex max-w-5xl flex-col gap-6 p-4 md:p-8">
+            <div className="flex w-full flex-col gap-6 p-4 md:p-8">
                 <Link
                     href={index(currentTeam.slug)}
                     className="text-muted-foreground inline-flex items-center gap-2 text-sm"
@@ -57,7 +71,9 @@ export default function Customer({
                                 <span>
                                     <b>{o.number}</b>
                                     <small className="text-muted-foreground block">
-                                        {o.status} · {o.payment_status}
+                                        {orderStatuses[o.status] ?? o.status} ·{' '}
+                                        {paymentStatuses[o.payment_status] ??
+                                            o.payment_status}
                                     </small>
                                 </span>
                                 <strong>S/ {o.total}</strong>

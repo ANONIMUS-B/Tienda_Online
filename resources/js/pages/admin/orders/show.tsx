@@ -1,44 +1,64 @@
-import { Form, Head, Link } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
+import { Form, Head, usePage } from '@inertiajs/react';
+import {
+    Download,
+    FileCheck2,
+    Mail,
+    MessageCircle,
+    Send,
+    X,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import AdminFormModal from '@/components/admin/admin-form-modal';
 import { Button } from '@/components/ui/button';
 import { index, update } from '@/routes/admin/orders';
 import type { Order } from '@/types/order';
+const receiptStatuses: Record<string, string> = {
+    pending: 'Pendiente',
+    issued: 'Emitido',
+    accepted: 'Aceptado',
+    sent: 'Enviado',
+    rejected: 'Rechazado',
+};
+
 export default function OrderDetail({
     order,
     currentTeam,
-    customerOrderUrl,
 }: {
     order: Order;
     currentTeam: { slug: string };
-    customerOrderUrl: string;
 }) {
-    const receiptMessage = encodeURIComponent(`Hola ${order.customer_name}, revisa tu pedido ${order.number}${order.receipt_url ? ` y tu comprobante: ${order.receipt_url}` : `: ${customerOrderUrl}`}`);
-    const whatsappNumber = order.customer_phone.replace(/\D/g, '');
+    const document = order.electronic_documents?.[0];
+    const [paymentStatus, setPaymentStatus] = useState(order.payment_status);
+    const [previewFormat, setPreviewFormat] = useState<
+        'json' | 'html' | 'xml' | 'pdf' | null
+    >(null);
+    const previewUrl =
+        document && previewFormat
+            ? `/${currentTeam.slug}/administracion/facturacion/${document.id}/${previewFormat}`
+            : '';
+    const whatsappUrl = (
+        usePage().props.flash as { whatsappUrl?: string | null } | undefined
+    )?.whatsappUrl;
+    useEffect(() => {
+        if (whatsappUrl)
+            window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    }, [whatsappUrl]);
+
     return (
         <>
             <Head title={order.number} />
-            <div className="flex max-w-5xl flex-col gap-6 p-4 md:p-8">
-                <Link
-                    href={index(currentTeam.slug)}
-                    className="text-muted-foreground inline-flex items-center gap-2 text-sm"
-                >
-                    <ArrowLeft className="size-4" />
-                    Volver
-                </Link>
-                <div>
-                    <h1 className="text-2xl font-semibold">{order.number}</h1>
-                    <p className="text-muted-foreground">
-                        {order.customer_name} · {order.customer_email} ·{' '}
-                        {order.customer_phone}
-                    </p>
-                </div>
-                <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
-                    <section className="bg-card rounded-xl border p-6">
+            <AdminFormModal
+                title={order.number}
+                description={`${order.customer_name} · ${order.customer_email} · ${order.customer_phone}`}
+                backHref={index(currentTeam.slug).url}
+            >
+                <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+                    <section className="bg-card rounded-xl border p-5 md:p-6">
                         <h2 className="font-semibold">Productos</h2>
                         {order.items.map((item) => (
                             <div
                                 key={item.id}
-                                className="flex justify-between border-b py-4"
+                                className="flex justify-between gap-4 border-b py-4"
                             >
                                 <span>
                                     {item.name} × {item.quantity}
@@ -53,11 +73,9 @@ export default function OrderDetail({
                             <span>Total</span>
                             <span>S/ {order.total}</span>
                         </div>
-                    </section>
-                    <aside className="grid h-fit gap-5">
-                        <div className="bg-card rounded-xl border p-6">
-                            <h2 className="font-semibold">Entrega</h2>
-                            <p className="text-muted-foreground mt-3 text-sm">
+                        <div className="bg-muted/40 mt-6 rounded-lg p-4 text-sm">
+                            <strong>Entrega</strong>
+                            <p className="text-muted-foreground mt-2">
                                 {order.address}
                                 <br />
                                 {order.district}, {order.province}
@@ -65,22 +83,24 @@ export default function OrderDetail({
                                 {order.department}
                             </p>
                         </div>
+                    </section>
+                    <aside className="grid content-start gap-5">
                         <Form
                             {...update.form({
                                 current_team: currentTeam.slug,
                                 order: order.id,
                             })}
-                            className="bg-card grid gap-4 rounded-xl border p-6"
+                            className="bg-card grid gap-3 rounded-xl border p-5"
                         >
                             {({ processing }) => (
                                 <>
                                     <h2 className="font-semibold">
-                                        Actualizar seguimiento
+                                        Seguimiento
                                     </h2>
                                     <select
                                         name="status"
                                         defaultValue={order.status}
-                                        className="rounded-md border bg-transparent p-2"
+                                        className="bg-background h-10 rounded-md border px-3"
                                     >
                                         <option value="pending">
                                             Pendiente
@@ -101,8 +121,11 @@ export default function OrderDetail({
                                     </select>
                                     <select
                                         name="payment_status"
-                                        defaultValue={order.payment_status}
-                                        className="rounded-md border bg-transparent p-2"
+                                        value={paymentStatus}
+                                        onChange={(event) =>
+                                            setPaymentStatus(event.target.value)
+                                        }
+                                        className="bg-background h-10 rounded-md border px-3"
                                     >
                                         <option value="pending">
                                             Pago pendiente
@@ -113,35 +136,269 @@ export default function OrderDetail({
                                             Reembolsado
                                         </option>
                                     </select>
-                                    <h2 className="border-t pt-4 font-semibold">Comprobante</h2>
-                                    <select name="receipt_type" defaultValue={order.receipt_type ?? 'boleta'} className="rounded-md border bg-transparent p-2">
-                                        <option value="boleta">Boleta</option>
-                                        <option value="factura">Factura</option>
-                                    </select>
-                                    <select name="receipt_status" defaultValue={order.receipt_status ?? 'pending'} className="rounded-md border bg-transparent p-2">
-                                        <option value="pending">Pendiente de emisión</option>
-                                        <option value="issued">Emitido y aceptado</option>
-                                        <option value="sent">Enviado al cliente</option>
-                                        <option value="rejected">Rechazado</option>
-                                    </select>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <input name="receipt_series" defaultValue={order.receipt_series ?? ''} placeholder="Serie" className="rounded-md border bg-transparent p-2" />
-                                        <input name="receipt_number" defaultValue={order.receipt_number ?? ''} placeholder="Correlativo" className="rounded-md border bg-transparent p-2" />
-                                    </div>
-                                    <input name="receipt_url" type="url" defaultValue={order.receipt_url ?? ''} placeholder="Enlace del comprobante" className="rounded-md border bg-transparent p-2" />
+                                    <input
+                                        type="hidden"
+                                        name="receipt_type"
+                                        value={order.receipt_type ?? 'boleta'}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="receipt_status"
+                                        value={
+                                            order.receipt_status === 'draft'
+                                                ? 'pending'
+                                                : order.receipt_status
+                                        }
+                                    />
                                     <Button disabled={processing}>
-                                        Guardar cambios
+                                        Guardar seguimiento
                                     </Button>
-                                    <div className="grid grid-cols-2 gap-2 text-center text-xs font-semibold">
-                                        <a href={`https://wa.me/${whatsappNumber}?text=${receiptMessage}`} target="_blank" rel="noreferrer" className="rounded-md border p-2">WhatsApp</a>
-                                        <a href={`mailto:${order.customer_email}?subject=${encodeURIComponent(`Comprobante ${order.number}`)}&body=${receiptMessage}`} className="rounded-md border p-2">Correo</a>
-                                    </div>
+                                </>
+                            )}
+                        </Form>
+                        <Form
+                            action={`/${currentTeam.slug}/administracion/pedidos/${order.id}/${document ? 'compartir-comprobante' : 'emitir-comprobante'}`}
+                            method="post"
+                            className="bg-card grid gap-3 rounded-xl border p-5"
+                        >
+                            {({ processing, errors }) => (
+                                <>
+                                    <h2 className="flex items-center gap-2 font-semibold">
+                                        <FileCheck2 className="size-5" />{' '}
+                                        Comprobante
+                                    </h2>
+                                    {document ? (
+                                        <>
+                                            <input
+                                                type="hidden"
+                                                name="receipt_type"
+                                                value={document.type}
+                                            />
+                                            <div className="rounded-lg border border-cyan-200 bg-cyan-50 p-4 text-sm text-cyan-900">
+                                                <strong>
+                                                    {document.number}
+                                                </strong>
+                                                <p>
+                                                    Estado:{' '}
+                                                    {receiptStatuses[
+                                                        document.status
+                                                    ] ?? document.status}
+                                                </p>
+                                                <p>
+                                                    Total: S/ {document.total}
+                                                </p>
+                                            </div>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                disabled
+                                            >
+                                                Comprobante ya emitido
+                                            </Button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <label className="grid gap-1 text-sm font-medium">
+                                                Tipo
+                                                <select
+                                                    name="receipt_type"
+                                                    defaultValue={
+                                                        order.receipt_type ??
+                                                        'boleta'
+                                                    }
+                                                    className="bg-background h-10 rounded-md border px-3"
+                                                >
+                                                    <option value="boleta">
+                                                        Boleta
+                                                    </option>
+                                                    <option value="factura">
+                                                        Factura
+                                                    </option>
+                                                    <option value="sales_note">
+                                                        Nota de venta
+                                                    </option>
+                                                </select>
+                                            </label>
+                                            <p className="text-muted-foreground text-xs">
+                                                La serie y el correlativo se
+                                                asignan automáticamente al
+                                                emitir.
+                                            </p>
+                                        </>
+                                    )}
+                                    {document && (
+                                        <div className="grid gap-2 text-sm">
+                                            <label className="flex items-center gap-2">
+                                                <input
+                                                    type="checkbox"
+                                                    name="send_email"
+                                                    value="1"
+                                                    defaultChecked
+                                                />
+                                                <Mail className="size-4" />{' '}
+                                                Enviar por correo
+                                            </label>
+                                            <label className="flex items-center gap-2">
+                                                <input
+                                                    type="checkbox"
+                                                    name="open_whatsapp"
+                                                    value="1"
+                                                />
+                                                <MessageCircle className="size-4" />{' '}
+                                                Abrir WhatsApp
+                                            </label>
+                                            <label className="flex items-center gap-2">
+                                                <input
+                                                    type="checkbox"
+                                                    name="send_system"
+                                                    value="1"
+                                                    disabled={!order.user_id}
+                                                />
+                                                <Send className="size-4" />{' '}
+                                                Notificar en su cuenta{' '}
+                                                {!order.user_id &&
+                                                    '(no registrado)'}
+                                            </label>
+                                        </div>
+                                    )}
+                                    {errors.receipt_type && (
+                                        <p className="text-destructive text-sm">
+                                            {errors.receipt_type}
+                                        </p>
+                                    )}
+                                    <Button
+                                        disabled={
+                                            processing ||
+                                            (!document &&
+                                                paymentStatus !== 'paid')
+                                        }
+                                    >
+                                        {processing
+                                            ? 'Procesando…'
+                                            : document
+                                              ? 'Compartir comprobante'
+                                              : 'Emitir comprobante'}
+                                    </Button>
+                                    {document && (
+                                        <p className="text-muted-foreground text-xs">
+                                            Compartir lo envía al cliente; no
+                                            vuelve a emitirlo ante SUNAT.
+                                        </p>
+                                    )}
+                                    {paymentStatus !== 'paid' && !document && (
+                                        <p className="text-xs text-amber-700">
+                                            Selecciona “Pagado” y guarda el
+                                            seguimiento.
+                                        </p>
+                                    )}
+                                    {document && (
+                                        <div className="grid grid-cols-4 gap-2 text-center text-xs">
+                                            {(
+                                                [
+                                                    'json',
+                                                    'html',
+                                                    'xml',
+                                                    'pdf',
+                                                ] as const
+                                            ).map((format) => (
+                                                <button
+                                                    type="button"
+                                                    key={format}
+                                                    onClick={() =>
+                                                        setPreviewFormat(format)
+                                                    }
+                                                    className="rounded-md border p-2 uppercase hover:border-cyan-400 hover:bg-cyan-50"
+                                                >
+                                                    {format}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
                                 </>
                             )}
                         </Form>
                     </aside>
                 </div>
-            </div>
+                {document && previewFormat && (
+                    <div className="fixed inset-0 z-[70] grid place-items-center bg-slate-950/55 p-4">
+                        <button
+                            type="button"
+                            className="absolute inset-0"
+                            aria-label="Cerrar vista previa"
+                            onClick={() => setPreviewFormat(null)}
+                        />
+                        <section
+                            role="dialog"
+                            aria-modal="true"
+                            className="bg-background relative z-10 flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border shadow-2xl"
+                        >
+                            <header className="flex items-start justify-between gap-4 border-b p-5">
+                                <div>
+                                    <p className="text-xs font-bold tracking-widest text-cyan-600 uppercase">
+                                        Vista previa {previewFormat}
+                                    </p>
+                                    <h2 className="mt-1 text-xl font-semibold">
+                                        {document.number} ·{' '}
+                                        <span className="uppercase">
+                                            {receiptStatuses[document.status] ??
+                                                document.status}
+                                        </span>
+                                    </h2>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setPreviewFormat(null)}
+                                    className="grid size-10 place-items-center rounded-full border"
+                                >
+                                    <X className="size-5" />
+                                </button>
+                            </header>
+                            <div className="min-h-0 flex-1 overflow-auto bg-slate-950 p-4">
+                                {previewFormat === 'json' ? (
+                                    <pre className="min-h-80 rounded-lg bg-slate-900 p-5 text-xs leading-6 break-words whitespace-pre-wrap text-cyan-100">
+                                        {JSON.stringify(
+                                            {
+                                                document: {
+                                                    number: document.number,
+                                                    type: document.type,
+                                                    status: document.status,
+                                                },
+                                                estado: document.status,
+                                                payload: document.payload_json,
+                                                provider_response:
+                                                    document.response_json,
+                                            },
+                                            null,
+                                            2,
+                                        )}
+                                    </pre>
+                                ) : (
+                                    <iframe
+                                        title={`Vista previa ${previewFormat}`}
+                                        src={previewUrl}
+                                        className="h-[58vh] w-full rounded-lg bg-white"
+                                    />
+                                )}
+                            </div>
+                            <footer className="flex flex-col gap-3 border-t p-4 sm:flex-row sm:items-center sm:justify-between">
+                                <p className="text-muted-foreground text-sm">
+                                    Cliente: {order.customer_name} · Total: S/{' '}
+                                    {document.total}
+                                </p>
+                                <a
+                                    href={previewUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-cyan-500 px-5 font-semibold text-white"
+                                >
+                                    <Download className="size-4" /> Descargar /
+                                    abrir
+                                </a>
+                            </footer>
+                        </section>
+                    </div>
+                )}
+            </AdminFormModal>
         </>
     );
 }

@@ -21,25 +21,32 @@ test('program downloads require a registered customer', function () {
     expect($program->fresh()->downloads)->toBe(1);
 });
 
-test('administrators can upload programs into shared storage', function () {
+test('administrators can publish programs with an icon and download link', function () {
     $user = User::factory()->create();
-    $payload = ['name' => 'POS JBTECHLINE', 'slug' => 'pos-jbtechline', 'category' => 'Facturación', 'platform' => 'Windows', 'version' => '1.0', 'license_type' => 'demo', 'price' => null, 'short_description' => 'Sistema de ventas', 'description' => 'Control comercial', 'requirements' => 'Windows 10', 'is_own' => true, 'is_featured' => true, 'is_active' => true, 'program_file' => UploadedFile::fake()->create('pos.zip', 20, 'application/zip')];
+    $payload = ['name' => 'POS JBTECHLINE', 'slug' => 'pos-jbtechline', 'category' => 'Facturación', 'platform' => 'Windows', 'version' => '1.0', 'license_type' => 'paid', 'short_description' => 'Sistema de ventas', 'description' => 'Control comercial', 'requirements' => 'Windows 10', 'download_url' => 'https://downloads.example.com/pos.zip', 'download_enabled' => true, 'is_own' => false, 'is_featured' => true, 'is_active' => true, 'image' => UploadedFile::fake()->image('pos.png')];
 
     $this->actingAs($user)->post(route('admin.software.store', $user->currentTeam), $payload)->assertRedirect();
 
     $program = SoftwareProgram::query()->firstOrFail();
-    expect($program->file_id)->not->toBeNull();
-    $this->assertDatabaseHas('media_files', ['id' => $program->file_id]);
+    expect($program->download_url)->toBe('https://downloads.example.com/pos.zip')
+        ->and($program->image_id)->not->toBeNull()
+        ->and($program->is_own)->toBeFalse();
 });
 
 test('software and programs use separate administration lists', function () {
     $admin = User::factory()->create();
-    SoftwareProgram::factory()->create(['name' => 'Sistema propio', 'is_own' => true]);
     SoftwareProgram::factory()->create(['name' => 'Programa descargable', 'is_own' => false]);
 
     $this->actingAs($admin)->get(route('admin.software.index', ['current_team' => $admin->currentTeam, 'catalog' => 'software']))
-        ->assertInertia(fn ($page) => $page->where('catalogType', 'software')->has('programs.data', 1)->where('programs.data.0.name', 'Sistema propio'));
+        ->assertInertia(fn ($page) => $page->component('admin/service-requests/index')->where('quoteMode', true)->has('requests.data', 0));
 
     $this->actingAs($admin)->get(route('admin.software.index', ['current_team' => $admin->currentTeam, 'catalog' => 'programs']))
         ->assertInertia(fn ($page) => $page->where('catalogType', 'programs')->has('programs.data', 1)->where('programs.data.0.name', 'Programa descargable'));
+});
+
+test('authorized customers are redirected to an external program download', function () {
+    $program = SoftwareProgram::factory()->create(['download_url' => 'https://downloads.example.com/app.exe', 'download_enabled' => true, 'license_type' => 'free']);
+
+    $this->actingAs(User::factory()->create())->get(route('programs.download', $program))
+        ->assertRedirect('https://downloads.example.com/app.exe');
 });

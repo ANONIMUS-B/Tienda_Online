@@ -1,6 +1,7 @@
 import { Head } from '@inertiajs/react';
 import ProgramForm from './program-form';
-import { update } from '@/routes/admin/software';
+import { index, update } from '@/routes/admin/software';
+import AdminFormModal from '@/components/admin/admin-form-modal';
 import type { SoftwareProgram } from '@/types/software';
 export default function Edit({
     program,
@@ -14,7 +15,7 @@ export default function Edit({
     return (
         <>
             <Head title={program.name} />
-            <div className="max-w-4xl p-4 md:p-8">
+            <AdminFormModal title={`Editar ${program.name}`} backHref={`${index(currentTeam.slug).url}?catalog=${catalogType}`}>
                 <h1 className="mb-6 text-2xl font-semibold">
                     Editar {program.name}
                 </h1>
@@ -29,7 +30,7 @@ export default function Edit({
                     program={program}
                     catalogType={catalogType}
                 />
-            </div>
+            </AdminFormModal>
         </>
     );
 }

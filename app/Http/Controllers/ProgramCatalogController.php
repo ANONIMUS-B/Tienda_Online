@@ -38,7 +38,7 @@ class ProgramCatalogController extends Controller
         $user = request()->user();
         $hasMembership = $user?->hasActiveSoftwareMembership() ?? false;
 
-        return [...$program->toArray(), 'image_url' => $program->image_id ? route('media.show', $program->image_id, false) : null, 'can_download' => $program->file_id && (($program->license_type === 'free' && $program->download_enabled) || $hasMembership)];
+        return [...$program->toArray(), 'image_url' => $program->image_id ? route('media.show', $program->image_id, false) : null, 'can_download' => ($program->download_url || $program->file_id) && (($program->license_type === 'free' && $program->download_enabled) || $hasMembership)];
     }
 
     /** @return array<string, mixed> */

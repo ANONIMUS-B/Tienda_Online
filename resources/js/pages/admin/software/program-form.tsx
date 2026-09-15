@@ -58,17 +58,8 @@ export default function ProgramForm({
                         className={input}
                     >
                         <option value="free">Gratis</option>
-                        <option value="demo">Demo</option>
-                        <option value="paid">De pago</option>
+                        <option value="paid">Requiere membresía</option>
                     </select>
-                    <input
-                        name="price"
-                        type="number"
-                        step="0.01"
-                        defaultValue={program?.price ?? ''}
-                        placeholder="Precio"
-                        className={input}
-                    />
                     <input
                         name="short_description"
                         defaultValue={program?.short_description}
@@ -97,23 +88,23 @@ export default function ProgramForm({
                         name="tutorial_url"
                         type="url"
                         defaultValue={program?.tutorial_url ?? ''}
-                        placeholder="Enlace del video tutorial"
+                        placeholder="Video tutorial (YouTube no listado o Vimeo)"
+                        className={`${input} md:col-span-2`}
+                    />
+                    <input
+                        name="download_url"
+                        type="url"
+                        required
+                        defaultValue={program?.download_url ?? ''}
+                        placeholder="Enlace privado de descarga https://..."
                         className={`${input} md:col-span-2`}
                     />
                     <label>
-                        Imagen
+                        Icono del programa
                         <input
                             name="image"
                             type="file"
                             accept="image/*"
-                            className={`${input} mt-1`}
-                        />
-                    </label>
-                    <label>
-                        Archivo del programa
-                        <input
-                            name="program_file"
-                            type="file"
                             className={`${input} mt-1`}
                         />
                     </label>

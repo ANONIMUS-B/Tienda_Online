@@ -2,6 +2,7 @@ import { Head } from '@inertiajs/react';
 import CategoryForm from './category-form';
 import { edit, index } from '@/routes/admin/categories';
 import type { CategorySummary, ParentCategory } from '@/types/category';
+import AdminFormModal from '@/components/admin/admin-form-modal';
 
 export default function EditCategory({
     currentTeam,
@@ -15,7 +16,7 @@ export default function EditCategory({
     return (
         <>
             <Head title={`Editar ${category.name}`} />
-            <div className="flex flex-col gap-6 p-4 md:p-8">
+            <AdminFormModal title="Editar categoría" backHref={index(currentTeam.slug).url}>
                 <div>
                     <h1 className="text-2xl font-semibold">Editar categoría</h1>
                     <p className="text-muted-foreground mt-1 text-sm">
@@ -27,7 +28,7 @@ export default function EditCategory({
                     category={category}
                     parentCategories={parentCategories}
                 />
-            </div>
+            </AdminFormModal>
         </>
     );
 }

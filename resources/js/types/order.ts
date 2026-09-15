@@ -7,6 +7,7 @@ export type CartItem = {
 };
 export type OrderItem = {
     id: number;
+    user_id: number | null;
     name: string;
     sku: string;
     quantity: number;
@@ -18,7 +19,7 @@ export type Order = {
     number: string;
     status: string;
     payment_status: string;
-    receipt_type: 'boleta' | 'factura';
+    receipt_type: 'boleta' | 'factura' | 'sales_note';
     receipt_status: 'pending' | 'issued' | 'sent' | 'rejected';
     receipt_series: string | null;
     receipt_number: string | null;
@@ -37,5 +38,6 @@ export type Order = {
     total: string;
     created_at: string;
     items: OrderItem[];
+    electronic_documents?: { id: number; number: string; type: string; status: string; total: string; payload_json: Record<string, unknown>; response_json: Record<string, unknown> | null; xml_path: string | null; cdr_path: string | null }[];
     items_count?: number;
 };

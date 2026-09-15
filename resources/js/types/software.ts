@@ -12,6 +12,7 @@ export type SoftwareProgram = {
     requirements: string | null;
     installation_instructions: string | null;
     tutorial_url: string | null;
+    download_url: string | null;
     download_enabled: boolean;
     can_download?: boolean;
     is_own: boolean;

@@ -27,6 +27,11 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function electronicDocuments(): HasMany
+    {
+        return $this->hasMany(ElectronicDocument::class);
+    }
+
     /** @return array<string, string> */
     protected function casts(): array
     {

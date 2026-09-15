@@ -32,7 +32,7 @@ export default function CompanySettings({
     return (
         <>
             <Head title="Empresa y pagos" />
-            <div className="flex max-w-5xl flex-col gap-6 p-4 md:p-8">
+            <div className="flex w-full flex-col gap-6 p-4 md:p-8">
                 <div>
                     <h1 className="text-2xl font-semibold">
                         Empresa, pagos y WhatsApp

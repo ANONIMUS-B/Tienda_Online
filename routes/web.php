@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CompanySettingController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\ElectronicBillingController;
 use App\Http\Controllers\Admin\HomepageSettingController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
@@ -72,6 +73,13 @@ Route::prefix('{current_team}')
             Route::put('administracion/inicio', [HomepageSettingController::class, 'update'])->name('admin.homepage.update');
             Route::get('administracion/empresa', [CompanySettingController::class, 'edit'])->name('admin.company-settings.edit');
             Route::put('administracion/empresa', [CompanySettingController::class, 'update'])->name('admin.company-settings.update');
+            Route::get('administracion/facturacion', [ElectronicBillingController::class, 'edit'])->name('admin.electronic-billing.edit');
+            Route::put('administracion/facturacion', [ElectronicBillingController::class, 'update'])->name('admin.electronic-billing.update');
+            Route::get('administracion/facturacion/{electronicDocument}/json', [ElectronicBillingController::class, 'json'])->name('admin.electronic-billing.json');
+            Route::get('administracion/facturacion/{electronicDocument}/pdf', [ElectronicBillingController::class, 'pdf'])->name('admin.electronic-billing.pdf');
+            Route::get('administracion/facturacion/{electronicDocument}/html', [ElectronicBillingController::class, 'html'])->name('admin.electronic-billing.html');
+            Route::get('administracion/facturacion/{electronicDocument}/xml', [ElectronicBillingController::class, 'xml'])->name('admin.electronic-billing.xml');
+            Route::get('administracion/facturacion/{electronicDocument}/cdr', [ElectronicBillingController::class, 'cdr'])->name('admin.electronic-billing.cdr');
             Route::resource('administracion/categorias', CategoryController::class)
                 ->parameters(['categorias' => 'category'])
                 ->except('show')
@@ -88,16 +96,20 @@ Route::prefix('{current_team}')
                 ->parameters(['pedidos' => 'order'])
                 ->only(['index', 'show', 'update'])
                 ->names('admin.orders');
+            Route::post('administracion/pedidos/{order}/emitir-comprobante', [OrderController::class, 'issue'])->name('admin.orders.issue');
+            Route::post('administracion/pedidos/{order}/compartir-comprobante', [OrderController::class, 'share'])->name('admin.orders.share');
             Route::resource('administracion/software', SoftwareProgramController::class)
                 ->parameters(['software' => 'software_program'])
                 ->except('show')
                 ->names('admin.software');
             Route::get('administracion/membresias-software', [AdminSoftwareMembershipController::class, 'index'])->name('admin.software-memberships.index');
             Route::put('administracion/membresias-software/{softwareMembership}', [AdminSoftwareMembershipController::class, 'update'])->name('admin.software-memberships.update');
+            Route::post('administracion/membresias-software/{softwareMembership}/emitir-comprobante', [AdminSoftwareMembershipController::class, 'issue'])->name('admin.software-memberships.issue');
             Route::get('administracion/clientes', [CustomerController::class, 'index'])->name('admin.customers.index');
             Route::get('administracion/clientes/{customer}', [CustomerController::class, 'show'])->name('admin.customers.show');
             Route::get('administracion/solicitudes-servicio', [AdminServiceRequestController::class, 'index'])->name('admin.service-requests.index');
             Route::put('administracion/solicitudes-servicio/{serviceRequest}', [AdminServiceRequestController::class, 'update'])->name('admin.service-requests.update');
+            Route::post('administracion/solicitudes-servicio/{serviceRequest}/emitir-comprobante', [AdminServiceRequestController::class, 'issue'])->name('admin.service-requests.issue');
             Route::get('administracion/usuarios', [UserController::class, 'index'])->name('admin.users.index');
 
             Route::middleware('system.role:admin')->group(function () {

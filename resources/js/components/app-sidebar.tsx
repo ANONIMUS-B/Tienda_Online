@@ -12,6 +12,7 @@ import {
     MessagesSquare,
     KeyRound,
     Users,
+    ReceiptText,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
@@ -101,6 +102,13 @@ export function AppSidebar() {
                           ? companySettings(page.props.currentTeam.slug)
                           : '/',
                       icon: Settings,
+                  },
+                  {
+                      title: 'Facturación electrónica',
+                      href: page.props.currentTeam
+                          ? `/${page.props.currentTeam.slug}/administracion/facturacion`
+                          : '/',
+                      icon: ReceiptText,
                   },
                   {
                       title: 'Software',

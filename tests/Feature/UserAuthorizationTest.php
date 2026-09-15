@@ -3,6 +3,7 @@
 use App\Enums\SystemRole;
 use App\Models\CompanySetting;
 use App\Models\Product;
+use App\Models\Team;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Support\Facades\Hash;
@@ -79,6 +80,16 @@ test('administrative roles are redirected to their administrative dashboard afte
 
     $response->assertRedirect(route('dashboard', $user->currentTeam));
 })->with([SystemRole::Admin, SystemRole::Subadmin]);
+
+test('administrators ignore stale intended urls from another team after login', function () {
+    $user = User::factory()->create(['role' => SystemRole::Admin, 'password' => Hash::make('password')]);
+    $otherTeam = Team::factory()->create();
+
+    $response = $this->withSession(['url.intended' => route('dashboard', $otherTeam)])
+        ->post(route('login.store'), ['email' => $user->email, 'password' => 'password']);
+
+    $response->assertRedirect(route('dashboard', $user->currentTeam));
+});
 
 test('inactive users cannot log in', function () {
     User::factory()->create(['email' => 'inactive@example.com', 'password' => Hash::make('password'), 'is_active' => false]);

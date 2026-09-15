@@ -52,6 +52,7 @@ export default function PublicHeader() {
         cartCount = 0,
         catalogCategories = [],
         serviceNotifications = { unread: 0, latest: [] },
+        accountNotifications = { unread: 0, latest: [] },
         membershipNotice = null,
     } = page.props as any;
     const [open, setOpen] = useState(false);
@@ -62,7 +63,7 @@ export default function PublicHeader() {
     const dashboardUrl = currentTeam ? dashboard(currentTeam.slug) : '/';
     const isCustomer = auth.user?.role === 'user';
     const accountUrl = isCustomer ? cart() : dashboardUrl;
-    const notificationCount = serviceNotifications.unread + (membershipNotice ? 1 : 0);
+    const notificationCount = serviceNotifications.unread + accountNotifications.unread + (membershipNotice ? 1 : 0);
     return (
         <>
             <header className="border-brand-primary/25 bg-brand-background/95 fixed inset-x-0 top-0 z-50 border-b shadow-lg shadow-black/10 backdrop-blur-xl">
@@ -154,7 +155,13 @@ export default function PublicHeader() {
                                                 <p className="mt-1 text-sm">Vence el {new Date(membershipNotice.expires_at).toLocaleDateString('es-PE')}.</p>
                                             </Link>
                                         )}
-                                        {serviceNotifications.latest.length === 0 && !membershipNotice ? (
+                                        {accountNotifications.latest.map((notification: any) => (
+                                            <a key={notification.id} href={notification.data.url} className="block border-b border-cyan-50 bg-cyan-50/50 px-4 py-3 transition hover:bg-cyan-50">
+                                                <p className="text-xs font-bold text-cyan-600">{notification.data.title}</p>
+                                                <p className="mt-1 text-sm">{notification.data.message}</p>
+                                            </a>
+                                        ))}
+                                        {serviceNotifications.latest.length === 0 && accountNotifications.latest.length === 0 && !membershipNotice ? (
                                             <p className="px-4 py-6 text-center text-sm text-slate-500">
                                                 Aún no tienes respuestas.
                                             </p>
