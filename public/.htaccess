@@ -1,3 +1,6 @@
+# Disable directory listing unconditionally to avoid "Index of /"
+Options -Indexes
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes

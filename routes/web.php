@@ -26,12 +26,14 @@ use App\Http\Controllers\ProgramCatalogController;
 use App\Http\Controllers\ProgramDownloadController;
 use App\Http\Controllers\ServiceCatalogController;
 use App\Http\Controllers\ServiceRequestController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SoftwareCatalogController;
 use App\Http\Controllers\SoftwareMembershipController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use App\Http\Middleware\EnsureTeamMembership;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/', HomepageController::class)->name('home');
 Route::get('/media/{mediaFile}', MediaFileController::class)->name('media.show');
 Route::get('/productos', [ProductCatalogController::class, 'index'])->name('products');

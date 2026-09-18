@@ -1,2 +1,10 @@
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /administracion/
+Disallow: /admin/
+Disallow: /settings/
+Disallow: /mis-pedidos
+Disallow: /mis-solicitudes
+Disallow: /finalizar-compra
+
+Sitemap: https://jbtechline.net.pe/sitemap.xml

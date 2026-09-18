@@ -106,10 +106,10 @@ export default function Welcome({
 
     return (
         <>
-            <Head title="Tecnología, soporte y soluciones para tu negocio">
+            <Head title="Tienda Online de Software, Antivirus y Soporte Tecnológico">
                 <meta
                     name="description"
-                    content="JBTECHLINE: productos tecnológicos, software, soporte técnico y soluciones empresariales."
+                    content="JBTECHLINE: Tu aliado tecnológico en Perú. Software original con licencia, antivirus NOD32 con garantía oficial, equipos de cómputo y soporte técnico especializado."
                 />
             </Head>
             <div className="bg-brand-background selection:bg-brand-primary selection:text-brand-background min-h-screen overflow-hidden text-white">
