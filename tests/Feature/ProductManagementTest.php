@@ -23,6 +23,26 @@ test('administrators can create products with uploaded images', function () {
     $this->assertDatabaseHas('media_files', ['id' => str($product->images->first()->path)->after('/media/')->toString()]);
 });
 
+test('administrators can delete a product image', function () {
+    $user = User::factory()->create();
+    $category = Category::factory()->create();
+    $brand = Brand::factory()->create();
+
+    $this->actingAs($user)->post(route('admin.products.store', $user->currentTeam), productPayload($category, $brand));
+    $product = Product::query()->firstOrFail();
+    $imageToDelete = $product->images->first();
+
+    $this->actingAs($user)
+        ->delete(route('admin.products.images.destroy', [
+            'current_team' => $user->currentTeam->slug,
+            'product' => $product->slug,
+            'image' => $imageToDelete->id,
+        ]))
+        ->assertRedirect();
+
+    expect($product->fresh()->images)->toHaveCount(1);
+});
+
 test('product image uploads reject unsafe formats', function () {
     $user = User::factory()->create();
     $category = Category::factory()->create();

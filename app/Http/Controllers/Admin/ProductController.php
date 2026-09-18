@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateProductRequest;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\StockMovement;
 use App\Models\Team;
 use App\Services\ImageUploader;
@@ -106,6 +107,23 @@ class ProductController extends Controller
         $product->load('images')->images->each(fn ($image) => $this->images->delete($image->path));
         $product->delete();
         Cache::flush();
+
+        return back();
+    }
+
+    public function destroyImage(Team $currentTeam, Product $product, ProductImage $image): RedirectResponse
+    {
+        if ($image->product_id === $product->id) {
+            $isPrimary = $image->is_primary;
+            $this->images->delete($image->path);
+            $image->delete();
+
+            if ($isPrimary) {
+                $product->images()->first()?->update(['is_primary' => true]);
+            }
+
+            Cache::flush();
+        }
 
         return back();
     }

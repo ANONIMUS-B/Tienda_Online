@@ -88,6 +88,7 @@ Route::prefix('{current_team}')
                 ->parameters(['marcas' => 'brand'])
                 ->except('show')
                 ->names('admin.brands');
+            Route::delete('administracion/productos/{product}/imagenes/{image}', [ProductController::class, 'destroyImage'])->name('admin.products.images.destroy');
             Route::resource('administracion/productos', ProductController::class)
                 ->parameters(['productos' => 'product'])
                 ->except('show')

@@ -1,10 +1,12 @@
-import { Form } from '@inertiajs/react';
-import { Save } from 'lucide-react';
+import { Form, router } from '@inertiajs/react';
+import { Save, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { store, update } from '@/routes/admin/products';
+import { destroy as destroyProductImage } from '@/routes/admin/products/images';
 import type { Product } from '@/types/product';
 
 type Option = { id: number; name: string };
@@ -28,6 +30,26 @@ export default function ProductForm({
               .join('\n')
         : '';
     const benefits = product?.benefits?.join('\n') ?? '';
+    const [deletingImageId, setDeletingImageId] = useState<number | null>(null);
+
+    const handleDeleteImage = (imageId: number) => {
+        if (!product) return;
+        if (!confirm('¿Estás seguro de que deseas eliminar esta imagen?')) return;
+
+        setDeletingImageId(imageId);
+        router.delete(
+            destroyProductImage.url({
+                current_team: currentTeam.slug,
+                product: product.slug,
+                image: imageId,
+            }),
+            {
+                preserveScroll: true,
+                onFinish: () => setDeletingImageId(null),
+            }
+        );
+    };
+
     return (
         <Form
             {...form}
@@ -195,15 +217,36 @@ export default function ProductForm({
                         </div>
                     </div>
                     {product?.images.length ? (
-                        <div className="flex flex-wrap gap-3">
-                            {product.images.map((image) => (
-                                <img
-                                    key={image.id}
-                                    src={image.path}
-                                    alt=""
-                                    className="size-24 rounded-xl border object-cover"
-                                />
-                            ))}
+                        <div className="grid gap-2">
+                            <Label>Imágenes actuales</Label>
+                            <div className="flex flex-wrap gap-3">
+                                {product.images.map((image) => (
+                                    <div
+                                        key={image.id}
+                                        className="group relative size-24 rounded-xl border overflow-hidden bg-muted"
+                                    >
+                                        <img
+                                            src={image.path}
+                                            alt={image.alt_text ?? ''}
+                                            className="h-full w-full object-cover"
+                                        />
+                                        {image.is_primary && (
+                                            <span className="absolute bottom-1 left-1 rounded bg-primary/90 px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground shadow-sm">
+                                                Principal
+                                            </span>
+                                        )}
+                                        <button
+                                            type="button"
+                                            onClick={() => handleDeleteImage(image.id)}
+                                            disabled={deletingImageId === image.id}
+                                            title="Eliminar imagen"
+                                            className="absolute right-1 top-1 flex size-7 items-center justify-center rounded-lg bg-destructive text-destructive-foreground opacity-90 transition-opacity hover:opacity-100 group-hover:opacity-100 shadow-sm disabled:opacity-50"
+                                        >
+                                            <Trash2 className="size-4" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     ) : null}
                     <div className="grid gap-3 sm:grid-cols-4">

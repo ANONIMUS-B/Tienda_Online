@@ -36,8 +36,8 @@ export default function AuthModal({ mode, onModeChange }: AuthModalProps) {
                 }
             }}
         >
-            <DialogContent className="store-light max-h-[calc(100dvh-1.5rem)] w-[calc(100%-1.5rem)] overflow-y-auto rounded-3xl border-cyan-200 bg-white p-0 shadow-[0_24px_80px_rgba(8,145,178,.25)] sm:max-w-md">
-                <div className="border-b border-cyan-100 bg-gradient-to-br from-cyan-50 to-white px-5 py-5 pr-14 sm:px-7">
+            <DialogContent className="store-light flex max-h-[calc(100dvh-2rem)] w-[calc(100%-1.5rem)] flex-col overflow-hidden rounded-3xl border-cyan-200 bg-white p-0 shadow-[0_24px_80px_rgba(8,145,178,.25)] sm:max-w-md">
+                <div className="shrink-0 border-b border-cyan-100 bg-gradient-to-br from-cyan-50 to-white px-5 py-5 pr-14 sm:px-7">
                     <DialogHeader>
                         <p className="text-xs font-black tracking-[.18em] text-cyan-500 uppercase">
                             JB Techline
@@ -55,10 +55,11 @@ export default function AuthModal({ mode, onModeChange }: AuthModalProps) {
                     </DialogHeader>
                 </div>
 
-                <div className="px-5 py-5 sm:px-7 sm:py-6">
+                <div className="overflow-y-auto px-5 py-5 sm:px-7 sm:py-6 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/80 [&::-webkit-scrollbar-track]:bg-transparent [scrollbar-width:thin] [scrollbar-color:#a5f3fc_transparent]">
                     {isLogin ? (
                         <Form
                             {...loginStore.form()}
+                            onSuccess={() => onModeChange(null)}
                             resetOnSuccess={['password']}
                             className="grid gap-4"
                         >
@@ -133,6 +134,7 @@ export default function AuthModal({ mode, onModeChange }: AuthModalProps) {
                     ) : (
                         <Form
                             {...registerStore.form()}
+                            onSuccess={() => onModeChange(null)}
                             resetOnSuccess={[
                                 'password',
                                 'password_confirmation',
