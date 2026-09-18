@@ -34,6 +34,8 @@ class StoreCheckoutRequest extends FormRequest
             'department' => ['required', 'string', 'max:100'],
             'shipping_method' => ['required', Rule::in(['delivery', 'store_pickup'])],
             'payment_method' => ['required', Rule::in(['yape', 'bank_transfer', 'cash_on_delivery', 'gateway'])],
+            'payment_reference' => ['nullable', 'string', 'max:50'],
+            'payment_receipt' => ['nullable', 'image', 'mimes:jpeg,png,webp', 'max:5120'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

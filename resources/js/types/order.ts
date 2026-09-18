@@ -25,6 +25,8 @@ export type Order = {
     receipt_number: string | null;
     receipt_url: string | null;
     payment_method: string;
+    payment_reference?: string | null;
+    payment_receipt_path?: string | null;
     shipping_method: string;
     customer_name: string;
     customer_email: string;

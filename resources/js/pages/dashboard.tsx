@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Boxes, Package, ShoppingBag, Users } from 'lucide-react';
 import { useState } from 'react';
 import PendingInvitationsModal from '@/components/pending-invitations-modal';
@@ -14,6 +14,7 @@ type Props = {
 const statusLabels: Record<string, string> = { pending: 'Pendiente', confirmed: 'Confirmado', processing: 'En proceso', shipped: 'Enviado', delivered: 'Entregado', cancelled: 'Cancelado' };
 
 export default function Dashboard({ pendingInvitations = [], summary, recentOrders }: Props) {
+    const { currentTeam } = usePage().props as { currentTeam?: { slug: string } };
     const [showInvitations, setShowInvitations] = useState(
         pendingInvitations.length > 0,
     );
@@ -43,10 +44,62 @@ export default function Dashboard({ pendingInvitations = [], summary, recentOrde
                     ))}
                 </div>
                 <section className="overflow-hidden rounded-2xl border bg-card shadow-sm">
-                    <div className="border-b p-5"><h2 className="text-lg font-bold">Pedidos recientes</h2><p className="text-sm text-muted-foreground">Últimas solicitudes recibidas desde la tienda.</p></div>
+                    <div className="flex items-center justify-between border-b p-5">
+                        <div>
+                            <h2 className="text-lg font-bold">Pedidos recientes</h2>
+                            <p className="text-sm text-muted-foreground">Últimas solicitudes recibidas desde la tienda.</p>
+                        </div>
+                        {currentTeam?.slug && (
+                            <Link
+                                href={`/${currentTeam.slug}/administracion/pedidos`}
+                                className="text-sm font-semibold text-lime-600 hover:underline"
+                            >
+                                Ver todos →
+                            </Link>
+                        )}
+                    </div>
                     <div className="overflow-x-auto">
-                        <table className="w-full text-sm"><thead className="bg-muted/50 text-left text-muted-foreground"><tr><th className="p-4">Pedido</th><th className="p-4">Cliente</th><th className="p-4">Estado</th><th className="p-4 text-right">Total</th></tr></thead>
-                            <tbody>{recentOrders.map((order) => <tr key={order.id} className="border-t"><td className="p-4 font-semibold">{order.number}</td><td className="p-4">{order.customer_name}</td><td className="p-4">{statusLabels[order.status] ?? order.status}</td><td className="p-4 text-right font-semibold">S/ {Number(order.total).toFixed(2)}</td></tr>)}</tbody>
+                        <table className="w-full text-sm">
+                            <thead className="bg-muted/50 text-left text-muted-foreground">
+                                <tr>
+                                    <th className="p-4">Pedido</th>
+                                    <th className="p-4">Cliente</th>
+                                    <th className="p-4">Estado</th>
+                                    <th className="p-4 text-right">Total</th>
+                                    <th className="p-4 text-right">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {recentOrders.map((order) => (
+                                    <tr key={order.id} className="border-t">
+                                        <td className="p-4 font-semibold">
+                                            {currentTeam?.slug ? (
+                                                <Link
+                                                    href={`/${currentTeam.slug}/administracion/pedidos/${order.id}`}
+                                                    className="text-lime-600 hover:underline font-mono"
+                                                >
+                                                    {order.number}
+                                                </Link>
+                                            ) : (
+                                                order.number
+                                            )}
+                                        </td>
+                                        <td className="p-4">{order.customer_name}</td>
+                                        <td className="p-4">{statusLabels[order.status] ?? order.status}</td>
+                                        <td className="p-4 text-right font-semibold">S/ {Number(order.total).toFixed(2)}</td>
+                                        <td className="p-4 text-right">
+                                            {currentTeam?.slug && (
+                                                <Link
+                                                    href={`/${currentTeam.slug}/administracion/pedidos/${order.id}`}
+                                                    className="inline-flex items-center rounded-lg bg-lime-600/10 px-3 py-1 text-xs font-semibold text-lime-600 hover:bg-lime-600/20"
+                                                >
+                                                    Ver pedido
+                                                </Link>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
                         </table>
                         {recentOrders.length === 0 && <p className="p-10 text-center text-muted-foreground">Todavía no hay pedidos registrados.</p>}
                     </div>

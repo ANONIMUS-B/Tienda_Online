@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { Form, Head, Link, usePage } from '@inertiajs/react';
 import { store } from '@/routes/checkout';
 import type { CartItem } from '@/types/order';
 import { MessageCircle } from 'lucide-react';
 import { register } from '@/routes';
+import ReceiptFileInput from '@/components/receipt-file-input';
 
 const field =
     'min-h-12 w-full rounded-xl border border-white/10 bg-black/30 px-4 outline-none focus:border-lime-400/50';
@@ -11,13 +13,23 @@ export default function Checkout({
     subtotal,
     paymentMethods,
     whatsappUrl,
+    companySettings,
 }: {
     items: CartItem[];
     subtotal: number;
     paymentMethods: { value: string; label: string }[];
     whatsappUrl: string | null;
+    companySettings?: {
+        yape_number?: string;
+        yape_qr_path?: string | null;
+        bank_name?: string | null;
+        bank_account?: string | null;
+    };
 }) {
     const { auth } = usePage().props;
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
+        paymentMethods[0]?.value ?? 'yape',
+    );
     return (
         <div className="bg-brand-background min-h-screen text-white">
             <Head title="Finalizar compra | JBTECHLINE" />
@@ -112,7 +124,8 @@ export default function Checkout({
                                 <select
                                     name="payment_method"
                                     className={`${field} sm:col-span-2`}
-                                    defaultValue={paymentMethods[0]?.value}
+                                    defaultValue={selectedPaymentMethod}
+                                    onChange={(e) => setSelectedPaymentMethod(e.target.value)}
                                 >
                                     {paymentMethods.map((method) => (
                                         <option
@@ -123,6 +136,83 @@ export default function Checkout({
                                         </option>
                                     ))}
                                 </select>
+
+                                {selectedPaymentMethod === 'yape' && (
+                                    <div className="rounded-2xl border border-purple-200 bg-purple-50/70 p-5 sm:col-span-2 grid gap-4 shadow-xs">
+                                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                            <div>
+                                                <span className="inline-block rounded-full bg-purple-100 px-3 py-1 text-xs font-bold text-purple-700">
+                                                    YAPE / PLIN
+                                                </span>
+                                                <h3 className="mt-2 text-lg font-bold text-purple-950">Instrucciones de Pago</h3>
+                                                <p className="mt-1 text-sm text-slate-600">
+                                                    Realiza el Yape al número <strong className="text-purple-700 text-base font-extrabold">{companySettings?.yape_number || '925523419'}</strong>
+                                                </p>
+                                            </div>
+                                            {companySettings?.yape_qr_path && (
+                                                <div className="rounded-xl bg-white p-2 shrink-0 border border-slate-200 shadow-xs">
+                                                    <img
+                                                        src={`/storage/${companySettings.yape_qr_path}`}
+                                                        alt="QR Yape"
+                                                        className="size-32 object-contain rounded-lg"
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="grid gap-4 sm:grid-cols-2 pt-2 border-t border-purple-200 items-end">
+                                            <div>
+                                                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                                                    N° de Operación (opcional)
+                                                </label>
+                                                <input
+                                                    name="payment_reference"
+                                                    placeholder="Ej: 849201"
+                                                    className={field}
+                                                />
+                                            </div>
+                                            <div>
+                                                <ReceiptFileInput accentColor="purple" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {selectedPaymentMethod === 'bank_transfer' && (
+                                    <div className="rounded-2xl border border-cyan-200 bg-cyan-50/70 p-5 sm:col-span-2 grid gap-4 shadow-xs">
+                                        <div>
+                                            <span className="inline-block rounded-full bg-cyan-100 px-3 py-1 text-xs font-bold text-cyan-700">
+                                                TRANSFERENCIA BANCARIA
+                                            </span>
+                                            <h3 className="mt-2 text-lg font-bold text-cyan-950">Datos Bancarios</h3>
+                                            <p className="mt-1 text-sm text-slate-600">
+                                                Banco: <strong className="text-cyan-700">{companySettings?.bank_name || 'BCP / Interbank'}</strong>
+                                            </p>
+                                            {companySettings?.bank_account && (
+                                                <p className="text-sm text-slate-600">
+                                                    Cuenta: <strong className="text-cyan-700">{companySettings.bank_account}</strong>
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <div className="grid gap-4 sm:grid-cols-2 pt-2 border-t border-cyan-200 items-end">
+                                            <div>
+                                                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                                                    N° de Operación / Constancia
+                                                </label>
+                                                <input
+                                                    name="payment_reference"
+                                                    placeholder="Ej: 00492019"
+                                                    className={field}
+                                                />
+                                            </div>
+                                            <div>
+                                                <ReceiptFileInput accentColor="cyan" label="Foto del voucher / comprobante (opcional)" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
                                 <textarea
                                     name="notes"
                                     placeholder="Indicaciones adicionales"

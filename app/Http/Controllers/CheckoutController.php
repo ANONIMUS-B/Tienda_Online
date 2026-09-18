@@ -6,6 +6,7 @@ use App\Http\Requests\StoreCheckoutRequest;
 use App\Mail\OrderConfirmation;
 use App\Models\CompanySetting;
 use App\Models\Order;
+use App\Services\ImageUploader;
 use App\Services\ShoppingCart;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +19,8 @@ use Inertia\Response;
 
 class CheckoutController extends Controller
 {
+    public function __construct(private ImageUploader $images) {}
+
     public function create(ShoppingCart $cart): Response|RedirectResponse
     {
         $items = $cart->items();
@@ -38,7 +41,18 @@ class CheckoutController extends Controller
             $whatsappUrl = 'https://wa.me/'.preg_replace('/\D/', '', (string) $settings->whatsapp_number).'?text='.rawurlencode($message);
         }
 
-        return Inertia::render('checkout/create', ['items' => $items, 'subtotal' => round($items->sum('total'), 2), 'paymentMethods' => $methods, 'whatsappUrl' => $whatsappUrl]);
+        return Inertia::render('checkout/create', [
+            'items' => $items,
+            'subtotal' => round($items->sum('total'), 2),
+            'paymentMethods' => $methods,
+            'whatsappUrl' => $whatsappUrl,
+            'companySettings' => [
+                'yape_number' => $settings->yape_number ?: '925523419',
+                'yape_qr_path' => $settings->yape_qr_path,
+                'bank_name' => $settings->bank_name,
+                'bank_account' => $settings->bank_account,
+            ],
+        ]);
     }
 
     public function store(StoreCheckoutRequest $request, ShoppingCart $cart): RedirectResponse
@@ -48,7 +62,13 @@ class CheckoutController extends Controller
         if (! array_key_exists($request->string('payment_method')->toString(), $enabledMethods)) {
             throw ValidationException::withMessages(['payment_method' => 'Este método de pago no está habilitado.']);
         }
-        $order = DB::transaction(function () use ($request, $cart): Order {
+
+        $receiptPath = null;
+        if ($request->hasFile('payment_receipt')) {
+            $receiptPath = $this->images->replace($request->file('payment_receipt'), 'receipts');
+        }
+
+        $order = DB::transaction(function () use ($request, $cart, $receiptPath): Order {
             $items = $cart->items(lock: true);
             if ($items->isEmpty()) {
                 throw ValidationException::withMessages(['cart' => 'El carrito está vacío.']);
@@ -60,7 +80,21 @@ class CheckoutController extends Controller
             }
             $subtotal = round($items->sum('total'), 2);
             $shipping = $request->string('shipping_method')->toString() === 'delivery' ? 15.0 : 0.0;
-            $order = Order::query()->create([...$request->validated(), 'user_id' => $request->user()?->id, 'number' => 'JB-'.now()->format('Ymd').'-'.Str::upper(Str::random(6)), 'subtotal' => $subtotal, 'shipping_total' => $shipping, 'total' => $subtotal + $shipping]);
+
+            $data = $request->safe()->except(['payment_receipt']);
+            if ($receiptPath) {
+                $data['payment_receipt_path'] = $receiptPath;
+            }
+
+            $order = Order::query()->create([
+                ...$data,
+                'user_id' => $request->user()?->id,
+                'number' => 'JB-'.now()->format('Ymd').'-'.Str::upper(Str::random(6)),
+                'subtotal' => $subtotal,
+                'shipping_total' => $shipping,
+                'total' => $subtotal + $shipping,
+            ]);
+
             foreach ($items as $item) {
                 $product = $item['product'];
                 $order->items()->create(['product_id' => $product->id, 'sku' => $product->sku, 'name' => $product->name, 'quantity' => $item['quantity'], 'unit_price' => $item['unit_price'], 'total' => $item['total']]);

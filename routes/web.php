@@ -55,13 +55,15 @@ Route::post('/carrito', [CartController::class, 'store'])->name('cart.store');
 Route::patch('/carrito/{product}', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/carrito/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
 Route::middleware('auth')->group(function () {
+    Route::get('/mis-pedidos', [CustomerOrderController::class, 'index'])->name('orders.index');
     Route::post('/membresia-software', [SoftwareMembershipController::class, 'store'])->name('software-memberships.store');
     Route::get('/mis-solicitudes', [ServiceRequestController::class, 'index'])->name('service-requests.index');
     Route::post('/solicitudes-servicio', [ServiceRequestController::class, 'store'])->name('service-requests.store');
     Route::get('/finalizar-compra', [CheckoutController::class, 'create'])->name('checkout.create');
     Route::post('/finalizar-compra', [CheckoutController::class, 'store'])->name('checkout.store');
 });
-Route::get('/pedido/{number}', [CustomerOrderController::class, 'show'])->middleware('signed')->name('orders.show');
+Route::get('/pedido/{number}', [CustomerOrderController::class, 'show'])->name('orders.show');
+Route::post('/pedido/{number}/registrar-pago', [CustomerOrderController::class, 'submitPaymentProof'])->name('orders.submit-payment');
 
 Route::prefix('{current_team}')
     ->middleware(['auth', 'verified', EnsureTeamMembership::class])
@@ -99,6 +101,8 @@ Route::prefix('{current_team}')
                 ->names('admin.orders');
             Route::post('administracion/pedidos/{order}/emitir-comprobante', [OrderController::class, 'issue'])->name('admin.orders.issue');
             Route::post('administracion/pedidos/{order}/compartir-comprobante', [OrderController::class, 'share'])->name('admin.orders.share');
+            Route::post('administracion/pedidos/{order}/aprobar-pago', [OrderController::class, 'approvePayment'])->name('admin.orders.approve-payment');
+            Route::post('administracion/pedidos/{order}/rechazar-pago', [OrderController::class, 'rejectPayment'])->name('admin.orders.reject-payment');
             Route::resource('administracion/software', SoftwareProgramController::class)
                 ->parameters(['software' => 'software_program'])
                 ->except('show')

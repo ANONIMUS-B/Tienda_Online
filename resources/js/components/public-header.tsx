@@ -4,6 +4,7 @@ import {
     Bell,
     ChevronDown,
     ChevronRight,
+    FileText,
     LogOut,
     Menu,
     Package,
@@ -62,7 +63,7 @@ export default function PublicHeader() {
     const currentPath = page.url.split('?')[0];
     const dashboardUrl = currentTeam ? dashboard(currentTeam.slug) : '/';
     const isCustomer = auth.user?.role === 'user';
-    const accountUrl = isCustomer ? cart() : dashboardUrl;
+    const accountUrl = isCustomer ? '/mis-pedidos' : dashboardUrl;
     const notificationCount = serviceNotifications.unread + accountNotifications.unread + (membershipNotice ? 1 : 0);
     return (
         <>
@@ -82,16 +83,32 @@ export default function PublicHeader() {
                         onClick={() => setCategoriesOpen(!categoriesOpen)}
                         aria-expanded={categoriesOpen}
                         aria-controls="categories-mega-menu"
-                        className={`hidden items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-bold transition xl:flex ${categoriesOpen ? 'border-lime-400 bg-lime-400 text-black' : 'border-lime-400/25 bg-lime-400/8 text-lime-300 hover:border-lime-400/60'}`}
+                        className={`group hidden items-center gap-2.5 rounded-xl border px-3.5 py-2 text-xs font-bold transition-all xl:flex cursor-pointer ${
+                            categoriesOpen
+                                ? 'border-cyan-600 bg-cyan-600 text-white shadow-sm shadow-cyan-600/20'
+                                : 'border-slate-200 bg-slate-50/80 text-slate-700 hover:border-cyan-300 hover:bg-cyan-50/70 hover:text-cyan-800 shadow-xs'
+                        }`}
                     >
-                        {categoriesOpen ? (
-                            <X className="size-4" />
-                        ) : (
-                            <Menu className="size-4" />
-                        )}
-                        Categorías
+                        <span
+                            className={`grid size-6 place-items-center rounded-lg transition-colors ${
+                                categoriesOpen
+                                    ? 'bg-white/20 text-white'
+                                    : 'bg-cyan-100 text-cyan-700 group-hover:bg-cyan-200/80'
+                            }`}
+                        >
+                            {categoriesOpen ? (
+                                <X className="size-3.5" />
+                            ) : (
+                                <Menu className="size-3.5" />
+                            )}
+                        </span>
+                        <span>Categorías</span>
                         <ChevronDown
-                            className={`size-3.5 transition ${categoriesOpen ? 'rotate-180' : ''}`}
+                            className={`size-3 transition-transform duration-200 ${
+                                categoriesOpen
+                                    ? 'rotate-180 text-white'
+                                    : 'text-slate-400 group-hover:text-cyan-600'
+                            }`}
                         />
                     </button>
                     <nav className="hidden items-center gap-4 xl:flex">
@@ -146,7 +163,7 @@ export default function PublicHeader() {
                                                 Notificaciones
                                             </p>
                                             <p className="text-xs text-slate-500">
-                                                Seguimiento de tus solicitudes
+                                                Seguimiento de tus pedidos y solicitudes
                                             </p>
                                         </div>
                                         {membershipNotice && (
@@ -192,15 +209,34 @@ export default function PublicHeader() {
                                                 ),
                                             )
                                         )}
-                                        <Link
-                                            href="/mis-solicitudes"
-                                            onClick={() =>
-                                                setNotificationsOpen(false)
-                                            }
-                                            className="block px-4 py-3 text-center text-sm font-bold text-cyan-600"
-                                        >
-                                            Ver todas mis solicitudes
-                                        </Link>
+                                        <div className="border-t border-cyan-100 bg-cyan-50/40 divide-y divide-cyan-100/70">
+                                            <Link
+                                                href="/mis-pedidos"
+                                                onClick={() =>
+                                                    setNotificationsOpen(false)
+                                                }
+                                                className="flex items-center justify-between px-4 py-2.5 text-xs font-bold text-cyan-700 hover:bg-cyan-100/60 transition"
+                                            >
+                                                <span className="flex items-center gap-2">
+                                                    <Package className="size-4 text-cyan-600 shrink-0" />
+                                                    Ver todos mis pedidos
+                                                </span>
+                                                <span className="text-cyan-500 font-bold">→</span>
+                                            </Link>
+                                            <Link
+                                                href="/mis-solicitudes"
+                                                onClick={() =>
+                                                    setNotificationsOpen(false)
+                                                }
+                                                className="flex items-center justify-between px-4 py-2.5 text-xs font-bold text-cyan-700 hover:bg-cyan-100/60 transition"
+                                            >
+                                                <span className="flex items-center gap-2">
+                                                    <FileText className="size-4 text-cyan-600 shrink-0" />
+                                                    Ver todas mis solicitudes
+                                                </span>
+                                                <span className="text-cyan-500 font-bold">→</span>
+                                            </Link>
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -222,12 +258,14 @@ export default function PublicHeader() {
                         )}
                         {auth.user ? (
                             <>
-                                <Link
-                                    href={accountUrl}
-                                    className="ml-2 rounded-full bg-lime-400 px-5 py-2.5 text-sm font-bold text-black"
-                                >
-                                    {isCustomer ? 'Mi carrito' : 'Mi panel'}
-                                </Link>
+                                {!isCustomer && (
+                                    <Link
+                                        href={dashboardUrl}
+                                        className="ml-2 rounded-full bg-lime-400 px-5 py-2.5 text-sm font-bold text-black"
+                                    >
+                                        Mi panel
+                                    </Link>
+                                )}
                                 <Link
                                     href={logout()}
                                     method="post"
@@ -366,9 +404,17 @@ export default function PublicHeader() {
                         )}
                         {auth.user && (
                             <>
+                                <Link
+                                    href="/mis-pedidos"
+                                    onClick={() => setOpen(false)}
+                                    className="mt-2 flex items-center justify-center gap-2 rounded-xl border border-lime-400/40 px-4 py-3 font-bold text-lime-400"
+                                >
+                                    <Package className="size-5" /> Mis Pedidos
+                                </Link>
                                 {!isCustomer && (
                                     <Link
                                         href={dashboardUrl}
+                                        onClick={() => setOpen(false)}
                                         className="mt-2 rounded-xl border border-lime-400/40 px-4 py-3 text-center font-bold text-lime-400"
                                     >
                                         Mi panel
@@ -396,97 +442,98 @@ export default function PublicHeader() {
                         type="button"
                         aria-label="Cerrar categorías"
                         onClick={() => setCategoriesOpen(false)}
-                        className="fixed inset-0 top-20 cursor-default bg-black/55 backdrop-blur-sm"
+                        className="fixed inset-0 top-20 cursor-default bg-slate-900/30 backdrop-blur-xs transition-opacity"
                     />
-                    <div className="border-brand-support/20 bg-brand-background relative mx-auto max-h-[calc(100vh-6rem)] max-w-[1400px] overflow-y-auto border-x border-b shadow-[0_30px_80px_rgba(0,0,0,.65)] xl:rounded-b-3xl">
-                        <div className="flex items-center justify-between border-b border-white/8 px-5 py-4 sm:px-7">
+                    <div className="relative mx-auto max-h-[calc(100vh-6rem)] max-w-6xl overflow-hidden rounded-b-3xl border-x border-b border-cyan-100 bg-white shadow-2xl shadow-cyan-950/15">
+                        <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/80 px-6 py-4">
                             <div>
-                                <p className="text-xs font-extrabold tracking-[.2em] text-lime-400 uppercase">
-                                    Catálogo
-                                </p>
-                                <h2 className="mt-1 text-xl font-black">
+                                <span className="inline-block rounded-full bg-cyan-100 px-3 py-1 text-[11px] font-extrabold tracking-wider text-cyan-800 uppercase">
+                                    Catálogo de Productos
+                                </span>
+                                <h2 className="mt-1 text-lg font-black text-slate-900">
                                     Explora nuestras categorías
                                 </h2>
                             </div>
                             <button
                                 type="button"
                                 onClick={() => setCategoriesOpen(false)}
-                                className="rounded-full border border-white/10 p-2.5 text-white/55 transition hover:border-lime-400/40 hover:text-lime-400"
+                                className="grid size-9 place-items-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
                                 aria-label="Cerrar menú de categorías"
                             >
-                                <X className="size-5" />
+                                <X className="size-4" />
                             </button>
                         </div>
-                        <div className="grid gap-px bg-white/8 sm:grid-cols-2 xl:grid-cols-4">
+                        <div className="grid max-h-[calc(100vh-14rem)] gap-4 overflow-y-auto p-6 sm:grid-cols-2 xl:grid-cols-4">
                             {(catalogCategories as CatalogCategory[]).map(
                                 ({ id, name, slug, image_path, children }) => (
                                     <section
                                         key={id}
-                                        className="bg-brand-background p-5 sm:p-6"
+                                        className="group flex flex-col justify-between rounded-2xl border border-slate-100 bg-slate-50/50 p-4.5 transition hover:border-cyan-200 hover:bg-white hover:shadow-md hover:shadow-cyan-500/5"
                                     >
-                                        <Link
-                                            href={`${products().url}?category=${slug}`}
-                                            onClick={() => {
-                                                setCategoriesOpen(false);
-                                                setOpen(false);
-                                            }}
-                                            className="group flex items-center gap-3"
-                                        >
-                                            <span className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-lime-400/10 text-lime-400 transition group-hover:bg-lime-400 group-hover:text-black">
-                                                {image_path ? (
-                                                    <img
-                                                        src={image_path}
-                                                        alt=""
-                                                        className="size-full object-cover"
-                                                    />
-                                                ) : (
-                                                    <Package className="size-5" />
+                                        <div>
+                                            <Link
+                                                href={`${products().url}?category=${slug}`}
+                                                onClick={() => {
+                                                    setCategoriesOpen(false);
+                                                    setOpen(false);
+                                                }}
+                                                className="flex items-center gap-3"
+                                            >
+                                                <span className="grid size-11 shrink-0 place-items-center overflow-hidden rounded-xl bg-cyan-100/70 text-cyan-700 transition-all group-hover:bg-cyan-500 group-hover:text-white">
+                                                    {image_path ? (
+                                                        <img
+                                                            src={image_path}
+                                                            alt=""
+                                                            className="size-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <Package className="size-5" />
+                                                    )}
+                                                </span>
+                                                <span className="font-bold text-sm text-slate-900 transition group-hover:text-cyan-600">
+                                                    {name}
+                                                </span>
+                                                <ChevronRight className="ml-auto size-4 text-slate-300 transition group-hover:translate-x-1 group-hover:text-cyan-600" />
+                                            </Link>
+                                            <div className="mt-3.5 flex flex-col gap-1 border-t border-slate-200/60 pt-2.5">
+                                                {children.slice(0, 5).map((child) => (
+                                                    <Link
+                                                        key={child.id}
+                                                        href={`${products().url}?category=${child.slug}`}
+                                                        onClick={() => {
+                                                            setCategoriesOpen(
+                                                                false,
+                                                            );
+                                                            setOpen(false);
+                                                        }}
+                                                        className="rounded-lg px-2.5 py-1 text-xs font-medium text-slate-600 transition hover:bg-cyan-50 hover:text-cyan-700"
+                                                    >
+                                                        {child.name}
+                                                    </Link>
+                                                ))}
+                                                {children.length === 0 && (
+                                                    <Link
+                                                        href={`${products().url}?category=${slug}`}
+                                                        onClick={() => {
+                                                            setCategoriesOpen(
+                                                                false,
+                                                            );
+                                                            setOpen(false);
+                                                        }}
+                                                        className="rounded-lg px-2.5 py-1 text-xs font-medium text-cyan-600 hover:underline"
+                                                    >
+                                                        Ver productos →
+                                                    </Link>
                                                 )}
-                                            </span>
-                                            <span className="font-extrabold group-hover:text-lime-400">
-                                                {name}
-                                            </span>
-                                            <ChevronRight className="ml-auto size-4 text-white/25 transition group-hover:translate-x-1 group-hover:text-lime-400" />
-                                        </Link>
-                                        <div className="mt-5 grid gap-1">
-                                            {children.map((child) => (
-                                                <Link
-                                                    key={child.id}
-                                                    href={`${products().url}?category=${child.slug}`}
-                                                    onClick={() => {
-                                                        setCategoriesOpen(
-                                                            false,
-                                                        );
-                                                        setOpen(false);
-                                                    }}
-                                                    className="rounded-lg px-3 py-2 text-sm text-white/50 transition hover:bg-white/5 hover:text-white"
-                                                >
-                                                    {child.name}
-                                                </Link>
-                                            ))}
-                                            {children.length === 0 && (
-                                                <Link
-                                                    href={`${products().url}?category=${slug}`}
-                                                    onClick={() => {
-                                                        setCategoriesOpen(
-                                                            false,
-                                                        );
-                                                        setOpen(false);
-                                                    }}
-                                                    className="rounded-lg px-3 py-2 text-sm text-white/50 transition hover:bg-white/5 hover:text-white"
-                                                >
-                                                    Ver productos
-                                                </Link>
-                                            )}
+                                            </div>
                                         </div>
                                     </section>
                                 ),
                             )}
                         </div>
-                        <div className="flex flex-col justify-between gap-3 border-t border-white/8 bg-black/15 px-5 py-4 sm:flex-row sm:items-center sm:px-7">
-                            <p className="text-sm text-white/45">
-                                Encuentra equipos, componentes y accesorios en
-                                un solo lugar.
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/80 px-6 py-3.5">
+                            <p className="text-xs text-slate-500">
+                                Equipos, componentes, software y accesorios con garantía oficial.
                             </p>
                             <Link
                                 href={categories()}
@@ -494,10 +541,10 @@ export default function PublicHeader() {
                                     setCategoriesOpen(false);
                                     setOpen(false);
                                 }}
-                                className="inline-flex items-center gap-2 text-sm font-bold text-lime-400"
+                                className="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-600 transition hover:text-cyan-700 hover:underline"
                             >
-                                Ver todas las categorías
-                                <ArrowRight className="size-4" />
+                                Ver catálogo completo
+                                <ArrowRight className="size-3.5" />
                             </Link>
                         </div>
                     </div>

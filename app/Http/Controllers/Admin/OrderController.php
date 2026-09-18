@@ -84,4 +84,23 @@ class OrderController extends Controller
             ? $redirect->with('whatsapp_url', 'https://wa.me/'.preg_replace('/\D/', '', $order->customer_phone).'?text='.$message)
             : $redirect;
     }
+
+    public function approvePayment(Team $currentTeam, Order $order): RedirectResponse
+    {
+        $order->update([
+            'payment_status' => 'paid',
+            'status' => $order->status === 'pending' ? 'processing' : $order->status,
+        ]);
+
+        return back()->with('success', 'Pago de Yape aprobado correctamente.');
+    }
+
+    public function rejectPayment(Team $currentTeam, Order $order): RedirectResponse
+    {
+        $order->update([
+            'payment_status' => 'rejected',
+        ]);
+
+        return back()->with('success', 'Pago rechazado.');
+    }
 }
