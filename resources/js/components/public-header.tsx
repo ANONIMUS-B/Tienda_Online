@@ -5,36 +5,38 @@ import {
     ChevronDown,
     ChevronRight,
     FileText,
-    LogOut,
     Menu,
+    MessageCircle,
     Package,
     ShoppingCart,
     X,
 } from 'lucide-react';
 import { useState } from 'react';
+import CustomerAccountMenu from '@/components/customer-account-menu';
 import AuthModal, { type AuthModalMode } from '@/components/auth-modal';
 import { openCartDrawer } from '@/components/cart-drawer';
 import SearchPopover from '@/components/search-popover';
-import { index as cart } from '@/routes/cart';
 import { index as programs } from '@/routes/programs';
 import {
     apps,
     categories,
-    contact,
     dashboard,
     home,
-    logout,
     products,
     services,
     software,
 } from '@/routes';
 
+const whatsappUrl =
+    'https://wa.me/51925523419?text=Hola%2C%20quiero%20más%20informaci%C3%B3n';
+
 const navigation = [
+    ['Productos', products],
     ['Servicios', services],
     ['Software', software],
-    ['Programas', programs],
+    ['Cracks', programs],
     ['Apps', apps],
-    ['Contacto', contact],
+    ['WhatsApp', () => whatsappUrl],
 ] as const;
 
 type CatalogCategory = {
@@ -63,19 +65,21 @@ export default function PublicHeader() {
     const currentPath = page.url.split('?')[0];
     const dashboardUrl = currentTeam ? dashboard(currentTeam.slug) : '/';
     const isCustomer = auth.user?.role === 'user';
-    const accountUrl = isCustomer ? '/mis-pedidos' : dashboardUrl;
-    const notificationCount = serviceNotifications.unread + accountNotifications.unread + (membershipNotice ? 1 : 0);
+    const notificationCount =
+        serviceNotifications.unread +
+        accountNotifications.unread +
+        (membershipNotice ? 1 : 0);
     return (
         <>
             <header className="border-brand-primary/25 bg-brand-background/95 fixed inset-x-0 top-0 z-50 border-b shadow-lg shadow-black/10 backdrop-blur-xl">
                 <div className="mx-auto flex h-20 max-w-[1500px] items-center justify-between px-5 lg:px-8">
                     <Link href={home()} prefetch className="flex items-center">
                         <img
-                            src="/images/brand/jbtechline-logo.png"
-                            alt="JBTECHLINE - Tu aliado tecnológico"
+                            src="/images/brand/jbtechline-logo-v2.png"
+                            alt="JB TECHLINE — Tu aliado estratégico en tecnología"
                             loading="eager"
                             draggable={false}
-                            className="h-12 w-auto max-w-[240px] object-contain sm:h-14 lg:h-16"
+                            className="h-auto w-[180px] object-contain sm:w-[220px] lg:w-[240px]"
                         />
                     </Link>
                     <button
@@ -83,10 +87,10 @@ export default function PublicHeader() {
                         onClick={() => setCategoriesOpen(!categoriesOpen)}
                         aria-expanded={categoriesOpen}
                         aria-controls="categories-mega-menu"
-                        className={`group hidden items-center gap-2.5 rounded-xl border px-3.5 py-2 text-xs font-bold transition-all xl:flex cursor-pointer ${
+                        className={`group hidden cursor-pointer items-center gap-2.5 rounded-xl border px-3.5 py-2 text-xs font-bold transition-all xl:flex ${
                             categoriesOpen
                                 ? 'border-cyan-600 bg-cyan-600 text-white shadow-sm shadow-cyan-600/20'
-                                : 'border-slate-200 bg-slate-50/80 text-slate-700 hover:border-cyan-300 hover:bg-cyan-50/70 hover:text-cyan-800 shadow-xs'
+                                : 'border-slate-200 bg-slate-50/80 text-slate-700 shadow-xs hover:border-cyan-300 hover:bg-cyan-50/70 hover:text-cyan-800'
                         }`}
                     >
                         <span
@@ -115,27 +119,49 @@ export default function PublicHeader() {
                         <Link
                             href={home()}
                             prefetch
-                            className={`text-xs font-medium transition hover:text-lime-400 ${currentPath === '/' ? 'text-lime-400' : 'text-white/65'}`}
+                            className={`inline-flex items-center gap-2 text-xs font-medium transition ${currentPath === '/' ? 'rounded-full border border-cyan-400 bg-cyan-200/80 px-3 py-2 font-bold text-slate-900 shadow-sm shadow-cyan-300/30' : 'text-white/75 hover:text-lime-400'}`}
                         >
                             Inicio
                         </Link>
-                        <Link
-                            href={products()}
-                            prefetch
-                            className={`text-xs font-medium transition hover:text-lime-400 ${currentPath.startsWith('/productos') ? 'text-lime-400' : 'text-white/65'}`}
-                        >
-                            Productos
-                        </Link>
-                        {navigation.map(([label, route]) => (
-                            <Link
-                                key={label}
-                                href={route()}
-                                prefetch
-                                className={`text-xs font-medium transition hover:text-lime-400 ${currentPath === route().url ? 'text-lime-400' : 'text-white/65'}`}
-                            >
-                                {label}
-                            </Link>
-                        ))}
+                        {navigation.map(([label, route]) => {
+                            const destination = route();
+                            const href =
+                                typeof destination === 'string'
+                                    ? destination
+                                    : destination.url;
+                            const isWhatsAppLink = label === 'WhatsApp';
+                            const isCurrentPage =
+                                !isWhatsAppLink && currentPath === href;
+                            const linkProps = isWhatsAppLink
+                                ? {
+                                      href,
+                                      target: '_blank',
+                                      rel: 'noreferrer',
+                                  }
+                                : {
+                                      href,
+                                      prefetch: true,
+                                  };
+
+                            return (
+                                <Link
+                                    key={label}
+                                    {...linkProps}
+                                    className={`inline-flex items-center gap-2 text-xs font-medium transition ${
+                                        isWhatsAppLink
+                                            ? 'rounded-full bg-[#25D366] px-4 py-2.5 font-bold text-white shadow-lg shadow-emerald-500/20 hover:bg-[#20bd5a]'
+                                            : isCurrentPage
+                                              ? 'rounded-full border border-cyan-400 bg-cyan-200/80 px-3 py-2 font-bold text-slate-900 shadow-sm shadow-cyan-300/30'
+                                              : 'text-white/75 hover:text-lime-400'
+                                    }`}
+                                >
+                                    {isWhatsAppLink && (
+                                        <MessageCircle className="size-3.5 shrink-0" />
+                                    )}
+                                    {label}
+                                </Link>
+                            );
+                        })}
                     </nav>
                     <div className="hidden items-center gap-2 xl:flex">
                         <SearchPopover showLabel />
@@ -163,22 +189,59 @@ export default function PublicHeader() {
                                                 Notificaciones
                                             </p>
                                             <p className="text-xs text-slate-500">
-                                                Seguimiento de tus pedidos y solicitudes
+                                                Seguimiento de tus pedidos y
+                                                solicitudes
                                             </p>
                                         </div>
                                         {membershipNotice && (
-                                            <Link href={programs()} onClick={() => setNotificationsOpen(false)} className="block border-b border-cyan-50 bg-amber-50 px-4 py-3 transition hover:bg-amber-100">
-                                                <p className="text-xs font-bold text-amber-700">Membresía por vencer</p>
-                                                <p className="mt-1 text-sm">Vence el {new Date(membershipNotice.expires_at).toLocaleDateString('es-PE')}.</p>
+                                            <Link
+                                                href={programs()}
+                                                onClick={() =>
+                                                    setNotificationsOpen(false)
+                                                }
+                                                className="block border-b border-cyan-50 bg-amber-50 px-4 py-3 transition hover:bg-amber-100"
+                                            >
+                                                <p className="text-xs font-bold text-amber-700">
+                                                    Membresía por vencer
+                                                </p>
+                                                <p className="mt-1 text-sm">
+                                                    Vence el{' '}
+                                                    {new Date(
+                                                        membershipNotice.expires_at,
+                                                    ).toLocaleDateString(
+                                                        'es-PE',
+                                                    )}
+                                                    .
+                                                </p>
                                             </Link>
                                         )}
-                                        {accountNotifications.latest.map((notification: any) => (
-                                            <a key={notification.id} href={notification.data.url} className="block border-b border-cyan-50 bg-cyan-50/50 px-4 py-3 transition hover:bg-cyan-50">
-                                                <p className="text-xs font-bold text-cyan-600">{notification.data.title}</p>
-                                                <p className="mt-1 text-sm">{notification.data.message}</p>
-                                            </a>
-                                        ))}
-                                        {serviceNotifications.latest.length === 0 && accountNotifications.latest.length === 0 && !membershipNotice ? (
+                                        {accountNotifications.latest.map(
+                                            (notification: any) => (
+                                                <a
+                                                    key={notification.id}
+                                                    href={notification.data.url}
+                                                    className="block border-b border-cyan-50 bg-cyan-50/50 px-4 py-3 transition hover:bg-cyan-50"
+                                                >
+                                                    <p className="text-xs font-bold text-cyan-600">
+                                                        {
+                                                            notification.data
+                                                                .title
+                                                        }
+                                                    </p>
+                                                    <p className="mt-1 text-sm">
+                                                        {
+                                                            notification.data
+                                                                .message
+                                                        }
+                                                    </p>
+                                                </a>
+                                            ),
+                                        )}
+                                        {serviceNotifications.latest.length ===
+                                            0 &&
+                                        accountNotifications.latest.length ===
+                                            0 &&
+                                        !membershipNotice ? (
                                             <p className="px-4 py-6 text-center text-sm text-slate-500">
                                                 Aún no tienes respuestas.
                                             </p>
@@ -209,32 +272,36 @@ export default function PublicHeader() {
                                                 ),
                                             )
                                         )}
-                                        <div className="border-t border-cyan-100 bg-cyan-50/40 divide-y divide-cyan-100/70">
+                                        <div className="divide-y divide-cyan-100/70 border-t border-cyan-100 bg-cyan-50/40">
                                             <Link
                                                 href="/mis-pedidos"
                                                 onClick={() =>
                                                     setNotificationsOpen(false)
                                                 }
-                                                className="flex items-center justify-between px-4 py-2.5 text-xs font-bold text-cyan-700 hover:bg-cyan-100/60 transition"
+                                                className="flex items-center justify-between px-4 py-2.5 text-xs font-bold text-cyan-700 transition hover:bg-cyan-100/60"
                                             >
                                                 <span className="flex items-center gap-2">
-                                                    <Package className="size-4 text-cyan-600 shrink-0" />
+                                                    <Package className="size-4 shrink-0 text-cyan-600" />
                                                     Ver todos mis pedidos
                                                 </span>
-                                                <span className="text-cyan-500 font-bold">→</span>
+                                                <span className="font-bold text-cyan-500">
+                                                    →
+                                                </span>
                                             </Link>
                                             <Link
                                                 href="/mis-solicitudes"
                                                 onClick={() =>
                                                     setNotificationsOpen(false)
                                                 }
-                                                className="flex items-center justify-between px-4 py-2.5 text-xs font-bold text-cyan-700 hover:bg-cyan-100/60 transition"
+                                                className="flex items-center justify-between px-4 py-2.5 text-xs font-bold text-cyan-700 transition hover:bg-cyan-100/60"
                                             >
                                                 <span className="flex items-center gap-2">
-                                                    <FileText className="size-4 text-cyan-600 shrink-0" />
+                                                    <FileText className="size-4 shrink-0 text-cyan-600" />
                                                     Ver todas mis solicitudes
                                                 </span>
-                                                <span className="text-cyan-500 font-bold">→</span>
+                                                <span className="font-bold text-cyan-500">
+                                                    →
+                                                </span>
                                             </Link>
                                         </div>
                                     </div>
@@ -266,14 +333,10 @@ export default function PublicHeader() {
                                         Mi panel
                                     </Link>
                                 )}
-                                <Link
-                                    href={logout()}
-                                    method="post"
-                                    as="button"
-                                    className="flex items-center gap-2 rounded-full border border-white/15 px-4 py-2.5 text-sm font-semibold text-white/75 hover:border-red-300/50 hover:text-red-300"
-                                >
-                                    <LogOut className="size-4" /> Cerrar sesión
-                                </Link>
+                                <CustomerAccountMenu
+                                    user={auth.user}
+                                    onNavigate={() => setOpen(false)}
+                                />
                             </>
                         ) : (
                             <>
@@ -331,23 +394,31 @@ export default function PublicHeader() {
                         >
                             Inicio
                         </Link>
-                        <Link
-                            href={products()}
-                            onClick={() => setOpen(false)}
-                            className="rounded-xl px-4 py-3 text-sm text-white/75"
-                        >
-                            Productos
-                        </Link>
-                        {navigation.map(([label, route]) => (
-                            <Link
-                                key={label}
-                                href={route()}
-                                onClick={() => setOpen(false)}
-                                className="rounded-xl px-4 py-3 text-sm text-white/75"
-                            >
-                                {label}
-                            </Link>
-                        ))}
+                        {navigation.map(([label, route]) => {
+                            const isWhatsAppLink = label === 'WhatsApp';
+
+                            return (
+                                <Link
+                                    key={label}
+                                    href={route()}
+                                    onClick={() => setOpen(false)}
+                                    target={
+                                        isWhatsAppLink ? '_blank' : undefined
+                                    }
+                                    rel={
+                                        isWhatsAppLink
+                                            ? 'noreferrer'
+                                            : undefined
+                                    }
+                                    className={`flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold ${isWhatsAppLink ? 'bg-[#25D366] text-white shadow-lg shadow-emerald-500/20' : 'text-white/75'}`}
+                                >
+                                    {isWhatsAppLink && (
+                                        <MessageCircle className="size-4 shrink-0" />
+                                    )}
+                                    {label}
+                                </Link>
+                            );
+                        })}
                         <div className="mt-3 border-t border-white/8 pt-3">
                             <SearchPopover showLabel />
                         </div>
@@ -420,14 +491,10 @@ export default function PublicHeader() {
                                         Mi panel
                                     </Link>
                                 )}
-                                <Link
-                                    href={logout()}
-                                    method="post"
-                                    as="button"
-                                    className="mt-2 flex items-center justify-center gap-2 rounded-xl border border-red-300/30 px-4 py-3 text-red-300"
-                                >
-                                    <LogOut className="size-4" /> Cerrar sesión
-                                </Link>
+                                <CustomerAccountMenu
+                                    user={auth.user}
+                                    onNavigate={() => setOpen(false)}
+                                />
                             </>
                         )}
                     </nav>
@@ -490,27 +557,29 @@ export default function PublicHeader() {
                                                         <Package className="size-5" />
                                                     )}
                                                 </span>
-                                                <span className="font-bold text-sm text-slate-900 transition group-hover:text-cyan-600">
+                                                <span className="text-sm font-bold text-slate-900 transition group-hover:text-cyan-600">
                                                     {name}
                                                 </span>
                                                 <ChevronRight className="ml-auto size-4 text-slate-300 transition group-hover:translate-x-1 group-hover:text-cyan-600" />
                                             </Link>
                                             <div className="mt-3.5 flex flex-col gap-1 border-t border-slate-200/60 pt-2.5">
-                                                {children.slice(0, 5).map((child) => (
-                                                    <Link
-                                                        key={child.id}
-                                                        href={`${products().url}?category=${child.slug}`}
-                                                        onClick={() => {
-                                                            setCategoriesOpen(
-                                                                false,
-                                                            );
-                                                            setOpen(false);
-                                                        }}
-                                                        className="rounded-lg px-2.5 py-1 text-xs font-medium text-slate-600 transition hover:bg-cyan-50 hover:text-cyan-700"
-                                                    >
-                                                        {child.name}
-                                                    </Link>
-                                                ))}
+                                                {children
+                                                    .slice(0, 5)
+                                                    .map((child) => (
+                                                        <Link
+                                                            key={child.id}
+                                                            href={`${products().url}?category=${child.slug}`}
+                                                            onClick={() => {
+                                                                setCategoriesOpen(
+                                                                    false,
+                                                                );
+                                                                setOpen(false);
+                                                            }}
+                                                            className="rounded-lg px-2.5 py-1 text-xs font-medium text-slate-600 transition hover:bg-cyan-50 hover:text-cyan-700"
+                                                        >
+                                                            {child.name}
+                                                        </Link>
+                                                    ))}
                                                 {children.length === 0 && (
                                                     <Link
                                                         href={`${products().url}?category=${slug}`}
@@ -531,9 +600,10 @@ export default function PublicHeader() {
                                 ),
                             )}
                         </div>
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/80 px-6 py-3.5">
+                        <div className="flex flex-col items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/80 px-6 py-3.5 sm:flex-row">
                             <p className="text-xs text-slate-500">
-                                Equipos, componentes, software y accesorios con garantía oficial.
+                                Equipos, componentes, software y accesorios con
+                                garantía oficial.
                             </p>
                             <Link
                                 href={categories()}

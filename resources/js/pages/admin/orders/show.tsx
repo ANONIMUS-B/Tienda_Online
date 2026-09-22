@@ -1,4 +1,4 @@
-import { Form, Head, usePage } from '@inertiajs/react';
+import { Form, Head, Link, usePage } from '@inertiajs/react';
 import {
     CheckCircle2,
     Download,
@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import AdminFormModal from '@/components/admin/admin-form-modal';
 import { Button } from '@/components/ui/button';
 import { index, update } from '@/routes/admin/orders';
+import { index as paymentsIndex } from '@/routes/admin/culqi';
 import type { Order } from '@/types/order';
 const receiptStatuses: Record<string, string> = {
     pending: 'Pendiente',
@@ -26,8 +27,10 @@ const receiptStatuses: Record<string, string> = {
 export default function OrderDetail({
     order,
     currentTeam,
+    customerOrderUrl,
 }: {
     order: Order;
+    customerOrderUrl: string;
     currentTeam: { slug: string };
 }) {
     const document = order.electronic_documents?.[0];
@@ -58,6 +61,34 @@ export default function OrderDetail({
             >
                 <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
                     <section className="bg-card rounded-xl border p-5 md:p-6">
+                        {order.payment_method === 'gateway' && (
+                            <div className="mb-5 grid gap-3 rounded-lg border p-4 text-sm">
+                                <p>
+                                    El estado de pago se confirma
+                                    automáticamente con Culqi.
+                                </p>
+                                <Link
+                                    href={paymentsIndex(currentTeam.slug, {
+                                        query: { search: order.number },
+                                    })}
+                                    className="underline"
+                                >
+                                    Ver operaciones y devoluciones
+                                </Link>
+                                <label className="grid gap-1">
+                                    Enlace de pago para el cliente (puedes
+                                    enviarlo por WhatsApp)
+                                    <input
+                                        readOnly
+                                        value={customerOrderUrl}
+                                        onFocus={(event) =>
+                                            event.target.select()
+                                        }
+                                        className="w-full rounded border p-2"
+                                    />
+                                </label>
+                            </div>
+                        )}
                         <h2 className="font-semibold">Productos</h2>
                         {order.items.map((item) => (
                             <div
@@ -88,88 +119,145 @@ export default function OrderDetail({
                             </p>
                         </div>
 
-                        <div className="mt-6 rounded-lg border border-purple-500/30 bg-purple-950/10 p-4 text-sm">
-                            <div className="flex items-center justify-between gap-2">
-                                <strong className="text-purple-300">
-                                    Verificación de Pago ({order.payment_method === 'yape' ? 'Yape / Plin' : order.payment_method === 'bank_transfer' ? 'Transferencia' : order.payment_method})
-                                </strong>
-                                <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
-                                    order.payment_status === 'paid' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
-                                    order.payment_status === 'rejected' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
-                                    'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                                }`}>
-                                    {order.payment_status === 'paid' ? 'Pago Aprobado ✓' : order.payment_status === 'rejected' ? 'Pago Rechazado ❌' : 'Pendiente'}
-                                </span>
-                            </div>
+                        {order.payment_method === 'bank_transfer' && (
+                            <div className="mt-6 rounded-lg border border-purple-500/30 bg-purple-950/10 p-4 text-sm">
+                                <div className="flex items-center justify-between gap-2">
+                                    <strong className="text-purple-300">
+                                        Verificación de transferencia bancaria
+                                    </strong>
+                                    <span
+                                        className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
+                                            order.payment_status === 'paid'
+                                                ? 'border border-emerald-500/30 bg-emerald-500/20 text-emerald-400'
+                                                : order.payment_status ===
+                                                    'rejected'
+                                                  ? 'border border-red-500/30 bg-red-500/20 text-red-400'
+                                                  : 'border border-amber-500/30 bg-amber-500/20 text-amber-300'
+                                        }`}
+                                    >
+                                        {order.payment_status === 'paid'
+                                            ? 'Pago Aprobado ✓'
+                                            : order.payment_status ===
+                                                'rejected'
+                                              ? 'Pago Rechazado ❌'
+                                              : 'Pendiente'}
+                                    </span>
+                                </div>
 
-                            <div className="mt-3 grid gap-2">
-                                <p className="text-muted-foreground">
-                                    <strong>N° de Operación:</strong>{' '}
-                                    <span className="font-mono font-bold text-foreground">{order.payment_reference || 'No ingresado'}</span>
-                                </p>
+                                <div className="mt-3 grid gap-2">
+                                    <p className="text-muted-foreground">
+                                        <strong>N° de Operación:</strong>{' '}
+                                        <span className="text-foreground font-mono font-bold">
+                                            {order.payment_reference ||
+                                                'No ingresado'}
+                                        </span>
+                                    </p>
 
-                                {order.payment_receipt_path ? (
-                                    <div className="mt-2">
-                                        <p className="font-medium text-xs mb-1 text-muted-foreground">Comprobante adjunto:</p>
-                                        <div className="flex items-center gap-3">
-                                            <img
-                                                src={order.payment_receipt_path.startsWith('/') ? order.payment_receipt_path : `/storage/${order.payment_receipt_path}`}
-                                                alt="Comprobante de pago"
-                                                className="max-h-56 rounded-lg border bg-black/40 object-contain p-1 transition cursor-pointer hover:opacity-85"
-                                                onClick={() => setShowReceiptModal(true)}
-                                            />
+                                    {order.payment_receipt_path ? (
+                                        <div className="mt-2">
+                                            <p className="text-muted-foreground mb-1 text-xs font-medium">
+                                                Comprobante adjunto:
+                                            </p>
+                                            <div className="flex items-center gap-3">
+                                                <img
+                                                    src={
+                                                        order.payment_receipt_path.startsWith(
+                                                            '/',
+                                                        )
+                                                            ? order.payment_receipt_path
+                                                            : `/storage/${order.payment_receipt_path}`
+                                                    }
+                                                    alt="Comprobante de pago"
+                                                    className="max-h-56 cursor-pointer rounded-lg border bg-black/40 object-contain p-1 transition hover:opacity-85"
+                                                    onClick={() =>
+                                                        setShowReceiptModal(
+                                                            true,
+                                                        )
+                                                    }
+                                                />
+                                            </div>
+                                            <div className="mt-2 flex items-center gap-3 text-xs">
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        setShowReceiptModal(
+                                                            true,
+                                                        )
+                                                    }
+                                                    className="flex items-center gap-1 font-semibold text-purple-400 hover:underline"
+                                                >
+                                                    <ExternalLink className="size-3" />{' '}
+                                                    Ver en pantalla completa
+                                                </button>
+                                                <a
+                                                    href={
+                                                        order.payment_receipt_path.startsWith(
+                                                            '/',
+                                                        )
+                                                            ? order.payment_receipt_path
+                                                            : `/storage/${order.payment_receipt_path}`
+                                                    }
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="text-muted-foreground font-semibold hover:underline"
+                                                >
+                                                    Abrir en nueva pestaña
+                                                </a>
+                                            </div>
                                         </div>
-                                        <div className="mt-2 flex items-center gap-3 text-xs">
-                                            <button
-                                                type="button"
-                                                onClick={() => setShowReceiptModal(true)}
-                                                className="font-semibold text-purple-400 hover:underline flex items-center gap-1"
-                                            >
-                                                <ExternalLink className="size-3" /> Ver en pantalla completa
-                                            </button>
-                                            <a
-                                                href={order.payment_receipt_path.startsWith('/') ? order.payment_receipt_path : `/storage/${order.payment_receipt_path}`}
-                                                target="_blank"
-                                                rel="noreferrer"
-                                                className="font-semibold text-muted-foreground hover:underline"
-                                            >
-                                                Abrir en nueva pestaña
-                                            </a>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <p className="text-xs text-muted-foreground italic">El cliente aún no ha adjuntado captura del comprobante.</p>
-                                )}
-                            </div>
+                                    ) : (
+                                        <p className="text-muted-foreground text-xs italic">
+                                            El cliente aún no ha adjuntado
+                                            captura del comprobante.
+                                        </p>
+                                    )}
+                                </div>
 
-                            <div className="mt-4 flex flex-wrap gap-2 pt-3 border-t">
-                                <Form action={`/${currentTeam.slug}/administracion/pedidos/${order.id}/aprobar-pago`} method="post">
-                                    {({ processing }) => (
-                                        <Button
-                                            type="submit"
-                                            disabled={processing || order.payment_status === 'paid'}
-                                            className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs"
-                                        >
-                                            <CheckCircle2 className="mr-1.5 size-4" />
-                                            {order.payment_status === 'paid' ? 'Pago Aprobado' : 'Aprobar Pago Yape'}
-                                        </Button>
-                                    )}
-                                </Form>
-                                <Form action={`/${currentTeam.slug}/administracion/pedidos/${order.id}/rechazar-pago`} method="post">
-                                    {({ processing }) => (
-                                        <Button
-                                            type="submit"
-                                            variant="outline"
-                                            disabled={processing || order.payment_status === 'rejected'}
-                                            className="border-red-500/40 text-red-400 hover:bg-red-500/10 font-semibold text-xs"
-                                        >
-                                            <XCircle className="mr-1.5 size-4" />
-                                            Rechazar Pago
-                                        </Button>
-                                    )}
-                                </Form>
+                                <div className="mt-4 flex flex-wrap gap-2 border-t pt-3">
+                                    <Form
+                                        action={`/${currentTeam.slug}/administracion/pedidos/${order.id}/aprobar-pago`}
+                                        method="post"
+                                    >
+                                        {({ processing }) => (
+                                            <Button
+                                                type="submit"
+                                                disabled={
+                                                    processing ||
+                                                    order.payment_status ===
+                                                        'paid'
+                                                }
+                                                className="bg-emerald-600 text-xs font-semibold text-white hover:bg-emerald-500"
+                                            >
+                                                <CheckCircle2 className="mr-1.5 size-4" />
+                                                {order.payment_status === 'paid'
+                                                    ? 'Pago Aprobado'
+                                                    : 'Aprobar transferencia'}
+                                            </Button>
+                                        )}
+                                    </Form>
+                                    <Form
+                                        action={`/${currentTeam.slug}/administracion/pedidos/${order.id}/rechazar-pago`}
+                                        method="post"
+                                    >
+                                        {({ processing }) => (
+                                            <Button
+                                                type="submit"
+                                                variant="outline"
+                                                disabled={
+                                                    processing ||
+                                                    order.payment_status ===
+                                                        'rejected'
+                                                }
+                                                className="border-red-500/40 text-xs font-semibold text-red-400 hover:bg-red-500/10"
+                                            >
+                                                <XCircle className="mr-1.5 size-4" />
+                                                Rechazar Pago
+                                            </Button>
+                                        )}
+                                    </Form>
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </section>
                     <aside className="grid content-start gap-5">
                         <Form
@@ -207,7 +295,14 @@ export default function OrderDetail({
                                         </option>
                                     </select>
                                     <select
-                                        name="payment_status"
+                                        name={
+                                            order.payment_method === 'gateway'
+                                                ? undefined
+                                                : 'payment_status'
+                                        }
+                                        disabled={
+                                            order.payment_method === 'gateway'
+                                        }
                                         value={paymentStatus}
                                         onChange={(event) =>
                                             setPaymentStatus(event.target.value)
@@ -320,7 +415,12 @@ export default function OrderDetail({
                                                     type="checkbox"
                                                     name="send_email"
                                                     value="1"
-                                                    defaultChecked
+                                                    defaultChecked={
+                                                        !!order.customer_email
+                                                    }
+                                                    disabled={
+                                                        !order.customer_email
+                                                    }
                                                 />
                                                 <Mail className="size-4" />{' '}
                                                 Enviar por correo
@@ -330,6 +430,9 @@ export default function OrderDetail({
                                                     type="checkbox"
                                                     name="open_whatsapp"
                                                     value="1"
+                                                    disabled={
+                                                        !order.customer_phone
+                                                    }
                                                 />
                                                 <MessageCircle className="size-4" />{' '}
                                                 Abrir WhatsApp
@@ -379,7 +482,7 @@ export default function OrderDetail({
                                         </p>
                                     )}
                                     {document && (
-                                        <div className="grid grid-cols-4 gap-2 text-center text-xs">
+                                        <div className="grid grid-cols-2 gap-2 text-center text-xs sm:grid-cols-5">
                                             {(
                                                 [
                                                     'json',
@@ -399,6 +502,12 @@ export default function OrderDetail({
                                                     {format}
                                                 </button>
                                             ))}
+                                            <a
+                                                href={`/${currentTeam.slug}/administracion/facturacion/${document.id}/pdf?format=ticket`}
+                                                className="rounded-md border p-2 uppercase hover:border-cyan-400 hover:bg-cyan-50"
+                                            >
+                                                Ticket
+                                            </a>
                                         </div>
                                     )}
                                 </>
@@ -499,22 +608,28 @@ export default function OrderDetail({
                             className="bg-background relative z-10 flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border shadow-2xl"
                         >
                             <header className="flex items-center justify-between border-b p-4">
-                                <h3 className="font-semibold text-lg">
+                                <h3 className="text-lg font-semibold">
                                     Comprobante de Pago — {order.number}
                                 </h3>
                                 <button
                                     type="button"
                                     onClick={() => setShowReceiptModal(false)}
-                                    className="grid size-9 place-items-center rounded-full border hover:bg-muted"
+                                    className="hover:bg-muted grid size-9 place-items-center rounded-full border"
                                 >
                                     <X className="size-5" />
                                 </button>
                             </header>
-                            <div className="min-h-0 flex-1 overflow-auto bg-slate-950 p-6 flex justify-center items-center">
+                            <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto bg-slate-950 p-6">
                                 <img
-                                    src={order.payment_receipt_path.startsWith('/') ? order.payment_receipt_path : `/storage/${order.payment_receipt_path}`}
+                                    src={
+                                        order.payment_receipt_path.startsWith(
+                                            '/',
+                                        )
+                                            ? order.payment_receipt_path
+                                            : `/storage/${order.payment_receipt_path}`
+                                    }
                                     alt="Comprobante completo"
-                                    className="max-h-[75vh] w-auto object-contain rounded-lg shadow-2xl"
+                                    className="max-h-[75vh] w-auto rounded-lg object-contain shadow-2xl"
                                 />
                             </div>
                         </section>

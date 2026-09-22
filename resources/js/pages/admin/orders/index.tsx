@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { Eye, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { index, show } from '@/routes/admin/orders';
+import { create, index, show } from '@/routes/admin/orders';
 import type { Order } from '@/types/order';
 const orderStatuses: Record<string, string> = {
     pending: 'Pendiente',
@@ -42,6 +42,13 @@ export default function OrdersIndex({
                     </p>
                 </div>
                 <div className="bg-card overflow-x-auto rounded-xl border">
+                    <div className="p-4">
+                        <Button asChild>
+                            <Link href={create(currentTeam.slug)}>
+                                Nueva venta / WhatsApp
+                            </Link>
+                        </Button>
+                    </div>
                     <table className="w-full min-w-[1050px] text-sm">
                         <thead>
                             <tr className="bg-muted/40 border-b text-left">

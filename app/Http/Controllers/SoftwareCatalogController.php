@@ -12,7 +12,12 @@ class SoftwareCatalogController extends Controller
 {
     public function index(Request $request): Response
     {
-        return $this->catalog($request);
+        return $this->catalog($request, 'software');
+    }
+
+    public function apps(Request $request): Response
+    {
+        return $this->catalog($request, 'apps');
     }
 
     public function show(SoftwareProgram $softwareProgram): Response
@@ -22,7 +27,7 @@ class SoftwareCatalogController extends Controller
         return Inertia::render('software/show', ['catalogType' => 'software', 'program' => $this->item($softwareProgram)]);
     }
 
-    private function catalog(Request $request): Response
+    private function catalog(Request $request, string $catalogType): Response
     {
         $catalog = Cache::remember('public.software.safe.'.sha1($request->getQueryString() ?? 'index'), now()->addMinutes(5), function () use ($request): array {
             $base = SoftwareProgram::query()->where('is_active', true)->where('is_own', true);
@@ -32,7 +37,7 @@ class SoftwareCatalogController extends Controller
             return ['programs' => $programs->toArray(), 'categories' => (clone $base)->distinct()->orderBy('category')->pluck('category')->all(), 'platforms' => (clone $base)->whereNotNull('platform')->distinct()->orderBy('platform')->pluck('platform')->all()];
         });
 
-        return Inertia::render('software/index', ['catalogType' => 'software', ...$catalog, 'filters' => $request->only(['q', 'category', 'platform'])]);
+        return Inertia::render('software/index', ['catalogType' => $catalogType, ...$catalog, 'filters' => $request->only(['q', 'category', 'platform'])]);
     }
 
     /** @return array<string,mixed> */

@@ -17,6 +17,9 @@ class ProfileUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        return $this->profileRules($this->user()->id);
+        return [
+            ...$this->profileRules($this->user()->id),
+            'phone' => ['sometimes', 'nullable', 'string', 'max:30', 'regex:/^\+?(?:[ ()-]*[0-9]){7,15}[ ()-]*$/'],
+        ];
     }
 }

@@ -1,7 +1,9 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, Link } from '@inertiajs/react';
 import { Download, Eye, FileText, X } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { update as updateIdentityLookup } from '@/routes/admin/identity-lookup';
+import { create as createOrder } from '@/routes/admin/orders';
 
 type Document = {
     id: number;
@@ -45,6 +47,8 @@ export default function ElectronicBilling({
     settings,
     hasApiToken,
     hasCertificate,
+    identitySettings,
+    hasIdentityToken,
     documents,
     currentTeam,
 }: any) {
@@ -88,6 +92,95 @@ export default function ElectronicBilling({
                         Productos, servicios y membresías en un solo registro.
                     </p>
                 </div>
+                <Button asChild>
+                    <Link href={createOrder(currentTeam.slug)}>
+                        Nueva venta / WhatsApp
+                    </Link>
+                </Button>
+                <Form
+                    action={updateIdentityLookup.url(currentTeam.slug)}
+                    method="put"
+                    className="bg-card grid gap-4 rounded-xl border p-5"
+                >
+                    {({ errors, processing }) => (
+                        <>
+                            <h2 className="font-semibold">
+                                Consulta de DNI y RUC
+                            </h2>
+                            <p className="text-muted-foreground text-sm">
+                                Servicio independiente de la emisión SUNAT.
+                                Contrata el acceso con el proveedor y guarda
+                                aquí su token. También puedes ingresar clientes
+                                manualmente.
+                            </p>
+                            <label className="grid gap-1 text-sm">
+                                Consultas automáticas
+                                <select
+                                    name="identity_lookup_enabled"
+                                    defaultValue={
+                                        identitySettings?.identity_lookup_enabled
+                                            ? '1'
+                                            : '0'
+                                    }
+                                    className="bg-background h-10 rounded-md border px-3"
+                                >
+                                    <option value="0">
+                                        Desactivadas / ingreso manual
+                                    </option>
+                                    <option value="1">Activadas</option>
+                                </select>
+                            </label>
+                            <label className="grid gap-1 text-sm">
+                                Proveedor
+                                <select
+                                    name="identity_lookup_provider"
+                                    defaultValue={
+                                        identitySettings?.identity_lookup_provider ??
+                                        'decolecta'
+                                    }
+                                    className="bg-background h-10 rounded-md border px-3"
+                                >
+                                    <option value="decolecta">Decolecta</option>
+                                </select>
+                            </label>
+                            <label className="grid gap-1 text-sm">
+                                Token de consulta
+                                <input
+                                    name="identity_lookup_token"
+                                    type="password"
+                                    autoComplete="new-password"
+                                    placeholder={
+                                        hasIdentityToken
+                                            ? 'Token guardado; deja vacío para conservarlo'
+                                            : 'Ingresa el token de tu cuenta'
+                                    }
+                                    className="bg-background h-10 rounded-md border px-3"
+                                />
+                            </label>
+                            <label className="flex items-center gap-2 text-sm">
+                                <input
+                                    type="checkbox"
+                                    name="forget_token"
+                                    value="1"
+                                />
+                                Eliminar token guardado (desactiva las consultas
+                                primero)
+                            </label>
+                            {Object.entries(errors).map(([key, message]) => (
+                                <p
+                                    key={key}
+                                    role="alert"
+                                    className="text-destructive text-sm"
+                                >
+                                    {message}
+                                </p>
+                            ))}
+                            <Button type="submit" disabled={processing}>
+                                Guardar consultas DNI/RUC
+                            </Button>
+                        </>
+                    )}
+                </Form>
                 <Form
                     method="put"
                     action={`/${currentTeam.slug}/administracion/facturacion`}
@@ -337,6 +430,12 @@ export default function ElectronicBilling({
                                                         {format}
                                                     </button>
                                                 ))}
+                                                <a
+                                                    href={`/${currentTeam.slug}/administracion/facturacion/${d.id}/pdf?format=ticket`}
+                                                    className="inline-flex h-9 items-center gap-1 rounded-md border px-2 uppercase hover:bg-cyan-50"
+                                                >
+                                                    Ticket
+                                                </a>
                                             </div>
                                         </td>
                                     </tr>

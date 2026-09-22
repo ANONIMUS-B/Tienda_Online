@@ -1,8 +1,14 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
-import { CheckCircle2, Clock, Upload, ExternalLink } from 'lucide-react';
+import { CheckCircle2, Upload, ExternalLink } from 'lucide-react';
 import { products } from '@/routes';
 import type { Order } from '@/types/order';
 import ReceiptFileInput from '@/components/receipt-file-input';
+import CulqiPayment, {
+    type CulqiConfiguration,
+} from '@/components/culqi-payment';
+import PagoEfectivoPayment, {
+    type PagoEfectivoConfiguration,
+} from '@/components/pago-efectivo-payment';
 
 function WhatsAppIcon({ className = 'size-4' }: { className?: string }) {
     return (
@@ -38,8 +44,14 @@ const field =
 export default function OrderShow({
     order,
     companySettings,
+    culqi,
+    pagoEfectivo,
+    receiptUrls,
 }: {
     order: Order;
+    culqi?: CulqiConfiguration | null;
+    pagoEfectivo?: PagoEfectivoConfiguration | null;
+    receiptUrls?: { a4: string; ticket: string } | null;
     companySettings?: {
         yape_number?: string;
         yape_qr_path?: string | null;
@@ -84,7 +96,28 @@ export default function OrderShow({
             `}</style>
             <Head title={`Pedido ${order.number}`} />
             <main className="mx-auto max-w-3xl px-5 pt-32 pb-20 sm:pt-36">
-                <div className="rounded-3xl border border-slate-200/90 bg-white p-8 sm:p-12 shadow-sm">
+                {culqi && (
+                    <CulqiPayment
+                        key={order.id}
+                        config={culqi}
+                        paid={
+                            ['paid', 'refunded'].includes(
+                                order.payment_status,
+                            ) || order.status === 'cancelled'
+                        }
+                    />
+                )}
+                {pagoEfectivo && (
+                    <PagoEfectivoPayment
+                        config={pagoEfectivo}
+                        paid={
+                            ['paid', 'refunded'].includes(
+                                order.payment_status,
+                            ) || order.status === 'cancelled'
+                        }
+                    />
+                )}
+                <div className="rounded-3xl border border-slate-200/90 bg-white p-8 shadow-sm sm:p-12">
                     <div className="flex items-center justify-between">
                         <CheckCircle2 className="size-14 text-cyan-500" />
                         <span
@@ -102,8 +135,10 @@ export default function OrderShow({
                     </h1>
                     <p className="mt-2 text-slate-500">
                         Número de pedido:{' '}
-                        <strong className="text-slate-800 font-mono">{order.number}</strong>.
-                        Enviamos la confirmación a {order.customer_email}.
+                        <strong className="font-mono text-slate-800">
+                            {order.number}
+                        </strong>
+                        . Enviamos la confirmación a {order.customer_email}.
                     </p>
 
                     {flash?.success && (
@@ -116,82 +151,107 @@ export default function OrderShow({
                         {order.items.map((item) => (
                             <div
                                 key={item.id}
-                                className="flex justify-between items-center rounded-xl bg-slate-50 border border-slate-100 p-4 text-sm"
+                                className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 p-4 text-sm"
                             >
-                                <span className="text-slate-700 font-medium">
+                                <span className="font-medium text-slate-700">
                                     {item.name} × {item.quantity}
                                 </span>
-                                <span className="font-bold text-slate-900">S/ {item.total}</span>
+                                <span className="font-bold text-slate-900">
+                                    S/ {item.total}
+                                </span>
                             </div>
                         ))}
                     </div>
 
-                    <div className="mt-6 flex justify-between items-center border-t border-slate-100 pt-5 text-2xl font-black">
+                    <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-5 text-2xl font-black">
                         <span className="text-slate-700">Total</span>
                         <span className="text-cyan-600">S/ {order.total}</span>
                     </div>
 
-                    {/* Yape / Bank Payment Info Section */}
-                    {['yape', 'bank_transfer'].includes(order.payment_method) && (
+                    {order.payment_method === 'bank_transfer' && (
                         <div className="mt-8 rounded-2xl border border-purple-200 bg-purple-50/70 p-6 shadow-xs">
                             <h2 className="text-lg font-bold text-purple-950">
-                                Información de Pago ({order.payment_method === 'yape' ? 'Yape / Plin' : 'Transferencia Bancaria'})
+                                Información de transferencia bancaria
                             </h2>
 
                             {order.payment_status === 'pending' && (
-                                <div className="mt-4 grid gap-4 sm:grid-cols-[1fr_auto] items-center rounded-xl bg-white p-4 border border-purple-200/80 shadow-xs">
+                                <div className="mt-4 grid items-center gap-4 rounded-xl border border-purple-200/80 bg-white p-4 shadow-xs sm:grid-cols-[1fr_auto]">
                                     <div>
                                         <p className="text-sm font-semibold text-purple-900">
                                             Yapear al número:{' '}
-                                            <strong className="text-purple-700 text-base font-extrabold">
-                                                {companySettings?.yape_number || '925523419'}
+                                            <strong className="text-base font-extrabold text-purple-700">
+                                                {companySettings?.yape_number ||
+                                                    '925523419'}
                                             </strong>
                                         </p>
                                         <p className="mt-1 text-xs text-slate-600">
-                                            Una vez realizado el Yape, ingresa tu N° de operación o adjunta el comprobante a continuación para que despachemos tu pedido.
+                                            Para este pedido anterior, registra
+                                            el número de operación si ya
+                                            pagaste. Las nuevas compras con Yape
+                                            se pagan mediante Culqi, sin subir
+                                            imágenes.
                                         </p>
                                     </div>
                                     {companySettings?.yape_qr_path && (
                                         <img
                                             src={`/storage/${companySettings.yape_qr_path}`}
                                             alt="QR Yape"
-                                            className="size-24 rounded-lg bg-white p-1 object-contain border border-slate-200 shadow-xs"
+                                            className="size-24 rounded-lg border border-slate-200 bg-white object-contain p-1 shadow-xs"
                                         />
                                     )}
                                 </div>
                             )}
 
-                            {(order.payment_reference || order.payment_receipt_path) && (
-                                <div className="mt-4 rounded-xl bg-white border border-purple-200/80 p-4 text-sm shadow-xs grid gap-2">
+                            {(order.payment_reference ||
+                                order.payment_receipt_path) && (
+                                <div className="mt-4 grid gap-2 rounded-xl border border-purple-200/80 bg-white p-4 text-sm shadow-xs">
                                     {order.payment_reference && (
                                         <p className="text-slate-700">
-                                            <strong className="text-slate-900">N° de Operación:</strong>{' '}
-                                            <span className="font-mono font-bold text-purple-700">{order.payment_reference}</span>
+                                            <strong className="text-slate-900">
+                                                N° de Operación:
+                                            </strong>{' '}
+                                            <span className="font-mono font-bold text-purple-700">
+                                                {order.payment_reference}
+                                            </span>
                                         </p>
                                     )}
                                     {order.payment_receipt_path && (
                                         <p className="flex items-center gap-2 text-slate-700">
-                                            <strong className="text-slate-900">Comprobante enviado:</strong>
+                                            <strong className="text-slate-900">
+                                                Comprobante enviado:
+                                            </strong>
                                             <a
-                                                href={order.payment_receipt_path.startsWith('/') ? order.payment_receipt_path : `/storage/${order.payment_receipt_path}`}
+                                                href={
+                                                    order.payment_receipt_path.startsWith(
+                                                        '/',
+                                                    )
+                                                        ? order.payment_receipt_path
+                                                        : `/storage/${order.payment_receipt_path}`
+                                                }
                                                 target="_blank"
                                                 rel="noreferrer"
                                                 className="inline-flex items-center gap-1 font-bold text-cyan-600 hover:text-cyan-700 hover:underline"
                                             >
-                                                Ver comprobante <ExternalLink className="size-3.5" />
+                                                Ver comprobante{' '}
+                                                <ExternalLink className="size-3.5" />
                                             </a>
                                         </p>
                                     )}
-                                    <div className="pt-2 border-t border-purple-200/60 mt-1">
+                                    <div className="mt-1 border-t border-purple-200/60 pt-2">
                                         <a
-                                            href={getWhatsAppOrderUrl(order, companySettings?.whatsapp_number)}
+                                            href={getWhatsAppOrderUrl(
+                                                order,
+                                                companySettings?.whatsapp_number,
+                                            )}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="whatsapp-white-text inline-flex items-center gap-2 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] active:scale-[0.98] px-4 py-2 text-xs font-bold shadow-xs transition cursor-pointer"
+                                            className="whatsapp-white-text inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[#25D366] px-4 py-2 text-xs font-bold shadow-xs transition hover:bg-[#20bd5a] active:scale-[0.98]"
                                             style={{ color: '#ffffff' }}
                                         >
                                             <WhatsAppIcon className="size-3.5 shrink-0" />
-                                            <span>Confirmar pedido por WhatsApp</span>
+                                            <span>
+                                                Confirmar pedido por WhatsApp
+                                            </span>
                                         </a>
                                     </div>
                                 </div>
@@ -205,56 +265,79 @@ export default function OrderShow({
                                 >
                                     {({ errors, processing }) => (
                                         <>
-                                            <p className="text-xs font-bold text-purple-800 uppercase tracking-wider">
-                                                {order.payment_reference ? 'Actualizar datos de pago' : 'Registrar comprobante de pago'}
+                                            <p className="text-xs font-bold tracking-wider text-purple-800 uppercase">
+                                                {order.payment_reference
+                                                    ? 'Actualizar datos de pago'
+                                                    : 'Registrar comprobante de pago'}
                                             </p>
-                                            <div className="grid gap-4 sm:grid-cols-2 items-end">
+                                            <div className="grid items-end gap-4 sm:grid-cols-2">
                                                 <div>
-                                                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                                                    <label className="mb-1.5 block text-xs font-semibold text-slate-700">
                                                         N° de Operación Yape
                                                     </label>
                                                     <input
                                                         name="payment_reference"
-                                                        defaultValue={order.payment_reference ?? ''}
+                                                        defaultValue={
+                                                            order.payment_reference ??
+                                                            ''
+                                                        }
                                                         placeholder="Ej: 849201"
                                                         className={field}
                                                     />
                                                     {errors.payment_reference && (
-                                                        <p className="mt-1 text-xs text-red-600 font-medium">
-                                                            {errors.payment_reference}
+                                                        <p className="mt-1 text-xs font-medium text-red-600">
+                                                            {
+                                                                errors.payment_reference
+                                                            }
                                                         </p>
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <ReceiptFileInput
-                                                        existingPath={order.payment_receipt_path}
-                                                        accentColor="purple"
-                                                        label="Foto del comprobante"
-                                                    />
+                                                    {order.payment_method ===
+                                                        'bank_transfer' && (
+                                                        <ReceiptFileInput
+                                                            existingPath={
+                                                                order.payment_receipt_path
+                                                            }
+                                                            accentColor="purple"
+                                                            label="Foto del comprobante"
+                                                        />
+                                                    )}
                                                     {errors.payment_receipt && (
-                                                        <p className="mt-1 text-xs text-red-600 font-medium">
-                                                            {errors.payment_receipt}
+                                                        <p className="mt-1 text-xs font-medium text-red-600">
+                                                            {
+                                                                errors.payment_receipt
+                                                            }
                                                         </p>
                                                     )}
                                                 </div>
                                             </div>
                                             <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
                                                 <a
-                                                    href={getWhatsAppOrderUrl(order, companySettings?.whatsapp_number)}
+                                                    href={getWhatsAppOrderUrl(
+                                                        order,
+                                                        companySettings?.whatsapp_number,
+                                                    )}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="whatsapp-white-text inline-flex items-center gap-2 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] active:scale-[0.98] px-5 py-3 text-sm font-bold shadow-sm shadow-emerald-600/15 transition cursor-pointer"
+                                                    className="whatsapp-white-text inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[#25D366] px-5 py-3 text-sm font-bold shadow-sm shadow-emerald-600/15 transition hover:bg-[#20bd5a] active:scale-[0.98]"
                                                     style={{ color: '#ffffff' }}
                                                 >
                                                     <WhatsAppIcon className="size-4 shrink-0" />
-                                                    <span>Confirmar por WhatsApp</span>
+                                                    <span>
+                                                        Confirmar por WhatsApp
+                                                    </span>
                                                 </a>
                                                 <button
                                                     disabled={processing}
-                                                    className="yape-pure-white inline-flex items-center justify-center gap-2 rounded-xl bg-purple-700 hover:bg-purple-800 active:scale-[0.98] px-6 py-3 text-sm font-bold shadow-sm transition disabled:opacity-50 cursor-pointer"
+                                                    className="yape-pure-white inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-purple-700 px-6 py-3 text-sm font-bold shadow-sm transition hover:bg-purple-800 active:scale-[0.98] disabled:opacity-50"
                                                 >
                                                     <Upload className="size-4 shrink-0" />
-                                                    <span>{processing ? 'Enviando…' : 'Enviar datos de pago'}</span>
+                                                    <span>
+                                                        {processing
+                                                            ? 'Enviando…'
+                                                            : 'Enviar datos de pago'}
+                                                    </span>
                                                 </button>
                                             </div>
                                         </>
@@ -264,24 +347,30 @@ export default function OrderShow({
                         </div>
                     )}
 
-                    {order.receipt_url &&
+                    {receiptUrls &&
                         ['issued', 'accepted', 'sent'].includes(
                             order.receipt_status,
                         ) && (
-                            <a
-                                href={order.receipt_url}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="mt-6 inline-flex rounded-full border border-cyan-500 px-7 py-3 font-bold text-cyan-600 hover:bg-cyan-50 transition"
-                            >
-                                Ver comprobante {order.receipt_type}
-                            </a>
+                            <div className="mt-6 flex flex-wrap gap-3">
+                                <a
+                                    href={receiptUrls.a4}
+                                    className="inline-flex rounded-full border border-cyan-500 px-7 py-3 font-bold text-cyan-600 transition hover:bg-cyan-50"
+                                >
+                                    Descargar comprobante A4
+                                </a>
+                                <a
+                                    href={receiptUrls.ticket}
+                                    className="inline-flex rounded-full border border-cyan-500 px-7 py-3 font-bold text-cyan-600 transition hover:bg-cyan-50"
+                                >
+                                    Descargar para ticketera
+                                </a>
+                            </div>
                         )}
 
                     <div className="mt-8">
                         <Link
                             href={products()}
-                            className="inline-flex rounded-full bg-cyan-500 hover:bg-cyan-600 px-7 py-3 font-bold text-white shadow transition"
+                            className="inline-flex rounded-full bg-cyan-500 px-7 py-3 font-bold text-white shadow transition hover:bg-cyan-600"
                         >
                             Seguir comprando
                         </Link>

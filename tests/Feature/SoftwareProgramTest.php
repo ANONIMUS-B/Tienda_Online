@@ -50,3 +50,31 @@ test('authorized customers are redirected to an external program download', func
     $this->actingAs(User::factory()->create())->get(route('programs.download', $program))
         ->assertRedirect('https://downloads.example.com/app.exe');
 });
+
+test('the apps page displays only applications developed by the company', function () {
+    SoftwareProgram::factory()->create(['name' => 'App JB Ventas', 'is_own' => true]);
+    SoftwareProgram::factory()->create(['name' => 'Programa de terceros', 'is_own' => false]);
+
+    $this->get(route('apps'))->assertInertia(fn ($page) => $page
+        ->component('software/index')
+        ->where('catalogType', 'apps')
+        ->has('programs.data', 1)
+        ->where('programs.data.0.name', 'App JB Ventas'));
+});
+
+test('administrators can publish a company application from the apps catalog', function () {
+    $admin = User::factory()->create();
+    $payload = [
+        'name' => 'JB Control', 'slug' => 'jb-control', 'category' => 'Empresarial',
+        'platform' => 'Android', 'version' => '1.0', 'license_type' => 'free',
+        'short_description' => 'Aplicación desarrollada por JBTECHLINE',
+        'download_url' => 'https://apps.example.com/jb-control.apk',
+        'download_enabled' => true, 'is_own' => true, 'is_featured' => true, 'is_active' => true,
+    ];
+
+    $this->actingAs($admin)
+        ->post(route('admin.software.store', $admin->currentTeam), $payload)
+        ->assertRedirect(route('admin.software.index', ['current_team' => $admin->currentTeam, 'catalog' => 'apps']));
+
+    expect(SoftwareProgram::query()->sole()->is_own)->toBeTrue();
+});

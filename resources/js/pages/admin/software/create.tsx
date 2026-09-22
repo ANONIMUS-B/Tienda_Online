@@ -7,13 +7,30 @@ export default function Create({
     catalogType,
 }: {
     currentTeam: { slug: string };
-    catalogType: 'software' | 'programs';
+    catalogType: 'software' | 'programs' | 'apps';
 }) {
     return (
         <>
-            <Head title={catalogType === 'software' ? 'Nuevo software' : 'Nuevo programa'} />
-            <AdminFormModal title="Nuevo programa" backHref={`${index(currentTeam.slug).url}?catalog=programs`}>
-                <h1 className="mb-6 text-2xl font-semibold">{catalogType === 'software' ? 'Nuevo software' : 'Nuevo programa'}</h1>
+            <Head
+                title={
+                    catalogType === 'apps'
+                        ? 'Nueva aplicación'
+                        : 'Nuevo programa'
+                }
+            />
+            <AdminFormModal
+                title={
+                    catalogType === 'apps'
+                        ? 'Nueva aplicación'
+                        : 'Nuevo programa'
+                }
+                backHref={`${index(currentTeam.slug).url}?catalog=${catalogType}`}
+            >
+                <h1 className="mb-6 text-2xl font-semibold">
+                    {catalogType === 'apps'
+                        ? 'Nueva aplicación propia'
+                        : 'Nuevo programa'}
+                </h1>
                 <ProgramForm
                     action={store(currentTeam.slug).url}
                     method="post"

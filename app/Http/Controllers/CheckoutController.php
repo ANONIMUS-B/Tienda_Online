@@ -6,6 +6,8 @@ use App\Http\Requests\StoreCheckoutRequest;
 use App\Mail\OrderConfirmation;
 use App\Models\CompanySetting;
 use App\Models\Order;
+use App\Services\CulqiGateway;
+use App\Services\CulqiOrderGateway;
 use App\Services\ImageUploader;
 use App\Services\ShoppingCart;
 use Illuminate\Http\RedirectResponse;
@@ -28,11 +30,13 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index');
         }
         $settings = CompanySetting::query()->firstOrNew([], ['payment_yape_enabled' => true, 'payment_transfer_enabled' => true, 'payment_cash_enabled' => true, 'payment_gateway_enabled' => false, 'whatsapp_checkout_enabled' => true]);
+        $culqiReady = app(CulqiGateway::class)->ready($settings);
+        $pagoEfectivoReady = app(CulqiOrderGateway::class)->ready($settings);
         $methods = collect([
-            ['value' => 'yape', 'label' => 'Yape / Plin', 'enabled' => $settings->payment_yape_enabled],
-            ['value' => 'bank_transfer', 'label' => 'Transferencia bancaria', 'enabled' => $settings->payment_transfer_enabled],
+            ['value' => 'gateway', 'label' => 'Yape con Culqi / tarjeta'.($settings->payment_test_mode ? ' (pruebas)' : ''), 'enabled' => $culqiReady],
+            ['value' => 'pagoefectivo', 'label' => 'PagoEfectivo: banca móvil, agentes y bodegas'.($settings->payment_test_mode ? ' (pruebas)' : ''), 'enabled' => $pagoEfectivoReady],
+            ['value' => 'bank_transfer', 'label' => 'Transferencia bancaria', 'enabled' => $settings->payment_transfer_enabled && ! $culqiReady && ! $pagoEfectivoReady],
             ['value' => 'cash_on_delivery', 'label' => 'Pago contra entrega', 'enabled' => $settings->payment_cash_enabled],
-            ['value' => 'gateway', 'label' => 'Tarjeta en línea', 'enabled' => $settings->payment_gateway_enabled],
         ])->where('enabled', true)->values();
         $whatsappUrl = null;
         if ($settings->whatsapp_checkout_enabled && filled($settings->whatsapp_number)) {
@@ -58,7 +62,9 @@ class CheckoutController extends Controller
     public function store(StoreCheckoutRequest $request, ShoppingCart $cart): RedirectResponse
     {
         $settings = CompanySetting::query()->firstOrNew([], ['payment_yape_enabled' => true, 'payment_transfer_enabled' => true, 'payment_cash_enabled' => true, 'payment_gateway_enabled' => false]);
-        $enabledMethods = array_filter(['yape' => $settings->payment_yape_enabled, 'bank_transfer' => $settings->payment_transfer_enabled, 'cash_on_delivery' => $settings->payment_cash_enabled, 'gateway' => $settings->payment_gateway_enabled]);
+        $culqiReady = app(CulqiGateway::class)->ready($settings);
+        $pagoEfectivoReady = app(CulqiOrderGateway::class)->ready($settings);
+        $enabledMethods = array_filter(['bank_transfer' => $settings->payment_transfer_enabled && ! $culqiReady && ! $pagoEfectivoReady, 'cash_on_delivery' => $settings->payment_cash_enabled, 'gateway' => $culqiReady, 'pagoefectivo' => $pagoEfectivoReady]);
         if (! array_key_exists($request->string('payment_method')->toString(), $enabledMethods)) {
             throw ValidationException::withMessages(['payment_method' => 'Este método de pago no está habilitado.']);
         }
@@ -68,7 +74,7 @@ class CheckoutController extends Controller
             $receiptPath = $this->images->replace($request->file('payment_receipt'), 'receipts');
         }
 
-        $order = DB::transaction(function () use ($request, $cart, $receiptPath): Order {
+        $order = DB::transaction(function () use ($request, $cart, $receiptPath, $settings): Order {
             $items = $cart->items(lock: true);
             if ($items->isEmpty()) {
                 throw ValidationException::withMessages(['cart' => 'El carrito está vacío.']);
@@ -80,6 +86,13 @@ class CheckoutController extends Controller
             }
             $subtotal = round($items->sum('total'), 2);
             $shipping = $request->string('shipping_method')->toString() === 'delivery' ? 15.0 : 0.0;
+            $maximum = app(CulqiGateway::class)->maximumAmount($settings) / 100;
+            if ($request->input('payment_method') === 'gateway' && ($subtotal + $shipping < 3 || $subtotal + $shipping > $maximum)) {
+                throw ValidationException::withMessages(['payment_method' => "Para pagar con los medios Culqi habilitados el total debe estar entre S/ 3 y S/ {$maximum}."]);
+            }
+            if ($request->input('payment_method') === 'pagoefectivo' && $subtotal + $shipping < 1) {
+                throw ValidationException::withMessages(['payment_method' => 'PagoEfectivo requiere un total mínimo de S/ 1.']);
+            }
 
             $data = $request->safe()->except(['payment_receipt']);
             if ($receiptPath) {
@@ -104,7 +117,7 @@ class CheckoutController extends Controller
             return $order;
         });
         $cart->clear();
-        Mail::to($order->customer_email)->send(new OrderConfirmation($order->load('items')));
+        Mail::to($order->customer_email)->queue(new OrderConfirmation($order->load('items')));
 
         return redirect()->to(URL::temporarySignedRoute('orders.show', now()->addDays(7), ['number' => $order->number]));
     }

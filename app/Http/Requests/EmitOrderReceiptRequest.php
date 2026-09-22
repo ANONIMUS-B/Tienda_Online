@@ -35,11 +35,20 @@ class EmitOrderReceiptRequest extends FormRequest
     {
         return [function (Validator $validator): void {
             $order = $this->route('order');
+            if ($this->boolean('send_email') && blank($order?->customer_email)) {
+                $validator->errors()->add('receipt_type', 'Este cliente no tiene correo. Desmarca el envío por correo.');
+            }
+            if ($this->boolean('open_whatsapp') && blank($order?->customer_phone)) {
+                $validator->errors()->add('receipt_type', 'Este cliente no tiene teléfono para compartir por WhatsApp.');
+            }
             if ($order?->payment_status !== 'paid') {
                 $validator->errors()->add('receipt_type', 'Primero debes marcar el pedido como pagado.');
             }
             if ($this->input('receipt_type') === 'factura' && ! preg_match('/^\d{11}$/', (string) $order?->document_number)) {
                 $validator->errors()->add('receipt_type', 'Para emitir factura el cliente debe tener un RUC válido de 11 dígitos.');
+            }
+            if ($this->input('receipt_type') === 'boleta' && (float) $order?->total > 700 && ! preg_match('/^(\d{8}|\d{11})$/', (string) $order?->document_number)) {
+                $validator->errors()->add('receipt_type', 'Las boletas mayores a S/ 700 requieren identificar al cliente con DNI o RUC.');
             }
         }];
     }

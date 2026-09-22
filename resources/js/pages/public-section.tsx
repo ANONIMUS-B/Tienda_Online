@@ -620,7 +620,7 @@ export default function PublicSection({
                     <div className="mx-auto flex h-20 max-w-[1500px] items-center justify-between px-5 lg:px-8">
                         <Link href={home()} className="flex items-center gap-3">
                             <img
-                                src="/images/brand/jbtechline-logo.png"
+                                src="/images/brand/jbtechline-icon-v2.png"
                                 alt="JBTECHLINE"
                                 className="h-16 w-20 object-contain"
                             />

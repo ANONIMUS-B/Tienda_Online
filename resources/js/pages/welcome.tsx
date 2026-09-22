@@ -35,14 +35,14 @@ import {
 import { index as cart } from '@/routes/cart';
 import { index as programs, show as programShow } from '@/routes/programs';
 import { store as addToCart } from '@/routes/cart';
-import { show as productShow } from '@/routes/products';
+import ProductDetailModal from '@/components/product-detail-modal';
 import type { Product } from '@/types/product';
 import type { SoftwareProgram } from '@/types/software';
 
 const navigation = [
     { label: 'Servicios', route: servicesPage },
     { label: 'Software', route: softwarePage },
-    { label: 'Programas', route: programs },
+    { label: 'Cracks', route: programs },
     { label: 'Apps', route: apps },
     { label: 'Contacto', route: contact },
 ];
@@ -84,6 +84,9 @@ export default function Welcome({
     const { auth, currentTeam } = usePage().props;
     const [menuOpen, setMenuOpen] = useState(false);
     const [featuredIndex, setFeaturedIndex] = useState(0);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(
+        null,
+    );
     const activeHeroProduct =
         featuredProducts[featuredIndex] ?? initialHeroProduct;
     const dashboardUrl = currentTeam ? dashboard(currentTeam.slug) : '/';
@@ -106,6 +109,10 @@ export default function Welcome({
 
     return (
         <>
+            <ProductDetailModal
+                product={selectedProduct}
+                onClose={() => setSelectedProduct(null)}
+            />
             <Head title="Tienda Online de Software, Antivirus y Soporte Tecnológico">
                 <meta
                     name="description"
@@ -121,7 +128,7 @@ export default function Welcome({
                             aria-label="JBTECHLINE - Inicio"
                         >
                             <img
-                                src="/images/brand/jbtechline-logo.png"
+                                src="/images/brand/jbtechline-icon-v2.png"
                                 alt="JBTECHLINE"
                                 className="h-16 w-20 object-contain"
                             />
@@ -326,7 +333,19 @@ export default function Welcome({
                                 <div className="pointer-events-none absolute top-1/2 left-1/2 size-[360px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-lime-400/20 blur-[100px] sm:size-[460px]" />
 
                                 {/* Floating 3D Image */}
-                                <div className="relative z-20 mx-auto w-full max-w-[300px] sm:max-w-[400px] lg:max-w-[480px]">
+                                <button
+                                    type="button"
+                                    disabled={!activeHeroProduct}
+                                    onClick={() =>
+                                        setSelectedProduct(activeHeroProduct)
+                                    }
+                                    aria-label={
+                                        activeHeroProduct
+                                            ? `Ver ${activeHeroProduct.name}`
+                                            : 'Producto destacado'
+                                    }
+                                    className="relative z-20 mx-auto w-full max-w-[300px] sm:max-w-[400px] lg:max-w-[480px]"
+                                >
                                     <img
                                         src={
                                             activeHeroProduct?.images[0]
@@ -339,15 +358,18 @@ export default function Welcome({
                                         }
                                         className="relative mx-auto max-h-[260px] w-full animate-[hero-float_6s_ease-in-out_infinite] object-contain brightness-105 drop-shadow-[0_30px_45px_rgba(0,0,0,0.3)] filter sm:max-h-[320px] lg:max-h-[380px]"
                                     />
-                                </div>
+                                </button>
 
                                 {/* Clean Glassmorphism Featured Product Card */}
                                 {activeHeroProduct && (
-                                    <Link
+                                    <button
                                         key={activeHeroProduct.id}
-                                        href={productShow(
-                                            activeHeroProduct.slug,
-                                        )}
+                                        type="button"
+                                        onClick={() =>
+                                            setSelectedProduct(
+                                                activeHeroProduct,
+                                            )
+                                        }
                                         className="group border-brand-primary/45 bg-brand-background/90 hover:border-brand-primary hover:bg-brand-background relative z-30 mt-4 flex w-full max-w-[440px] flex-col items-stretch justify-between gap-3 rounded-2xl border p-4 shadow-[0_20px_50px_rgba(0,0,0,0.15)] backdrop-blur-2xl transition duration-300 hover:scale-[1.01] hover:shadow-[0_0_30px_rgb(0_247_255/.3)] sm:mt-6 lg:absolute lg:top-[28%] lg:right-6 lg:mt-0 lg:w-80"
                                     >
                                         <div className="min-w-0 flex-1">
@@ -417,7 +439,7 @@ export default function Welcome({
                                                 <ArrowRight className="size-3" />
                                             </span>
                                         </div>
-                                    </Link>
+                                    </button>
                                 )}
                                 {featuredProducts.length > 1 && (
                                     <div className="relative z-30 mt-4 flex items-center gap-2">
@@ -501,8 +523,11 @@ export default function Welcome({
                                         key={product.id}
                                         className="group border-brand-support/20 hover:border-brand-primary/70 overflow-hidden rounded-3xl border bg-black/25 transition duration-300 hover:shadow-[0_15px_35px_rgba(0,0,0,0.35)]"
                                     >
-                                        <Link
-                                            href={productShow(product.slug)}
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                setSelectedProduct(product)
+                                            }
                                             className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden bg-gradient-to-b from-white/5 via-lime-400/5 to-transparent p-6"
                                         >
                                             <span className="border-brand-primary/50 bg-brand-background/90 text-brand-primary absolute top-4 left-4 z-10 inline-flex items-center gap-1 rounded-full border px-3 py-1 text-[10px] font-extrabold tracking-wider uppercase shadow-md backdrop-blur-md">
@@ -524,18 +549,21 @@ export default function Welcome({
                                                     strokeWidth={1.1}
                                                 />
                                             )}
-                                        </Link>
+                                        </button>
                                         <div className="border-t border-white/8 p-5">
                                             <p className="text-[10px] font-bold tracking-widest text-lime-400 uppercase">
                                                 {product.brand?.name ??
                                                     product.category?.name}
                                             </p>
-                                            <Link
-                                                href={productShow(product.slug)}
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setSelectedProduct(product)
+                                                }
                                                 className="mt-1.5 line-clamp-1 block text-base font-extrabold text-white transition-colors hover:text-lime-300"
                                             >
                                                 {product.name}
-                                            </Link>
+                                            </button>
                                             <div className="mt-4 flex items-end justify-between">
                                                 <div>
                                                     {product.promotional_price && (
@@ -641,7 +669,7 @@ export default function Welcome({
                                 href={programs()}
                                 className="inline-flex items-center gap-2 font-bold text-lime-400"
                             >
-                                Ver programas <ArrowRight className="size-4" />
+                                Ver cracks <ArrowRight className="size-4" />
                             </Link>
                         </div>
                     </section>
@@ -778,16 +806,10 @@ export default function Welcome({
                         <div className="sm:col-span-2">
                             <div className="flex items-center gap-3">
                                 <img
-                                    src="/images/brand/jbtechline-logo.png"
+                                    src="/images/brand/jbtechline-logo-v2.png"
                                     alt="JBTECHLINE"
-                                    className="h-16 w-20 object-contain"
+                                    className="h-auto w-80 max-w-full rounded-lg bg-white object-contain p-2"
                                 />
-                                <p className="text-xl font-black">
-                                    JB
-                                    <span className="text-lime-400">
-                                        TECHLINE
-                                    </span>
-                                </p>
                             </div>
                             <p className="mt-4 max-w-sm text-sm leading-6 text-white/40">
                                 Tecnología, soporte y soluciones inteligentes

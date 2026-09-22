@@ -33,11 +33,8 @@
             }
         </style>
 
-        <link rel="icon" href="/favicon.ico" sizes="any">
-        <link rel="icon" href="/images/brand/jbtechline-logo.png" type="image/png">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-        <link rel="apple-touch-icon" href="/images/brand/jbtechline-logo.png">
+        <link rel="icon" href="/images/brand/jbtechline-icon-v2.png" type="image/png">
+        <link rel="apple-touch-icon" href="/images/brand/jbtechline-icon-v2.png">
 
         @fonts
 
@@ -54,7 +51,7 @@
         <meta property="og:url" content="{{ url()->current() }}">
         <meta property="og:title" content="JBTECHLINE | Tienda Online de Software, Antivirus y Soporte Tecnológico">
         <meta property="og:description" content="JBTECHLINE: Tu aliado tecnológico en Perú. Venta de software original, antivirus NOD32 con garantía, equipos y soporte técnico especializado.">
-        <meta property="og:image" content="{{ asset('images/brand/jbtechline-logo.png') }}">
+        <meta property="og:image" content="{{ asset('images/brand/jbtechline-logo-v2.png') }}">
         <meta property="og:site_name" content="JBTECHLINE">
         <meta property="og:locale" content="es_PE">
 
@@ -63,7 +60,7 @@
         <meta name="twitter:url" content="{{ url()->current() }}">
         <meta name="twitter:title" content="JBTECHLINE | Tu Aliado Tecnológico">
         <meta name="twitter:description" content="Software original, antivirus NOD32 con garantía, componentes y soporte técnico especializado en Perú.">
-        <meta name="twitter:image" content="{{ asset('images/brand/jbtechline-logo.png') }}">
+        <meta name="twitter:image" content="{{ asset('images/brand/jbtechline-logo-v2.png') }}">
 
         {{-- Structured Data JSON-LD --}}
         <script type="application/ld+json">
@@ -71,7 +68,7 @@
             '@context' => 'https://schema.org',
             '@type' => 'Store',
             'name' => 'JBTECHLINE',
-            'image' => asset('images/brand/jbtechline-logo.png'),
+            'image' => asset('images/brand/jbtechline-logo-v2.png'),
             'url' => url('/'),
             'telephone' => '+51921820612',
             'priceRange' => 'S/.',

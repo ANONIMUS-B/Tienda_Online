@@ -2,6 +2,16 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useInitials } from '@/hooks/use-initials';
 import type { Team, User } from '@/types';
 
+const formatTeamLabel = (teamName?: string | null) => {
+    if (!teamName) {
+        return '';
+    }
+
+    const cleaned = teamName.trim();
+
+    return cleaned.replace(/^Equipo\s+/i, '') || cleaned;
+};
+
 export function UserInfo({
     user,
     showEmail = false,
@@ -28,7 +38,7 @@ export function UserInfo({
                 <span className="truncate font-medium">{user.name}</span>
                 {team ? (
                     <span className="text-muted-foreground truncate text-xs">
-                        {team.name}
+                        {formatTeamLabel(team.name)}
                     </span>
                 ) : null}
                 {!team && showEmail ? (

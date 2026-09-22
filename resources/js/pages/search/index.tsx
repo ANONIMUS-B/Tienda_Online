@@ -57,7 +57,7 @@ export default function GlobalSearch({
                         <option value="all">Buscar en todo</option>
                         <option value="products">Productos</option>
                         <option value="software">Software propio</option>
-                        <option value="programs">Programas</option>
+                        <option value="programs">Cracks</option>
                         <option value="services">Servicios</option>
                     </select>
                     <button className="flex h-12 items-center justify-center gap-2 rounded-xl bg-lime-400 px-7 font-bold text-black">

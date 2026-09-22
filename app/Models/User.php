@@ -38,7 +38,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property-read Collection<int, Membership> $teamMemberships
  * @property-read Collection<int, Team> $teams
  */
-#[Fillable(['name', 'email', 'document_type', 'document_number', 'address', 'password', 'current_team_id', 'role', 'is_active'])]
+#[Fillable(['name', 'email', 'phone', 'document_type', 'document_number', 'address', 'password', 'current_team_id', 'role', 'is_active'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements PasskeyUser
 {

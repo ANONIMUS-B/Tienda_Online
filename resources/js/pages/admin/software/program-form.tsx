@@ -11,7 +11,7 @@ export default function ProgramForm({
     action: string;
     method: 'post' | 'put';
     program?: SoftwareProgram;
-    catalogType: 'software' | 'programs';
+    catalogType: 'software' | 'programs' | 'apps';
 }) {
     return (
         <Form
@@ -21,7 +21,11 @@ export default function ProgramForm({
         >
             {({ errors, processing }) => (
                 <>
-                    <input type="hidden" name="is_own" value={catalogType === 'software' ? '1' : '0'} />
+                    <input
+                        type="hidden"
+                        name="is_own"
+                        value={catalogType === 'apps' ? '1' : '0'}
+                    />
                     <input
                         name="name"
                         defaultValue={program?.name}

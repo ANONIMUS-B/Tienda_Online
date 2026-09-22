@@ -68,5 +68,5 @@ test('customers registered from the storefront cannot access administration', fu
 
     $customer = User::where('email', 'customer@example.com')->firstOrFail();
 
-    $this->get(route('admin.customers.index', $customer->currentTeam))->assertForbidden();
+    $this->get(route('admin.customers.index', $customer->currentTeam))->assertRedirect(route('cart.index'));
 });

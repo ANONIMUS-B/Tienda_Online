@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\CompanySettingController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\ElectronicBillingController;
 use App\Http\Controllers\Admin\HomepageSettingController;
+use App\Http\Controllers\Admin\IdentityLookupController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ServiceRequestController as AdminServiceRequestController;
@@ -16,6 +17,9 @@ use App\Http\Controllers\BrandCatalogController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryCatalogController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\CulqiOrderPaymentController;
+use App\Http\Controllers\CulqiPaymentController;
+use App\Http\Controllers\CulqiWebhookController;
 use App\Http\Controllers\CustomerOrderController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GlobalSearchController;
@@ -45,7 +49,7 @@ Route::get('/software/{softwareProgram}', [SoftwareCatalogController::class, 'sh
 Route::get('/programas', [ProgramCatalogController::class, 'index'])->name('programs.index');
 Route::get('/programas/{softwareProgram}', [ProgramCatalogController::class, 'show'])->name('programs.show');
 Route::get('/programas/{softwareProgram}/descargar', ProgramDownloadController::class)->middleware('auth')->name('programs.download');
-Route::inertia('/apps', 'public-section', ['section' => 'apps'])->name('apps');
+Route::get('/apps', [SoftwareCatalogController::class, 'apps'])->name('apps');
 Route::get('/marcas', BrandCatalogController::class)->name('brands');
 Route::inertia('/nosotros', 'public-section', ['section' => 'about'])->name('about');
 Route::inertia('/blog', 'public-section', ['section' => 'blog'])->name('blog');
@@ -65,6 +69,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/finalizar-compra', [CheckoutController::class, 'store'])->name('checkout.store');
 });
 Route::get('/pedido/{number}', [CustomerOrderController::class, 'show'])->name('orders.show');
+Route::get('/pedido/{number}/comprobante/{format}', [CustomerOrderController::class, 'receipt'])->whereIn('format', ['a4', 'ticket'])->name('orders.receipt');
+Route::post('/pedido/{number}/culqi', [CulqiPaymentController::class, 'store'])->middleware('throttle:10,1')->name('orders.culqi.store');
+Route::get('/pedido/{number}/culqi', [CulqiPaymentController::class, 'show'])->middleware('throttle:20,1')->name('orders.culqi.show');
+Route::delete('/pedido/{number}/culqi', [CulqiPaymentController::class, 'cancel'])->middleware('throttle:10,1')->name('orders.culqi.cancel');
+Route::post('/webhooks/culqi', CulqiWebhookController::class)->middleware('throttle:600,1')->name('culqi.webhook');
+Route::post('/pedido/{number}/pagoefectivo', [CulqiOrderPaymentController::class, 'store'])->middleware('throttle:10,1')->name('orders.pagoefectivo.store');
+Route::get('/pedido/{number}/pagoefectivo', [CulqiOrderPaymentController::class, 'show'])->middleware('throttle:20,1')->name('orders.pagoefectivo.show');
 Route::post('/pedido/{number}/registrar-pago', [CustomerOrderController::class, 'submitPaymentProof'])->name('orders.submit-payment');
 
 Route::prefix('{current_team}')
@@ -76,9 +87,14 @@ Route::prefix('{current_team}')
             Route::get('administracion/inicio', [HomepageSettingController::class, 'edit'])->name('admin.homepage.edit');
             Route::put('administracion/inicio', [HomepageSettingController::class, 'update'])->name('admin.homepage.update');
             Route::get('administracion/empresa', [CompanySettingController::class, 'edit'])->name('admin.company-settings.edit');
+            Route::get('administracion/pagos-culqi', [App\Http\Controllers\Admin\CulqiPaymentController::class, 'index'])->name('admin.culqi.index');
+            Route::post('administracion/pagos-culqi/{paymentAttempt}/verificar', [App\Http\Controllers\Admin\CulqiPaymentController::class, 'update'])->middleware('throttle:20,1')->name('admin.culqi.update');
+            Route::post('administracion/pagos-culqi/{paymentAttempt}/devolver', [App\Http\Controllers\Admin\CulqiPaymentController::class, 'refund'])->middleware('throttle:5,1')->name('admin.culqi.refund');
             Route::put('administracion/empresa', [CompanySettingController::class, 'update'])->name('admin.company-settings.update');
             Route::get('administracion/facturacion', [ElectronicBillingController::class, 'edit'])->name('admin.electronic-billing.edit');
             Route::put('administracion/facturacion', [ElectronicBillingController::class, 'update'])->name('admin.electronic-billing.update');
+            Route::put('administracion/consulta-documentos', [IdentityLookupController::class, 'update'])->name('admin.identity-lookup.update');
+            Route::get('administracion/consulta-documentos', [IdentityLookupController::class, 'show'])->middleware('throttle:30,1')->name('admin.identity-lookup.show');
             Route::get('administracion/facturacion/{electronicDocument}/json', [ElectronicBillingController::class, 'json'])->name('admin.electronic-billing.json');
             Route::get('administracion/facturacion/{electronicDocument}/pdf', [ElectronicBillingController::class, 'pdf'])->name('admin.electronic-billing.pdf');
             Route::get('administracion/facturacion/{electronicDocument}/html', [ElectronicBillingController::class, 'html'])->name('admin.electronic-billing.html');
@@ -99,7 +115,7 @@ Route::prefix('{current_team}')
                 ->names('admin.products');
             Route::resource('administracion/pedidos', OrderController::class)
                 ->parameters(['pedidos' => 'order'])
-                ->only(['index', 'show', 'update'])
+                ->only(['index', 'create', 'store', 'show', 'update'])
                 ->names('admin.orders');
             Route::post('administracion/pedidos/{order}/emitir-comprobante', [OrderController::class, 'issue'])->name('admin.orders.issue');
             Route::post('administracion/pedidos/{order}/compartir-comprobante', [OrderController::class, 'share'])->name('admin.orders.share');

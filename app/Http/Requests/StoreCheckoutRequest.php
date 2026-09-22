@@ -25,7 +25,7 @@ class StoreCheckoutRequest extends FormRequest
     {
         return [
             'customer_name' => ['required', 'string', 'max:255'],
-            'customer_email' => ['required', 'email', 'max:255'],
+            'customer_email' => ['required', 'email', in_array($this->input('payment_method'), ['gateway', 'pagoefectivo', 'izipay'], true) ? 'max:50' : 'max:255'],
             'customer_phone' => ['required', 'string', 'max:30'],
             'document_number' => ['nullable', 'string', 'max:20'],
             'address' => ['required', 'string', 'max:255'],
@@ -33,9 +33,9 @@ class StoreCheckoutRequest extends FormRequest
             'province' => ['required', 'string', 'max:100'],
             'department' => ['required', 'string', 'max:100'],
             'shipping_method' => ['required', Rule::in(['delivery', 'store_pickup'])],
-            'payment_method' => ['required', Rule::in(['yape', 'bank_transfer', 'cash_on_delivery', 'gateway'])],
+            'payment_method' => ['required', Rule::in(['bank_transfer', 'cash_on_delivery', 'gateway', 'pagoefectivo', 'izipay'])],
             'payment_reference' => ['nullable', 'string', 'max:50'],
-            'payment_receipt' => ['nullable', 'image', 'mimes:jpeg,png,webp', 'max:5120'],
+            'payment_receipt' => ['nullable', 'prohibited_unless:payment_method,bank_transfer', 'image', 'mimes:jpeg,png,webp', 'max:5120'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

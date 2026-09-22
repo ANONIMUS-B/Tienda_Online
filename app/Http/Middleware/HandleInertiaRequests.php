@@ -54,30 +54,36 @@ class HandleInertiaRequests extends Middleware
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'cartCount' => fn () => array_sum(app(ShoppingCart::class)->quantities()),
             'serviceNotifications' => fn () => $user?->role->value === 'user'
-                ? [
-                    'unread' => ServiceRequest::query()
-                        ->where('user_id', $user->id)
-                        ->whereNotNull('responded_at')
-                        ->whereNull('customer_read_at')
-                        ->count(),
-                    'latest' => ServiceRequest::query()
-                        ->where('user_id', $user->id)
-                        ->whereNotNull('responded_at')
-                        ->latest('responded_at')
-                        ->limit(5)
-                        ->get(['id', 'number', 'status', 'admin_response', 'responded_at']),
-                ]
+                ? Cache::remember("inertia.service-notifications.{$user->id}", 60, function () use ($user) {
+                    return [
+                        'unread' => ServiceRequest::query()
+                            ->where('user_id', $user->id)
+                            ->whereNotNull('responded_at')
+                            ->whereNull('customer_read_at')
+                            ->count(),
+                        'latest' => ServiceRequest::query()
+                            ->where('user_id', $user->id)
+                            ->whereNotNull('responded_at')
+                            ->latest('responded_at')
+                            ->limit(5)
+                            ->get(['id', 'number', 'status', 'admin_response', 'responded_at']),
+                    ];
+                })
                 : ['unread' => 0, 'latest' => []],
             'membershipNotice' => fn () => $user?->role->value === 'user'
-                ? $user->softwareMemberships()
-                    ->where('status', 'active')
-                    ->whereNotNull('expires_at')
-                    ->whereBetween('expires_at', [now(), now()->addDays(7)])
-                    ->orderBy('expires_at')
-                    ->first(['id', 'plan', 'expires_at'])
+                ? Cache::remember("inertia.membership-notice.{$user->id}", 60, function () use ($user) {
+                    return $user->softwareMemberships()
+                        ->where('status', 'active')
+                        ->whereNotNull('expires_at')
+                        ->whereBetween('expires_at', [now(), now()->addDays(7)])
+                        ->orderBy('expires_at')
+                        ->first(['id', 'plan', 'expires_at']);
+                })
                 : null,
             'accountNotifications' => fn () => $user?->role->value === 'user'
-                ? ['unread' => $user->unreadNotifications()->count(), 'latest' => $user->notifications()->limit(5)->get()]
+                ? Cache::remember("inertia.account-notifications.{$user->id}", 60, function () use ($user) {
+                    return ['unread' => $user->unreadNotifications()->count(), 'latest' => $user->notifications()->limit(5)->get()];
+                })
                 : ['unread' => 0, 'latest' => []],
             'catalogCategories' => fn () => Cache::remember(
                 'public.navigation.categories',
@@ -99,7 +105,7 @@ class HandleInertiaRequests extends Middleware
                         $product = $item['product'];
                         $primaryImage = $product->images->firstWhere('is_primary', true) ?? $product->images->first();
                         $imagePath = $primaryImage?->path;
-                        $imageUrl = '/images/brand/jbtechline-logo.png';
+                        $imageUrl = '/images/brand/jbtechline-icon-v2.png';
                         if ($imagePath) {
                             $imageUrl = (str_starts_with($imagePath, 'http') || str_starts_with($imagePath, '/'))
                                 ? $imagePath

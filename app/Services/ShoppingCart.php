@@ -43,7 +43,16 @@ class ShoppingCart
     public function items(bool $lock = false): Collection
     {
         $quantities = $this->quantities();
-        $query = Product::query()->active()->with(['images', 'brand', 'category'])->whereIn('id', array_keys($quantities));
+        $query = Product::query()
+            ->active()
+            ->select(['id', 'name', 'slug', 'sku', 'price', 'promotional_price', 'stock'])
+            ->with([
+                'images' => fn ($query) => $query->select(['id', 'product_id', 'path', 'is_primary'])->orderBy('is_primary', 'desc')->orderBy('id'),
+                'brand:id,name',
+                'category:id,name',
+            ])
+            ->whereIn('id', array_keys($quantities));
+
         if ($lock) {
             $query->lockForUpdate();
         }

@@ -26,8 +26,8 @@ class UpdateServiceRequestRequest extends FormRequest
             'status' => ['required', 'in:pending,in_review,waiting_customer,resolved,closed'],
             'admin_response' => ['required', 'string', 'min:5', 'max:3000'],
             'quoted_amount' => ['nullable', 'numeric', 'min:0.01', 'max:999999999.99'],
-            'payment_status' => ['required', 'in:pending,paid,refunded'],
-            'receipt_type' => ['required', 'in:boleta,factura'],
+            'payment_status' => ['sometimes', 'in:pending,paid,refunded'],
+            'receipt_type' => ['sometimes', 'in:boleta,factura'],
         ];
     }
 }

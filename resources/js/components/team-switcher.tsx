@@ -18,6 +18,16 @@ type TeamSwitcherProps = {
     inHeader?: boolean;
 };
 
+const formatTeamLabel = (teamName?: string | null) => {
+    if (!teamName) {
+        return 'Select team';
+    }
+
+    const cleaned = teamName.trim();
+
+    return cleaned.replace(/^Equipo\s+/i, '') || cleaned;
+};
+
 export function TeamSwitcher({ inHeader = false }: TeamSwitcherProps) {
     const page = usePage();
     const isMobile = useIsMobile();
@@ -84,7 +94,7 @@ export function TeamSwitcher({ inHeader = false }: TeamSwitcherProps) {
                                     : 'truncate font-semibold'
                             }
                         >
-                            {currentTeam?.name ?? 'Select team'}
+                            {formatTeamLabel(currentTeam?.name)}
                         </span>
                     </div>
                     <ChevronsUpDown
@@ -120,7 +130,7 @@ export function TeamSwitcher({ inHeader = false }: TeamSwitcherProps) {
                         }
                         onSelect={() => switchTeam(team)}
                     >
-                        {team.name}
+                        {formatTeamLabel(team.name)}
                         {currentTeam?.id === team.id && (
                             <Check
                                 className={

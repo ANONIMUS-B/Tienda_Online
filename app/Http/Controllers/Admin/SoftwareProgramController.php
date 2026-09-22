@@ -24,7 +24,11 @@ class SoftwareProgramController extends Controller
      */
     public function index(Request $request): Response
     {
-        $catalogType = $request->string('catalog')->toString() === 'programs' ? 'programs' : 'software';
+        $catalogType = match ($request->string('catalog')->toString()) {
+            'programs' => 'programs',
+            'apps' => 'apps',
+            default => 'software',
+        };
 
         if ($catalogType === 'software') {
             return Inertia::render('admin/service-requests/index', [
@@ -40,7 +44,7 @@ class SoftwareProgramController extends Controller
         return Inertia::render('admin/software/index', [
             'programs' => SoftwareProgram::query()
                 ->select(['id', 'name', 'slug', 'category', 'platform', 'is_active', 'created_at'])
-                ->where('is_own', $catalogType === 'software')
+                ->where('is_own', $catalogType === 'apps')
                 ->latest()
                 ->paginate(25),
             'catalogType' => $catalogType,
@@ -52,10 +56,11 @@ class SoftwareProgramController extends Controller
      */
     public function create(Request $request): Response
     {
-        abort_unless($request->string('catalog')->toString() === 'programs', 404);
+        $catalogType = $request->string('catalog')->toString();
+        abort_unless(in_array($catalogType, ['programs', 'apps'], true), 404);
 
         return Inertia::render('admin/software/create', [
-            'catalogType' => 'programs',
+            'catalogType' => $catalogType,
         ]);
     }
 
@@ -65,14 +70,14 @@ class SoftwareProgramController extends Controller
     public function store(StoreSoftwareProgramRequest $request): RedirectResponse
     {
         $data = $request->safe()->except(['image', 'program_file']);
-        $data['is_own'] = false;
+        $data['is_own'] = (bool) $data['is_own'];
         $data['price'] = null;
         $data['image_id'] = $this->storeMedia($request->file('image'));
         $data['file_id'] = $this->storeMedia($request->file('program_file'));
         SoftwareProgram::query()->create($data);
         Cache::flush();
 
-        return redirect()->route('admin.software.index', ['current_team' => $request->route('current_team'), 'catalog' => 'programs']);
+        return redirect()->route('admin.software.index', ['current_team' => $request->route('current_team'), 'catalog' => $data['is_own'] ? 'apps' : 'programs']);
     }
 
     /**
@@ -80,7 +85,7 @@ class SoftwareProgramController extends Controller
      */
     public function edit(Team $currentTeam, SoftwareProgram $softwareProgram): Response
     {
-        return Inertia::render('admin/software/edit', ['program' => $softwareProgram, 'catalogType' => $softwareProgram->is_own ? 'software' : 'programs']);
+        return Inertia::render('admin/software/edit', ['program' => $softwareProgram, 'catalogType' => $softwareProgram->is_own ? 'apps' : 'programs']);
     }
 
     /**
@@ -99,7 +104,7 @@ class SoftwareProgramController extends Controller
         $softwareProgram->update($data);
         Cache::flush();
 
-        return redirect()->route('admin.software.index', ['current_team' => $request->route('current_team'), 'catalog' => $softwareProgram->is_own ? 'software' : 'programs']);
+        return redirect()->route('admin.software.index', ['current_team' => $request->route('current_team'), 'catalog' => $softwareProgram->is_own ? 'apps' : 'programs']);
     }
 
     /**

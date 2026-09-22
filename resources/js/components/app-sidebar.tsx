@@ -29,6 +29,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { index as culqiPayments } from '@/routes/admin/culqi';
 import { index as brandIndex } from '@/routes/admin/brands';
 import { index as productIndex } from '@/routes/admin/products';
 import { index as orderIndex } from '@/routes/admin/orders';
@@ -97,6 +98,13 @@ export function AppSidebar() {
                       icon: MessagesSquare,
                   },
                   {
+                      title: 'Pagos Culqi',
+                      href: page.props.currentTeam
+                          ? culqiPayments(page.props.currentTeam.slug)
+                          : '/',
+                      icon: ReceiptText,
+                  },
+                  {
                       title: 'Empresa y pagos',
                       href: page.props.currentTeam
                           ? companySettings(page.props.currentTeam.slug)
@@ -121,6 +129,13 @@ export function AppSidebar() {
                       title: 'Programas',
                       href: page.props.currentTeam
                           ? `${softwareIndex(page.props.currentTeam.slug).url}?catalog=programs`
+                          : '/',
+                      icon: Code2,
+                  },
+                  {
+                      title: 'Aplicaciones propias',
+                      href: page.props.currentTeam
+                          ? `${softwareIndex(page.props.currentTeam.slug).url}?catalog=apps`
                           : '/',
                       icon: Code2,
                   },

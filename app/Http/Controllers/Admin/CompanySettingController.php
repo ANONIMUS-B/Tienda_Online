@@ -19,6 +19,8 @@ class CompanySettingController extends Controller
         return Inertia::render('admin/company-settings/edit', [
             'settings' => $settings,
             'hasSecretKey' => filled($settings->gateway_secret_key),
+            'hasIzipayCredentials' => filled($settings->izipay_api_username) && filled($settings->izipay_api_password) && filled($settings->izipay_hash_key),
+            'culqiWebhookUrl' => route('culqi.webhook'),
         ]);
     }
 
@@ -30,6 +32,11 @@ class CompanySettingController extends Controller
         }
         if (blank($attributes['gateway_secret_key'] ?? null)) {
             unset($attributes['gateway_secret_key']);
+        }
+        foreach (['izipay_api_username', 'izipay_api_password', 'izipay_hash_key'] as $secret) {
+            if (blank($attributes[$secret] ?? null)) {
+                unset($attributes[$secret]);
+            }
         }
         CompanySetting::query()->updateOrCreate([], $attributes);
 

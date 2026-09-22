@@ -204,7 +204,7 @@ export default function CartDrawer() {
                                         <img
                                             src={
                                                 item.image ||
-                                                '/images/brand/jbtechline-logo.png'
+                                                '/images/brand/jbtechline-icon-v2.png'
                                             }
                                             alt={item.name}
                                             className="h-full w-full object-contain"
@@ -212,7 +212,7 @@ export default function CartDrawer() {
                                                 (
                                                     e.currentTarget as HTMLImageElement
                                                 ).src =
-                                                    '/images/brand/jbtechline-logo.png';
+                                                    '/images/brand/jbtechline-icon-v2.png';
                                             }}
                                         />
                                     </div>

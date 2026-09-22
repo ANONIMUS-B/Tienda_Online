@@ -75,7 +75,7 @@ export default function Login({
                                         tabIndex={1}
                                         autoComplete="email"
                                         placeholder="tu@correo.com"
-                                        className="h-11 rounded-xl border-white/14 bg-white/5 px-4 text-sm text-white placeholder:text-white/35 focus:border-lime-400/80 focus:bg-black/40 focus:ring-2 focus:ring-lime-400/30"
+                                        className="placeholder:text-brand-support h-11 rounded-xl border-white/14 bg-white/5 px-4 text-sm text-white focus:border-lime-400/80 focus:bg-black/40 focus:ring-2 focus:ring-lime-400/30"
                                     />
                                 </div>
                                 <InputError
@@ -111,7 +111,7 @@ export default function Login({
                                     tabIndex={2}
                                     autoComplete="current-password"
                                     placeholder="••••••••••••"
-                                    className="h-11 rounded-xl border-white/14 bg-white/5 px-4 text-sm text-white placeholder:text-white/35 focus:border-lime-400/80 focus:bg-black/40 focus:ring-2 focus:ring-lime-400/30"
+                                    className="placeholder:text-brand-support h-11 rounded-xl border-white/14 bg-white/5 px-4 text-sm text-white focus:border-lime-400/80 focus:bg-black/40 focus:ring-2 focus:ring-lime-400/30"
                                 />
                                 <InputError
                                     message={errors.password}
@@ -138,7 +138,7 @@ export default function Login({
                             {/* Submit CTA Button */}
                             <Button
                                 type="submit"
-                                className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-lime-400 text-sm font-extrabold text-black shadow-[0_0_25px_rgb(0_247_255/.35)] transition-all hover:scale-[1.01] hover:bg-lime-300 hover:shadow-[0_0_35px_rgb(0_247_255/.55)] active:scale-[0.99] disabled:opacity-50"
+                                className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-lime-400 text-sm font-extrabold text-black transition-colors hover:bg-lime-300 disabled:opacity-50"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
@@ -178,6 +178,5 @@ export default function Login({
 }
 
 Login.layout = {
-    title: '¡Hola de nuevo!',
-    description: 'Ingresa tus credenciales para acceder a tu panel y servicios',
+    title: 'Iniciar sesión',
 };

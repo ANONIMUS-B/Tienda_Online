@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Order;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -23,9 +24,11 @@ class UpdateOrderRequest extends FormRequest
      */
     public function rules(): array
     {
+        $order = $this->route('order');
+
         return [
             'status' => ['required', Rule::in(['pending', 'confirmed', 'preparing', 'shipped', 'delivered', 'cancelled'])],
-            'payment_status' => ['required', Rule::in(['pending', 'paid', 'failed', 'refunded'])],
+            'payment_status' => [$order instanceof Order && $order->payment_method === 'gateway' ? 'sometimes' : 'required', Rule::in(['pending', 'paid', 'failed', 'refunded'])],
             'receipt_type' => ['sometimes', Rule::in(['boleta', 'factura', 'sales_note'])],
             'receipt_status' => ['sometimes', Rule::in(['pending', 'issued', 'accepted', 'sent', 'rejected'])],
             'receipt_series' => ['nullable', 'string', 'max:10'],

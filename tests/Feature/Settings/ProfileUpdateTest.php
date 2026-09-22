@@ -1,6 +1,32 @@
 <?php
 
+use App\Enums\SystemRole;
 use App\Models\User;
+
+test('customers can edit their own phone name and email without changing privileges', function () {
+    $user = User::factory()->create(['role' => SystemRole::User]);
+    $other = User::factory()->create();
+    $this->actingAs($user)->patch(route('profile.update'), [
+        'name' => 'Cliente actualizado', 'email' => 'cliente@example.com', 'phone' => '+51 999 888 777',
+        'id' => $other->id, 'role' => 'admin',
+    ])->assertSessionHasNoErrors()->assertRedirect(route('profile.edit'));
+    expect($user->fresh()->phone)->toBe('+51 999 888 777');
+    expect($user->fresh()->role)->toBe(SystemRole::User);
+    expect($other->fresh()->email)->toBe($other->email);
+    $this->get(route('profile.edit'))->assertInertia(fn ($page) => $page->where('auth.user.phone', '+51 999 888 777')->where('auth.user.email', 'cliente@example.com'));
+});
+
+test('invalid phone values do not change the profile', function (string $phone) {
+    $user = User::factory()->create(['phone' => '999888777']);
+    $this->actingAs($user)->patch(route('profile.update'), ['name' => $user->name, 'email' => $user->email, 'phone' => $phone])->assertSessionHasErrors('phone');
+    expect($user->fresh()->phone)->toBe('999888777');
+})->with(['abc', '123', '-------', str_repeat('9', 31)]);
+
+test('customers can clear their optional phone', function () {
+    $user = User::factory()->create(['phone' => '999888777']);
+    $this->actingAs($user)->patch(route('profile.update'), ['name' => $user->name, 'email' => $user->email, 'phone' => ''])->assertSessionHasNoErrors();
+    expect($user->fresh()->phone)->toBeNull();
+});
 
 test('profile page is displayed', function () {
     $user = User::factory()->create();

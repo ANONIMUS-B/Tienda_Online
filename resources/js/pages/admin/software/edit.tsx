@@ -10,12 +10,15 @@ export default function Edit({
 }: {
     program: SoftwareProgram;
     currentTeam: { slug: string };
-    catalogType: 'software' | 'programs';
+    catalogType: 'software' | 'programs' | 'apps';
 }) {
     return (
         <>
             <Head title={program.name} />
-            <AdminFormModal title={`Editar ${program.name}`} backHref={`${index(currentTeam.slug).url}?catalog=${catalogType}`}>
+            <AdminFormModal
+                title={`Editar ${program.name}`}
+                backHref={`${index(currentTeam.slug).url}?catalog=${catalogType}`}
+            >
                 <h1 className="mb-6 text-2xl font-semibold">
                     Editar {program.name}
                 </h1>

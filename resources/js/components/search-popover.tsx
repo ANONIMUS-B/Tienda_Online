@@ -55,7 +55,7 @@ export default function SearchPopover({
                                 Buscar en JBTECHLINE
                             </p>
                             <p className="text-xs text-white/45">
-                                Productos, software, programas y servicios
+                                Productos, software, cracks y servicios
                             </p>
                         </div>
                         <button
@@ -86,7 +86,7 @@ export default function SearchPopover({
                             <option value="all">Todo</option>
                             <option value="products">Productos</option>
                             <option value="software">Software propio</option>
-                            <option value="programs">Programas</option>
+                            <option value="programs">Cracks</option>
                             <option value="services">Servicios</option>
                         </select>
                         <button className="rounded-xl bg-lime-400 px-5 py-3 text-sm font-black text-black">

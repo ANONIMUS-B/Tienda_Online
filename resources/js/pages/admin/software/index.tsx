@@ -16,26 +16,49 @@ export default function Index({
 }: {
     programs: ProgramPaginator;
     currentTeam: { slug: string };
-    catalogType: 'software' | 'programs';
+    catalogType: 'software' | 'programs' | 'apps';
 }) {
     const isSoftware = catalogType === 'software';
+    const isApps = catalogType === 'apps';
     return (
         <>
-            <Head title={isSoftware ? 'Software' : 'Programas'} />
+            <Head
+                title={
+                    isApps
+                        ? 'Aplicaciones'
+                        : isSoftware
+                          ? 'Software'
+                          : 'Programas'
+                }
+            />
             <div className="flex flex-col gap-6 p-4 md:p-8">
                 <div className="flex justify-between">
                     <div>
                         <h1 className="text-2xl font-semibold">
-                            {isSoftware ? 'Software' : 'Programas'}
+                            {isApps
+                                ? 'Aplicaciones propias'
+                                : isSoftware
+                                  ? 'Software'
+                                  : 'Programas'}
                         </h1>
                         <p className="text-muted-foreground">
-                            {isSoftware ? 'Soluciones propias y cotizaciones.' : 'Aplicaciones y archivos descargables.'}
+                            {isApps
+                                ? 'Aplicaciones desarrolladas y publicadas por la empresa.'
+                                : isSoftware
+                                  ? 'Solicitudes de desarrollo y cotizaciones.'
+                                  : 'Programas y archivos descargables.'}
                         </p>
                     </div>
                     <Button asChild>
-                        <Link href={`${create(currentTeam.slug).url}?catalog=${catalogType}`}>
+                        <Link
+                            href={`${create(currentTeam.slug).url}?catalog=${catalogType}`}
+                        >
                             <Plus />
-                            {isSoftware ? 'Nuevo software' : 'Nuevo programa'}
+                            {isApps
+                                ? 'Nueva aplicación'
+                                : isSoftware
+                                  ? 'Nuevo software'
+                                  : 'Nuevo programa'}
                         </Link>
                     </Button>
                 </div>

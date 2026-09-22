@@ -34,7 +34,7 @@ export default function Profile({
                 <Heading
                     variant="small"
                     title="Perfil"
-                    description="Actualiza tu nombre y correo electrónico"
+                    description="Actualiza tu nombre, correo electrónico y celular"
                 />
 
                 <Form
@@ -66,7 +66,9 @@ export default function Profile({
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Correo electrónico</Label>
+                                <Label htmlFor="email">
+                                    Correo electrónico
+                                </Label>
 
                                 <Input
                                     id="email"
@@ -85,24 +87,43 @@ export default function Profile({
                                 />
                             </div>
 
+                            <div className="grid gap-2">
+                                <Label htmlFor="phone">
+                                    Celular / WhatsApp
+                                </Label>
+                                <Input
+                                    id="phone"
+                                    type="tel"
+                                    name="phone"
+                                    autoComplete="tel"
+                                    defaultValue={auth.user.phone ?? ''}
+                                    maxLength={30}
+                                    placeholder="Ejemplo: +51 999 888 777"
+                                />
+                                <InputError message={errors.phone} />
+                            </div>
+
                             {mustVerifyEmail &&
                                 auth.user.email_verified_at === null && (
                                     <div>
                                         <p className="text-muted-foreground -mt-4 text-sm">
-                                            Tu correo electrónico todavía no está verificado.{' '}
+                                            Tu correo electrónico todavía no
+                                            está verificado.{' '}
                                             <Link
                                                 href={send()}
                                                 as="button"
                                                 className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
                                             >
-                                                Haz clic aquí para reenviar el correo de verificación.
+                                                Haz clic aquí para reenviar el
+                                                correo de verificación.
                                             </Link>
                                         </p>
 
                                         {status ===
                                             'verification-link-sent' && (
                                             <div className="mt-2 text-sm font-medium text-green-600">
-                                                Enviamos un nuevo enlace de verificación a tu correo.
+                                                Enviamos un nuevo enlace de
+                                                verificación a tu correo.
                                             </div>
                                         )}
                                     </div>

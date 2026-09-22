@@ -3,7 +3,7 @@ import { Code2, Download, FileText, Search, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import ProgramDetailModal from '@/components/program-detail-modal';
 import SoftwareQuoteModal from '@/components/software-quote-modal';
-import { software } from '@/routes';
+import { apps, software } from '@/routes';
 import { index as programsIndex } from '@/routes/programs';
 import type { SoftwareProgram } from '@/types/software';
 export default function SoftwareIndex({
@@ -14,7 +14,7 @@ export default function SoftwareIndex({
     filters,
     membership,
 }: {
-    catalogType: 'software' | 'programs';
+    catalogType: 'software' | 'programs' | 'apps';
     programs: {
         data: SoftwareProgram[];
         links: { url: string | null; label: string; active: boolean }[];
@@ -35,6 +35,7 @@ export default function SoftwareIndex({
     };
 }) {
     const isPrograms = catalogType === 'programs';
+    const isApps = catalogType === 'apps';
     const { auth } = usePage().props;
     const [selectedProgram, setSelectedProgram] =
         useState<SoftwareProgram | null>(null);
@@ -53,16 +54,18 @@ export default function SoftwareIndex({
     return (
         <div className="bg-brand-background min-h-screen text-white">
             <Head
-                title={`${isPrograms ? 'Programas' : 'Software'} | JBTECHLINE`}
+                title={`${isPrograms ? 'Cracks' : isApps ? 'Apps JBTECHLINE' : 'Software'} | JBTECHLINE`}
             />
             <main className="mx-auto max-w-7xl px-5 pt-24 pb-14 sm:pt-28">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <h1 className="text-3xl font-black sm:text-4xl">
                         {isPrograms
-                            ? 'Programas disponibles'
-                            : 'Software disponible'}
+                            ? 'Cracks disponibles'
+                            : isApps
+                              ? 'Aplicaciones desarrolladas por JBTECHLINE'
+                              : 'Software disponible'}
                     </h1>
-                    {!isPrograms && (
+                    {!isPrograms && !isApps && (
                         <button
                             type="button"
                             onClick={() => setQuoteOpen(true)}
@@ -73,7 +76,14 @@ export default function SoftwareIndex({
                     )}
                 </div>
                 <form
-                    action={(isPrograms ? programsIndex() : software()).url}
+                    action={
+                        (isPrograms
+                            ? programsIndex()
+                            : isApps
+                              ? apps()
+                              : software()
+                        ).url
+                    }
                     method="get"
                     className="mt-7 grid gap-3 rounded-3xl border border-white/10 bg-white/[.04] p-4 md:grid-cols-[1fr_220px_220px_auto]"
                 >
@@ -82,7 +92,9 @@ export default function SoftwareIndex({
                         <input
                             name="q"
                             defaultValue={filters.q}
-                            placeholder="Buscar programa"
+                            placeholder={
+                                isApps ? 'Buscar aplicación' : 'Buscar programa'
+                            }
                             className="h-11 w-full rounded-xl border border-white/10 bg-black/30 pr-4 pl-11"
                         />
                     </div>
@@ -155,7 +167,9 @@ export default function SoftwareIndex({
                                             ? 'Gratis'
                                             : isPrograms
                                               ? 'Incluido con membresía'
-                                              : 'Cotizar'}
+                                              : isApps
+                                                ? 'Aplicación JBTECHLINE'
+                                                : 'Cotizar'}
                                     </b>
                                     <Download className="size-5 text-lime-400" />
                                 </div>
@@ -165,7 +179,9 @@ export default function SoftwareIndex({
                 </div>
                 {programs.data.length === 0 && (
                     <div className="mt-8 rounded-2xl border border-cyan-100 bg-cyan-50/50 p-10 text-center text-slate-500">
-                        No hay software publicado con estos filtros.
+                        {isApps
+                            ? 'Próximamente publicaremos aquí nuestras aplicaciones.'
+                            : 'No hay software publicado con estos filtros.'}
                     </div>
                 )}
                 <nav

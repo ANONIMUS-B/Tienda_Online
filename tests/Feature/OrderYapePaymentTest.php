@@ -9,7 +9,22 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 
-test('customer can create an order with yape payment reference and receipt image', function () {
+test('legacy yape orders no longer accept receipt images', function () {
+    $order = Order::factory()->create(['payment_method' => 'yape']);
+    $this->post(URL::signedRoute('orders.submit-payment', ['number' => $order->number]), [
+        'payment_reference' => '12345', 'payment_receipt' => UploadedFile::fake()->image('yape.jpg'),
+    ])->assertSessionHasErrors('payment_receipt');
+    expect($order->fresh()->payment_receipt_path)->toBeNull();
+    $this->assertDatabaseCount('media_files', 0);
+});
+
+test('legacy yape references remain available for already registered payments', function () {
+    $order = Order::factory()->create(['payment_method' => 'yape']);
+    $this->post(URL::signedRoute('orders.submit-payment', ['number' => $order->number]), ['payment_reference' => '12345'])->assertSessionHasNoErrors();
+    expect($order->fresh()->payment_reference)->toBe('12345');
+});
+
+test('customer can create a bank transfer order with reference and receipt image', function () {
     $product = Product::factory()->create(['stock' => 5, 'price' => 100]);
     $user = User::factory()->create();
 
@@ -24,7 +39,7 @@ test('customer can create an order with yape payment reference and receipt image
         'province' => 'Lima',
         'department' => 'Lima',
         'shipping_method' => 'delivery',
-        'payment_method' => 'yape',
+        'payment_method' => 'bank_transfer',
         'payment_reference' => '839201',
         'payment_receipt' => $receipt,
     ];
@@ -43,9 +58,9 @@ test('customer can create an order with yape payment reference and receipt image
     expect(MediaFile::query()->whereKey($mediaId)->exists())->toBeTrue();
 });
 
-test('customer can submit payment proof after order creation via signed link', function () {
+test('customer can submit bank transfer proof after order creation via signed link', function () {
     $order = Order::factory()->create([
-        'payment_method' => 'yape',
+        'payment_method' => 'bank_transfer',
         'payment_status' => 'pending',
         'payment_reference' => null,
         'payment_receipt_path' => null,

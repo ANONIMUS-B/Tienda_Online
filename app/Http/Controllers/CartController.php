@@ -47,10 +47,14 @@ class CartController extends Controller
     public function store(StoreCartItemRequest $request, ShoppingCart $cart): RedirectResponse
     {
         $product = Product::query()->active()->findOrFail($request->integer('product_id'));
-        if ($product->stock < $request->integer('quantity')) {
+        $currentQuantity = (int) ($cart->quantities()[$product->id] ?? 0);
+        $requestedQuantity = $request->integer('quantity');
+
+        if (($currentQuantity + $requestedQuantity) > $product->stock) {
             return back()->withErrors(['quantity' => 'No hay stock suficiente para esa cantidad.']);
         }
-        $cart->put($product, $request->integer('quantity'));
+
+        $cart->put($product, $requestedQuantity);
 
         return back()->with('success', 'Producto agregado al carrito.');
     }

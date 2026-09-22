@@ -23,24 +23,31 @@ class ProductCatalogController extends Controller
             'max_price' => ['nullable', 'numeric', 'gte:min_price'],
         ]);
 
-        $cacheKey = 'public.products.safe.'.sha1($request->getQueryString() ?? 'index');
-        $catalog = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($filters, $request): array {
-            $products = Product::query()->active()->with(['category:id,name,slug', 'brand:id,name,slug', 'images'])
-                ->when($request->string('q')->isNotEmpty(), fn ($query) => $query->where(fn ($nested) => $nested->where('name', 'like', '%'.$request->string('q').'%')->orWhere('sku', 'like', '%'.$request->string('q').'%')))
-                ->when($request->filled('category'), fn ($query) => $query->whereHas('category', fn ($category) => $category->where('slug', $request->string('category'))))
-                ->when($request->filled('brand'), fn ($query) => $query->whereHas('brand', fn ($brand) => $brand->where('slug', $request->string('brand'))))
-                ->when(isset($filters['min_price']), fn ($query) => $query->whereRaw('COALESCE(promotional_price, price) >= ?', [$filters['min_price']]))
-                ->when(isset($filters['max_price']), fn ($query) => $query->whereRaw('COALESCE(promotional_price, price) <= ?', [$filters['max_price']]))
-                ->when($request->boolean('available'), fn ($query) => $query->where('stock', '>', 0))->latest()->paginate(12)->withQueryString();
+        $products = Product::query()->active()->with(['category:id,name,slug', 'brand:id,name,slug', 'images'])
+            ->when($request->string('q')->isNotEmpty(), fn ($query) => $query->where(fn ($nested) => $nested->where('name', 'like', '%'.$request->string('q').'%')->orWhere('sku', 'like', '%'.$request->string('q').'%')))
+            ->when($request->filled('category'), fn ($query) => $query->whereHas('category', fn ($category) => $category->where('slug', $request->string('category'))))
+            ->when($request->filled('brand'), fn ($query) => $query->whereHas('brand', fn ($brand) => $brand->where('slug', $request->string('brand'))))
+            ->when(isset($filters['min_price']), fn ($query) => $query->whereRaw('CAST(COALESCE(promotional_price, price) AS DECIMAL(12, 2)) >= CAST(? AS DECIMAL(12, 2))', [$filters['min_price']]))
+            ->when(isset($filters['max_price']), fn ($query) => $query->whereRaw('CAST(COALESCE(promotional_price, price) AS DECIMAL(12, 2)) <= CAST(? AS DECIMAL(12, 2))', [$filters['max_price']]))
+            ->when($request->boolean('available'), fn ($query) => $query->where('stock', '>', 0))
+            ->latest()
+            ->paginate(12)
+            ->withQueryString();
 
-            return [
-                'products' => $products->toArray(),
-                'categories' => Category::query()->active()->orderBy('name')->get(['name', 'slug'])->toArray(),
-                'brands' => Brand::query()->active()->orderBy('name')->get(['name', 'slug'])->toArray(),
-            ];
-        });
-
-        return Inertia::render('products/index', [...$catalog, 'filters' => $filters]);
+        return Inertia::render('products/index', [
+            'products' => $products,
+            'categories' => Cache::remember(
+                'public.products.categories',
+                now()->addMinutes(5),
+                fn () => Category::query()->active()->orderBy('name')->get(['name', 'slug']),
+            ),
+            'brands' => Cache::remember(
+                'public.products.brands',
+                now()->addMinutes(5),
+                fn () => Brand::query()->active()->orderBy('name')->get(['name', 'slug']),
+            ),
+            'filters' => $filters,
+        ]);
     }
 
     public function show(Product $product): Response
