@@ -105,7 +105,7 @@ class HandleInertiaRequests extends Middleware
                         $product = $item['product'];
                         $primaryImage = $product->images->firstWhere('is_primary', true) ?? $product->images->first();
                         $imagePath = $primaryImage?->path;
-                        $imageUrl = '/images/brand/jbtechline-icon-v2.png';
+                        $imageUrl = '/images/brand/jbtechline-icon-v3.png';
                         if ($imagePath) {
                             $imageUrl = (str_starts_with($imagePath, 'http') || str_starts_with($imagePath, '/'))
                                 ? $imagePath

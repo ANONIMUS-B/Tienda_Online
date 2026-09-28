@@ -33,7 +33,7 @@
             }
         </style>
 
-        <link rel="icon" href="/images/brand/jbtechline-icon-v2.png" type="image/png">
+        <link rel="icon" href="/images/brand/jbtechline-icon-v3.png" type="image/png">
         <link rel="apple-touch-icon" href="/images/brand/jbtechline-icon-v2.png">
 
         @fonts

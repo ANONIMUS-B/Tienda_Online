@@ -6,7 +6,7 @@ export default function AppLogoIcon(
     return (
         <img
             {...props}
-            src="/images/brand/jbtechline-icon-v2.png"
+            src="/images/brand/jbtechline-icon-v3.png"
             alt="JBTECHLINE"
             draggable={false}
         />

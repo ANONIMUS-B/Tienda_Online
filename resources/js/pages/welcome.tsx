@@ -128,7 +128,7 @@ export default function Welcome({
                             aria-label="JBTECHLINE - Inicio"
                         >
                             <img
-                                src="/images/brand/jbtechline-icon-v2.png"
+                                src="/images/brand/jbtechline-icon-v3.png"
                                 alt="JBTECHLINE"
                                 className="h-16 w-20 object-contain"
                             />
