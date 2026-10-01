@@ -9,6 +9,7 @@ use App\Models\Brand;
 use App\Models\Team;
 use App\Services\ImageUploader;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -21,10 +22,19 @@ class BrandController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $q = $request->string('q')->trim()->toString();
+
         return Inertia::render('admin/brands/index', [
-            'brands' => Brand::query()->orderBy('sort_order')->orderBy('name')->get(),
+            'brands' => Brand::query()
+                ->when($q !== '', fn ($query) => $query->where(fn ($sub) => $sub->where('name', 'like', "%{$q}%")->orWhere('slug', 'like', "%{$q}%")->orWhere('website_url', 'like', "%{$q}%")))
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->get(),
+            'filters' => [
+                'q' => $q,
+            ],
         ]);
     }
 

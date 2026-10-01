@@ -51,6 +51,37 @@ test('product image uploads reject unsafe formats', function () {
     $this->actingAs($user)->post(route('admin.products.store', $user->currentTeam), $payload)->assertSessionHasErrors('primary_image');
 });
 
+test('administrators can create product with automatic slug and sku when omitted', function () {
+    $user = User::factory()->create();
+    $category = Category::factory()->create();
+    $brand = Brand::factory()->create(['name' => 'Autodesk']);
+
+    $payload = productPayload($category, $brand);
+    unset($payload['slug'], $payload['sku']);
+    $payload['name'] = 'Autodesk Revit 2026';
+
+    $this->actingAs($user)->post(route('admin.products.store', $user->currentTeam), $payload)->assertRedirect();
+    $product = Product::query()->where('name', 'Autodesk Revit 2026')->firstOrFail();
+    expect($product->slug)->toBe('autodesk-revit-2026');
+    expect($product->sku)->toStartWith('JB-AUT-');
+});
+
+test('creating product with existing slug generates unique incremental slug', function () {
+    $user = User::factory()->create();
+    $category = Category::factory()->create();
+
+    Product::factory()->create(['slug' => 'revit-pro', 'name' => 'Revit Pro']);
+
+    $payload = productPayload($category);
+    $payload['slug'] = 'revit-pro';
+    $payload['sku'] = '';
+    $payload['name'] = 'Revit Pro';
+
+    $this->actingAs($user)->post(route('admin.products.store', $user->currentTeam), $payload)->assertRedirect();
+    $secondProduct = Product::query()->where('slug', 'revit-pro-1')->first();
+    expect($secondProduct)->not->toBeNull();
+});
+
 test('regular members cannot manage products', function () {
     $owner = User::factory()->create();
     $member = User::factory()->create();
@@ -97,6 +128,56 @@ test('public catalog rejects an inverted price range', function () {
 test('inactive products are hidden from their public detail page', function () {
     $product = Product::factory()->create(['is_active' => false]);
     $this->get(route('products.show', $product))->assertNotFound();
+});
+
+test('administrators can download product import template', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get(route('admin.products.template', $user->currentTeam));
+
+    $response->assertSuccessful();
+    $response->assertHeader('content-type', 'text/csv; charset=UTF-8');
+});
+
+test('administrators can export all products inventory to CSV', function () {
+    $user = User::factory()->create();
+    Product::factory()->create(['name' => 'AutoCAD 2026', 'sku' => 'AUT-ACAD-2026']);
+
+    $response = $this->actingAs($user)->get(route('admin.products.export', $user->currentTeam));
+
+    $response->assertSuccessful();
+    $response->assertHeader('content-type', 'text/csv; charset=UTF-8');
+    $content = $response->streamedContent();
+    expect($content)->toContain('AUT-ACAD-2026')
+        ->and($content)->toContain('AutoCAD 2026');
+});
+
+test('administrators can import products via CSV', function () {
+    $user = User::factory()->create();
+
+    $csvContent = "\xEF\xBB\xBFnombre,sku,categoria,marca,tipo,precio,precio_oferta,stock,stock_minimo,descripcion_corta,descripcion,especificaciones,beneficios,garantia,envio,metodos_pago,activo,destacado,mas_vendido,nuevo\n"
+        ."AutoCAD 2026 Test,AUT-TEST-001,Ingeniería,Autodesk,license,120.00,99.00,20,5,Software CAD,Descripción completa,\"RAM: 16 GB | SO: Windows 11\",\"Soporte oficial | Licencia legal\",1 año,Digital,Yape / Tarjeta,1,1,0,1\n";
+
+    $file = UploadedFile::fake()->createWithContent('productos.csv', $csvContent);
+
+    $response = $this->actingAs($user)->post(route('admin.products.import', $user->currentTeam), [
+        'file' => $file,
+    ]);
+
+    $response->assertRedirect();
+    $this->assertDatabaseHas('products', [
+        'sku' => 'AUT-TEST-001',
+        'name' => 'AutoCAD 2026 Test',
+        'price' => '120.00',
+        'promotional_price' => '99.00',
+        'stock' => 20,
+    ]);
+
+    $product = Product::query()->where('sku', 'AUT-TEST-001')->firstOrFail();
+    expect($product->specifications)->toHaveKey('RAM', '16 GB')
+        ->and($product->specifications)->toHaveKey('SO', 'Windows 11')
+        ->and($product->benefits)->toContain('Soporte oficial')
+        ->and($product->benefits)->toContain('Licencia legal');
 });
 
 /** @return array<string, mixed> */

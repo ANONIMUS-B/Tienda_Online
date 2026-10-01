@@ -108,6 +108,9 @@ Route::prefix('{current_team}')
                 ->parameters(['marcas' => 'brand'])
                 ->except('show')
                 ->names('admin.brands');
+            Route::get('administracion/productos/plantilla-importacion', [ProductController::class, 'downloadTemplate'])->name('admin.products.template');
+            Route::get('administracion/productos/exportar', [ProductController::class, 'export'])->name('admin.products.export');
+            Route::post('administracion/productos/importar', [ProductController::class, 'import'])->name('admin.products.import');
             Route::delete('administracion/productos/{product}/imagenes/{image}', [ProductController::class, 'destroyImage'])->name('admin.products.images.destroy');
             Route::resource('administracion/productos', ProductController::class)
                 ->parameters(['productos' => 'product'])

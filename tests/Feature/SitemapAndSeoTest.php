@@ -27,4 +27,3 @@ test('homepage includes seo meta tags and structured schema', function () {
     $response->assertSee('property="og:title"', false);
     $response->assertSee('application/ld+json', false);
 });
-

@@ -10,6 +10,7 @@ use App\Models\Team;
 use App\Services\ImageUploader;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -22,15 +23,21 @@ class CategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $q = $request->string('q')->trim()->toString();
+
         return Inertia::render('admin/categories/index', [
             'categories' => Category::query()
                 ->with('parent:id,name')
                 ->withCount('children')
+                ->when($q !== '', fn ($query) => $query->where(fn ($sub) => $sub->where('name', 'like', "%{$q}%")->orWhere('slug', 'like', "%{$q}%")->orWhere('description', 'like', "%{$q}%")))
                 ->orderBy('sort_order')
                 ->orderBy('name')
                 ->get(),
+            'filters' => [
+                'q' => $q,
+            ],
         ]);
     }
 

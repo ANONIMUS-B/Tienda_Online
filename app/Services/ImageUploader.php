@@ -22,7 +22,37 @@ class ImageUploader
         if ($contents === false) {
             return $currentPath;
         }
-        MediaFile::query()->create(['id' => $id, 'mime_type' => $image->getMimeType() ?: 'application/octet-stream', 'size' => $image->getSize(), 'original_name' => $image->getClientOriginalName(), 'contents' => base64_encode($contents)]);
+
+        $mimeType = $image->getMimeType() ?: 'application/octet-stream';
+        $originalName = $image->getClientOriginalName();
+
+        if (function_exists('imagewebp') && in_array($mimeType, ['image/jpeg', 'image/png'], true)) {
+            $gdImage = @imagecreatefromstring($contents);
+            if ($gdImage !== false) {
+                imagepalettetotruecolor($gdImage);
+                imagealphablending($gdImage, true);
+                imagesavealpha($gdImage, true);
+
+                ob_start();
+                imagewebp($gdImage, null, 85);
+                $webpContents = ob_get_clean();
+                imagedestroy($gdImage);
+
+                if ($webpContents !== false && strlen($webpContents) > 0) {
+                    $contents = $webpContents;
+                    $mimeType = 'image/webp';
+                    $originalName = pathinfo($originalName, PATHINFO_FILENAME).'.webp';
+                }
+            }
+        }
+
+        MediaFile::query()->create([
+            'id' => $id,
+            'mime_type' => $mimeType,
+            'size' => strlen($contents),
+            'original_name' => $originalName,
+            'contents' => base64_encode($contents),
+        ]);
 
         return route('media.show', $id, absolute: false);
     }

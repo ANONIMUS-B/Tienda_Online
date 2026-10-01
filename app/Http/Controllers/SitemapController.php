@@ -104,4 +104,3 @@ class SitemapController extends Controller
         ]);
     }
 }
-
