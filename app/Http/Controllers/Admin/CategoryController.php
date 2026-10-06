@@ -94,7 +94,7 @@ class CategoryController extends Controller
     public function destroy(Team $currentTeam, Category $category): RedirectResponse
     {
         $this->images->delete($category->image_path);
-        $category->delete();
+        $category->forceDelete();
         Cache::flush();
 
         return back();

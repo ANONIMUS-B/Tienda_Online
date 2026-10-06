@@ -122,7 +122,7 @@ class ProductController extends Controller
     public function destroy(Team $currentTeam, Product $product): RedirectResponse
     {
         $product->load('images')->images->each(fn ($image) => $this->images->delete($image->path));
-        $product->delete();
+        $product->forceDelete();
         Cache::flush();
 
         return back();

@@ -86,7 +86,7 @@ class BrandController extends Controller
     public function destroy(Team $currentTeam, Brand $brand): RedirectResponse
     {
         $this->images->delete($brand->logo_path);
-        $brand->delete();
+        $brand->forceDelete();
         Cache::flush();
 
         return back();

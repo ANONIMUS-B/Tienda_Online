@@ -68,7 +68,7 @@ class Product extends Model
         $slug = $baseSlug;
         $counter = 1;
 
-        while (static::query()->where('slug', $slug)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists()) {
+        while (static::withTrashed()->where('slug', $slug)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists()) {
             $slug = "{$baseSlug}-{$counter}";
             $counter++;
         }
@@ -123,7 +123,7 @@ class Product extends Model
         do {
             $random = strtoupper(Str::random(4));
             $sku = "{$prefix}-{$random}";
-        } while (static::query()->where('sku', $sku)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists());
+        } while (static::withTrashed()->where('sku', $sku)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists());
 
         return $sku;
     }

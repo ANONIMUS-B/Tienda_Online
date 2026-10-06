@@ -38,7 +38,7 @@ class StoreProductRequest extends FormRequest
             );
         } elseif ($sku !== '') {
             $sku = strtoupper($sku);
-            if (Product::query()->where('sku', $sku)->exists()) {
+            if (Product::withTrashed()->where('sku', $sku)->exists()) {
                 $sku = Product::generateUniqueSku(
                     $name ?: $sku,
                     $this->filled('brand_id') ? (int) $this->input('brand_id') : null,
