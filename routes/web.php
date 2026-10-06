@@ -36,6 +36,7 @@ use App\Http\Controllers\SoftwareMembershipController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use App\Http\Middleware\EnsureTeamMembership;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/', HomepageController::class)->name('home');
@@ -154,3 +155,9 @@ Route::middleware(['auth'])->group(function () {
 });
 
 require __DIR__.'/settings.php';
+
+Route::fallback(function () {
+    return Inertia::render('errors/404')
+        ->toResponse(request())
+        ->setStatusCode(404);
+});
